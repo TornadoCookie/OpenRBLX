@@ -7,7 +7,7 @@
 int main()
 {
     DataModel *datamodel = DataModel_new();
-    Model *mdl = LoadModelRBXMX("res/770 Ball 4x4x4.rbxmx");
+    Model *mdl = LoadModelRBXMX("tests/res/770 Ball 4x4x4.rbxmx");
 
     Instance_SetParent(mdl, datamodel);
     

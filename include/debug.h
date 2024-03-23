@@ -13,7 +13,7 @@ const char *debugstr_vector3(Vector3 v)
 void dbg_printf(const char *type, const char *func, const char *restrict format, ...)
 {
     static char buf[1024];
-    snprintf(buf, 1024, "%s:%s: %s", type, func, format);
+    snprintf(buf, 1024, "%s:%s %s", type, func, format);
     
     va_list args;
     va_start(args, format);

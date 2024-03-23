@@ -93,6 +93,7 @@ static void xmlserialize_BasePart(BasePart *basepart, XMLSerializeInstance *inst
     xmlserialize_atomic(float, basepart, TopParamB);
     xmlserialize_atomic(token, basepart, TopSurface);
     xmlserialize_atomic(token, basepart, TopSurfaceInput);
+    xmlserialize_atomic(float, basepart, Transparency);
     xmlserialize_atomic(Vector3, basepart, Velocity);
     xmlserialize_atomic(Vector3, basepart, size);
 }
@@ -180,17 +181,19 @@ static void load_model_part_xml(Model *mdl, struct xml_node *node)
         printf("error: no serializer for classname %s.", className);
     }
 
-    for (int i = 0; i < xml_node_children(node); i++)
+    for (int i = 0; i < xml_node_children(propertyNode); i++)
     {
-        struct xml_node *child = xml_node_child(node, i);
+        struct xml_node *child = xml_node_child(propertyNode, i);
         char *propName = xml_easy_string(xml_node_attribute_content(child, 0));
         char *prop = xml_easy_string(xml_node_content(child));
+        bool done = false;
         for (int j = 0; j < inst.serializationCount; j++)
         {
-            if (!strcmp(inst.serializations[i].name, propName))
+            if (!strcmp(inst.serializations[j].name, propName))
             {
-                void *val = inst.serializations[i].val;
-                switch (inst.serializations[i].type)
+                done = true;
+                void *val = inst.serializations[j].val;
+                switch (inst.serializations[j].type)
                 {
                     case Serialize_bool:
                     {
@@ -219,6 +222,10 @@ static void load_model_part_xml(Model *mdl, struct xml_node *node)
                 }
                 break;
             }
+        }
+        if (!done)
+        {
+            printf("warning: property %s not serialized. value: %s.\n", propName, prop);
         }
         free(propName);
         free(prop);
