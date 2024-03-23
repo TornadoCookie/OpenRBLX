@@ -5,8 +5,12 @@ ServiceProvider *ServiceProvider_new(const char *className, Instance *parent)
 {
     ServiceProvider *newInst = Instance_new(className, parent);
 
+    newInst->instance.DataCost = sizeof(ServiceProvider);
+
     newInst->ServiceAdded = newInst->instance.ChildAdded;
     newInst->ServiceRemoving = newInst->instance.ChildRemoved;
+
+    return newInst;
 }
 
 Instance *ServiceProvider_GetService(ServiceProvider *this, const char *className)

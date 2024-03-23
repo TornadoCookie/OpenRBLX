@@ -20,6 +20,10 @@ typedef struct DataModel {
     int Genre;
     const char *JobId;
     Workspace *Workspace;
+
+    RBXScriptSignal *AllowedGearTypeChanged;
+    RBXScriptSignal *GraphicsQualityChangeRequest;
+    RBXScriptSignal *ItemChanged;
 } DataModel;
 
 DataModel *DataModel_new(void);
