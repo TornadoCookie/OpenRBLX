@@ -15,6 +15,8 @@ DataModel *DataModel_new(void)
 
     newInst->JobId = "OpenRBLX";
 
+    newInst->Workspace = Workspace_new(newInst);
+
     return newInst;
 }
 
