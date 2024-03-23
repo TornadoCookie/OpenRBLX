@@ -7,4 +7,6 @@ typedef struct Model {
     PVInstance pvinstance;
 } Model;
 
+Model *Model_new(const char *className, Instance *parent);
+
 #endif
