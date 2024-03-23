@@ -1,11 +1,10 @@
 #ifndef _WORKSPACE_
 #define _WORKSPACE_
 
-#include "worldroot.h"
-#include "instance.h"
+#include "rootinstance.h"
 
 typedef struct Workspace {
-    WorldRoot worldroot;
+    RootInstance rootinstance;
 
     double DistributedGameTime;
 } Workspace;

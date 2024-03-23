@@ -4,9 +4,9 @@
 
 Workspace *Workspace_new(Instance *parent)
 {
-    Workspace *newInst = WorldRoot_new("Workspace", parent);
+    Workspace *newInst = RootInstance_new("Workspace", parent);
 
-    newInst->worldroot.model.pvinstance.instance.DataCost = sizeof(Workspace);
+    newInst->rootinstance.model.pvinstance.instance.DataCost = sizeof(Workspace);
 
     return newInst;
 }
