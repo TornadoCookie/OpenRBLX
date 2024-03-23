@@ -1,8 +1,9 @@
 #ifndef _CFRAME_
 #define _CFRAME_
 
-typedef struct CFrame {
+#include <raymath.h>
 
-} CFrame;
+typedef Matrix CFrame;
+typedef CFrame CoordinateFrame;
 
 #endif
