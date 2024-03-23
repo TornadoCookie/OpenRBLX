@@ -20,6 +20,9 @@ Instance *Instance_new(const char *className, Instance *parent)
     newInst->DescendantAdded = RBXScriptSignal_new();
     newInst->DescendantRemoving = RBXScriptSignal_new();
 
+    newInst->childCount = 0;
+    newInst->children = NULL;
+
     if (parent) Instance_SetParent(newInst, parent);
 
     return newInst;

@@ -1,0 +1,5 @@
+valgrind.info
+perf.data
+perf.data.old
+
+*-debug

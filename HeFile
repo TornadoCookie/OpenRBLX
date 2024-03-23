@@ -7,7 +7,7 @@ ExtraCFlag -Wno-incompatible-pointer-types
 
 Dependency xml
 
-Program tests/test_rbxmx
+Program test_rbxmx
 Source ../tests/test_rbxmx.c
 Source filetypes/rbxmx.c
 Source datamodel.c

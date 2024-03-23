@@ -244,4 +244,6 @@ Model *LoadModelRBXMX(const char *file)
     }
 
     xml_document_free(document, true);
+
+    return mdl;
 }

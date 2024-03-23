@@ -2,12 +2,14 @@
 #include <stddef.h>
 #include "debug.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 DataModel *DataModel_new(void)
 {
     DataModel *newInst = ServiceProvider_new("DataModel", NULL);
 
     newInst->serviceprovider.instance.DataCost = sizeof(DataModel);
+    newInst = realloc(newInst, sizeof(DataModel));
 
     newInst->AllowedGearTypeChanged = RBXScriptSignal_new();
     newInst->GraphicsQualityChangeRequest = RBXScriptSignal_new();

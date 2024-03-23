@@ -1,12 +1,14 @@
 #include "basepart.h"
 #include "debug.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 BasePart *BasePart_new(const char *className, Instance *parent)
 {
     BasePart *newInst = PVInstance_new(className, parent);
 
     newInst->pvinstance.instance.DataCost = sizeof(BasePart);
+    newInst = realloc(newInst, sizeof(BasePart));
 
     newInst->Touched = RBXScriptSignal_new();
     newInst->TouchEnded = RBXScriptSignal_new();
