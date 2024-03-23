@@ -1,0 +1,8 @@
+DefaultPlatform linux64-debug
+UseRaylib False
+
+Dependency xml
+
+Program tests/test_rbxmx
+Source ../tests/test_rbxmx.c
+
