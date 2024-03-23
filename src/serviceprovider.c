@@ -1,6 +1,5 @@
 #include "serviceprovider.h"
 #include <string.h>
-
 ServiceProvider *ServiceProvider_new(const char *className, Instance *parent)
 {
     ServiceProvider *newInst = Instance_new(className, parent);

@@ -7,7 +7,7 @@
 typedef struct PVInstance {
     Instance instance;
 
-    CoordinateFrame CoordinateFrame;
+    //CoordinateFrame CoordinateFrame;
 } PVInstance;
 
 PVInstance *PVInstance_new(const char *className, Instance *parent);

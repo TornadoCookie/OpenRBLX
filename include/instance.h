@@ -4,9 +4,11 @@
 #include <stdbool.h>
 #include "rbxscriptsignal.h"
 
+typedef struct Instance Instance;
+
 typedef struct Instance {
     // Properties
-    bool Archivable;
+    bool archivable;
     const char *ClassName;
     unsigned int DataCost;
     const char *Name;

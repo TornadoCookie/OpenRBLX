@@ -7,7 +7,7 @@ Instance *Instance_new(const char *className, Instance *parent)
 {
     Instance *newInst = malloc(sizeof(Instance));
 
-    newInst->Archivable = true;
+    newInst->archivable = true;
     newInst->ClassName = className;
     newInst->DataCost = sizeof(Instance);
     newInst->Name = "Instance";
@@ -20,7 +20,7 @@ Instance *Instance_new(const char *className, Instance *parent)
     newInst->DescendantAdded = RBXScriptSignal_new();
     newInst->DescendantRemoving = RBXScriptSignal_new();
 
-    Instance_SetParent(newInst, parent);
+    if (parent) Instance_SetParent(newInst, parent);
 
     return newInst;
 }
@@ -141,7 +141,7 @@ void Instance_Remove(Instance *this)
 
 void Instance_SetArchivable(Instance *this, bool archivable) 
 {
-    this->Archivable = archivable;
+    this->archivable = archivable;
     RBXScriptSignal_Fire(this->Changed, "Archivable");
 }
 
@@ -166,10 +166,10 @@ void Instance_SetParent(Instance *this, Instance *parent)
     RBXScriptSignal_Fire(this->AncestryChanged, eventarg);
     RBXScriptSignal_Fire(parent->ChildAdded, this);
     
-    Instance *x = parent;
-    while (x != NULL)
-    {
-        RBXScriptSignal_Fire(x->DescendantAdded, this);
-        x = x->Parent;
-    }
+    //Instance *x = parent;
+    //while (x != NULL)
+    ///{
+     //   RBXScriptSignal_Fire(x->DescendantAdded, this);
+     //   x = x->Parent;
+    //}
 }

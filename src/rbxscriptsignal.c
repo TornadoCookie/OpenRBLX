@@ -20,6 +20,9 @@ RBXScriptSignal *RBXScriptSignal_new()
     pthread_cond_init(&signal->private->cond, NULL);
     pthread_mutex_init(&signal->private->mutex, NULL);
 
+    signal->connections = NULL;
+    signal->connectionCount = 0;
+
     return signal;
 }
 
@@ -56,7 +59,7 @@ void RBXScriptSignal_Wait(RBXScriptSignal *this)
 
 void RBXScriptSignal_Fire(RBXScriptSignal *this, void *arg)
 {
-    pthread_cond_broadcast(&this->private->cond);
+    //pthread_cond_broadcast(&this->private->cond);
 
     for (int i = 0; i < this->connectionCount; i++)
     {

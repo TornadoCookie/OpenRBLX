@@ -1,8 +1,23 @@
 DefaultPlatform linux64-debug
 UseRaylib False
 
+ExtraCFlag -Iinclude
+ExtraCFlag -Ilib/xml/include
+ExtraCFlag -Wno-incompatible-pointer-types
+
 Dependency xml
 
 Program tests/test_rbxmx
 Source ../tests/test_rbxmx.c
-
+Source filetypes/rbxmx.c
+Source datamodel.c
+Source instance.c
+Source ../lib/xml/src/xml.c
+Source rbxscriptsignal.c
+Source workspace.c
+Source serviceprovider.c
+Source rootinstance.c
+Source model.c
+Source pvinstance.c
+Source trusspart.c
+Source basepart.c

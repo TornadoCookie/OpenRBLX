@@ -12,7 +12,7 @@ typedef struct BasePart {
     float BackParamA;
     float BackParamB;
     int BackSurface;
-    int BacksurfaceInput;
+    int BackSurfaceInput;
     float BottomParamA;
     float BottomParamB;
     int BottomSurface;
@@ -20,6 +20,7 @@ typedef struct BasePart {
     int BrickColor;
     CFrame CFrame;
     bool CanCollide;
+    bool DraggingV1;
     Color3 Color;
     float Elasticity;
     float Friction;
@@ -42,7 +43,7 @@ typedef struct BasePart {
     int RightSurface;
     int RightSurfaceInput;
     Vector3 RotVelocity;
-    Vector3 Size;
+    Vector3 size;
     float TopParamA;
     float TopParamB;
     int TopSurface;
