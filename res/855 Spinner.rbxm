@@ -1,0 +1,1383 @@
+<roblox xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<External>null</External>
+	<Item class="Model" referent="RBX108A847FED864BBFB5FDF6268DFC4A42">
+		<Properties>
+			<string name="Name">Spinner</string>
+			<tokens name="Keywords" xsi:nil="true"></tokens>
+			<CoordinateFrame name="CoordinateFrame" referent="RBXA7C127256CA24BA9B085F909E2513E65">
+				<X>3</X>
+				<Y>5</Y>
+				<Z>16</Z>
+				<R00>1</R00>
+				<R01>0</R01>
+				<R02>0</R02>
+				<R10>0</R10>
+				<R11>1</R11>
+				<R12>0</R12>
+				<R20>0</R20>
+				<R21>0</R21>
+				<R22>1</R22>
+			</CoordinateFrame>
+			<Feature name="Item">
+				<Vector3 name="Velocity">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+				</Vector3>
+				<Vector3 name="RotVel">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+				</Vector3>
+				<bool name="CanSelect">true</bool>
+				<bool name="CanUngroup">true</bool>
+				<bool name="NameShown">false</bool>
+				<token name="Controller">KeyboardRight</token>
+				<bool name="ControllerFlagShown">true</bool>
+			</Feature>
+		</Properties>
+		<Item class="Model">
+			<Properties>
+				<string name="Name">Model</string>
+				<tokens name="Keywords" xsi:nil="true"></tokens>
+				<CoordinateFrame name="CoordinateFrame">
+					<X>5</X>
+					<Y>1</Y>
+					<Z>3</Z>
+					<R00>0</R00>
+					<R01>0</R01>
+					<R02>-1</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>1</R20>
+					<R21>0</R21>
+					<R22>0</R22>
+				</CoordinateFrame>
+				<Feature name="Item">
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<Vector3 name="RotVel">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<bool name="CanSelect">true</bool>
+					<bool name="CanUngroup">true</bool>
+					<bool name="NameShown">false</bool>
+					<token name="Controller">KeyboardRight</token>
+					<bool name="ControllerFlagShown">true</bool>
+				</Feature>
+			</Properties>
+			<Item class="Part">
+				<Properties>
+					<string name="Name">Ball</string>
+					<tokens name="Keywords">Part</tokens>
+					<CoordinateFrame name="CoordinateFrame">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>3</Z>
+						<R00>0</R00>
+						<R01>-1</R01>
+						<R02>0</R02>
+						<R10>-1</R10>
+						<R11>0</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>-1</R22>
+					</CoordinateFrame>
+					<Feature name="Item">
+						<Vector3 name="Velocity">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Vector3>
+						<Vector3 name="RotVel">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Vector3>
+						<bool name="CanSelect">true</bool>
+						<bool name="CanUngroup">true</bool>
+						<bool name="NameShown">false</bool>
+						<token name="Controller">KeyboardRight</token>
+						<bool name="ControllerFlagShown">true</bool>
+					</Feature>
+					<Color3 name="Color">
+						<R>0.7</R>
+						<G>0</G>
+						<B>0.7</B>
+					</Color3>
+					<float name="Transparency">0</float>
+					<bool name="Anchored">false</bool>
+					<bool name="CanCollide">true</bool>
+					<Feature name="Part">
+						<token name="shape">Cylinder</token>
+						<Vector3 name="size">
+							<X>1</X>
+							<Y>1</Y>
+							<Z>1</Z>
+						</Vector3>
+						<float name="Friction">0.3</float>
+						<float name="Elasticity">0.5</float>
+						<Complex name="Top">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Bottom">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Left">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Right">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Front">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">Hinge</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Back">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">Hinge</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+					</Feature>
+				</Properties>
+			</Item>
+			<Item class="Part">
+				<Properties>
+					<string name="Name">Smooth Block</string>
+					<tokens name="Keywords">Part</tokens>
+					<CoordinateFrame name="CoordinateFrame">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>3</Z>
+						<R00>-1</R00>
+						<R01>0</R01>
+						<R02>0</R02>
+						<R10>0</R10>
+						<R11>1</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>-1</R22>
+					</CoordinateFrame>
+					<Feature name="Item">
+						<Vector3 name="Velocity">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Vector3>
+						<Vector3 name="RotVel">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Vector3>
+						<bool name="CanSelect">true</bool>
+						<bool name="CanUngroup">true</bool>
+						<bool name="NameShown">false</bool>
+						<token name="Controller">KeyboardLeft</token>
+						<bool name="ControllerFlagShown">true</bool>
+					</Feature>
+					<Color3 name="Color">
+						<R>0.8</R>
+						<G>0</G>
+						<B>0</B>
+					</Color3>
+					<float name="Transparency">0</float>
+					<bool name="Anchored">false</bool>
+					<bool name="CanCollide">true</bool>
+					<Feature name="Part">
+						<token name="shape">Block</token>
+						<Vector3 name="Size">
+							<X referent="RBXABCAA1049AAD4ABE8AF1F9CF2DF8DD31" xsi:nil="true"></X>
+							<Y referent="RBXB7DF2A60EE134E2FB713B2292348839E" xsi:nil="true"></Y>
+							<Z referent="RBXCE5CDEAD8BB346C2A0DF24ED71B3A541" xsi:nil="true"></Z>
+						</Vector3>
+						<Vector3 name="size">
+							<X>1</X>
+							<Y>1</Y>
+							<Z>6</Z>
+						</Vector3>
+						<float name="Friction">1</float>
+						<float name="Elasticity">0.5</float>
+						<Complex name="Top">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.3</float>
+							<float name="ParamB">0.3</float>
+						</Complex>
+						<Complex name="Bottom">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.3</float>
+							<float name="ParamB">0.3</float>
+						</Complex>
+						<Complex name="Left">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Right">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Front">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Back">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+					</Feature>
+					<Feature name="Card">
+						<string name="Title">Smooth ROBLOX block</string>
+						<string name="Description">No Joiners</string>
+						<Color3 name="Color">
+							<R>0.690196</R>
+							<G>0.768627</G>
+							<B>0.870588</B>
+						</Color3>
+						<Content name="Image">0</Content>
+						<Complex name="Row0">
+							<string name="Label">X:</string>
+							<Refs name="Properties">RBXABCAA1049AAD4ABE8AF1F9CF2DF8DD31</Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+						<Complex name="Row1">
+							<string name="Label">Y:</string>
+							<Refs name="Properties">RBXB7DF2A60EE134E2FB713B2292348839E</Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+						<Complex name="Row2">
+							<string name="Label">Z:</string>
+							<Refs name="Properties">RBXCE5CDEAD8BB346C2A0DF24ED71B3A541</Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+						<Complex name="Row3">
+							<string name="Label"></string>
+							<Refs name="Properties" xsi:nil="true"></Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+						<Complex name="Row4">
+							<string name="Label"></string>
+							<Refs name="Properties" xsi:nil="true"></Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+					</Feature>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="Part">
+			<Properties>
+				<string name="Name">Block</string>
+				<tokens name="Keywords">Part</tokens>
+				<CoordinateFrame name="CoordinateFrame">
+					<X>-3</X>
+					<Y>-1</Y>
+					<Z>3</Z>
+					<R00>0</R00>
+					<R01>0</R01>
+					<R02>1</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>-1</R20>
+					<R21>0</R21>
+					<R22>0</R22>
+				</CoordinateFrame>
+				<Feature name="Item">
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<Vector3 name="RotVel">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<bool name="CanSelect">true</bool>
+					<bool name="CanUngroup">true</bool>
+					<bool name="NameShown">false</bool>
+					<token name="Controller">KeyboardLeft</token>
+					<bool name="ControllerFlagShown">true</bool>
+				</Feature>
+				<Color3 name="Color">
+					<R>0.5</R>
+					<G>0.5</G>
+					<B>0.5</B>
+				</Color3>
+				<float name="Transparency">0</float>
+				<bool name="Anchored">false</bool>
+				<bool name="CanCollide">true</bool>
+				<Feature name="Part">
+					<token name="shape">Block</token>
+					<Vector3 name="Size">
+						<X referent="RBXE06C32B84CF943E5A67F17B6535BD6D8" xsi:nil="true"></X>
+						<Y referent="RBX46EB4927ADC2481291109E212E060DAA" xsi:nil="true"></Y>
+						<Z referent="RBX47836374F9E640F4BABB2CA71DE6A53E" xsi:nil="true"></Z>
+					</Vector3>
+					<Vector3 name="size">
+						<X>6</X>
+						<Y>1</Y>
+						<Z>6</Z>
+					</Vector3>
+					<float name="Friction">0.3</float>
+					<float name="Elasticity">0.5</float>
+					<Complex name="Top">
+						<token name="Type">Bumps</token>
+						<token name="Constraint">None</token>
+						<token name="SurfaceInput">NoInput</token>
+						<float name="ParamA">-0.3</float>
+						<float name="ParamB">0.3</float>
+					</Complex>
+					<Complex name="Bottom">
+						<token name="Type">Bumps</token>
+						<token name="Constraint">None</token>
+						<token name="SurfaceInput">NoInput</token>
+						<float name="ParamA">-0.3</float>
+						<float name="ParamB">0.3</float>
+					</Complex>
+					<Complex name="Left">
+						<token name="Type">Smooth</token>
+						<token name="Constraint">None</token>
+						<token name="SurfaceInput">NoInput</token>
+						<float name="ParamA">-0.5</float>
+						<float name="ParamB">0.5</float>
+					</Complex>
+					<Complex name="Right">
+						<token name="Type">Smooth</token>
+						<token name="Constraint">None</token>
+						<token name="SurfaceInput">NoInput</token>
+						<float name="ParamA">-0.5</float>
+						<float name="ParamB">0.5</float>
+					</Complex>
+					<Complex name="Front">
+						<token name="Type">Smooth</token>
+						<token name="Constraint">None</token>
+						<token name="SurfaceInput">NoInput</token>
+						<float name="ParamA">-0.5</float>
+						<float name="ParamB">0.5</float>
+					</Complex>
+					<Complex name="Back">
+						<token name="Type">Smooth</token>
+						<token name="Constraint">None</token>
+						<token name="SurfaceInput">NoInput</token>
+						<float name="ParamA">-0.5</float>
+						<float name="ParamB">0.5</float>
+					</Complex>
+				</Feature>
+				<Feature name="Card">
+					<string name="Title">Standard ROBLOX block</string>
+					<string name="Description">Joins on the top and bottom.</string>
+					<Color3 name="Color">
+						<R>0.690196</R>
+						<G>0.768627</G>
+						<B>0.870588</B>
+					</Color3>
+					<Content name="Image">0</Content>
+					<Complex name="Row0">
+						<string name="Label">X:</string>
+						<Refs name="Properties">RBXE06C32B84CF943E5A67F17B6535BD6D8</Refs>
+						<float name="Min">1</float>
+						<float name="Max">10</float>
+					</Complex>
+					<Complex name="Row1">
+						<string name="Label">Y:</string>
+						<Refs name="Properties">RBX46EB4927ADC2481291109E212E060DAA</Refs>
+						<float name="Min">1</float>
+						<float name="Max">10</float>
+					</Complex>
+					<Complex name="Row2">
+						<string name="Label">Z:</string>
+						<Refs name="Properties">RBX47836374F9E640F4BABB2CA71DE6A53E</Refs>
+						<float name="Min">1</float>
+						<float name="Max">10</float>
+					</Complex>
+					<Complex name="Row3">
+						<string name="Label"></string>
+						<Refs name="Properties" xsi:nil="true"></Refs>
+						<float name="Min">1</float>
+						<float name="Max">10</float>
+					</Complex>
+					<Complex name="Row4">
+						<string name="Label"></string>
+						<Refs name="Properties" xsi:nil="true"></Refs>
+						<float name="Min">1</float>
+						<float name="Max">10</float>
+					</Complex>
+				</Feature>
+			</Properties>
+		</Item>
+		<Item class="Part">
+			<Properties>
+				<string name="Name">Part</string>
+				<tokens name="Keywords">Part</tokens>
+				<CoordinateFrame name="CoordinateFrame">
+					<X>-1</X>
+					<Y>-1</Y>
+					<Z>-1</Z>
+					<R00>0</R00>
+					<R01>1</R01>
+					<R02>0</R02>
+					<R10>-1</R10>
+					<R11>0</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>1</R22>
+				</CoordinateFrame>
+				<Feature name="Item">
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<Vector3 name="RotVel">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<bool name="CanSelect">true</bool>
+					<bool name="CanUngroup">true</bool>
+					<bool name="NameShown">false</bool>
+					<token name="Controller">KeyboardRight</token>
+					<bool name="ControllerFlagShown">true</bool>
+				</Feature>
+				<Color3 name="Color">
+					<R>0.3</R>
+					<G>0.3</G>
+					<B>0.3</B>
+				</Color3>
+				<float name="Transparency">0</float>
+				<bool name="Anchored">false</bool>
+				<bool name="CanCollide">true</bool>
+				<Feature name="Part">
+					<token name="shape">Cylinder</token>
+					<Vector3 name="size">
+						<X>2</X>
+						<Y>2</Y>
+						<Z>2</Z>
+					</Vector3>
+					<float name="Friction">0.3</float>
+					<float name="Elasticity">0.5</float>
+					<Complex name="Top">
+						<token name="Type">Smooth</token>
+						<token name="Constraint">None</token>
+						<token name="SurfaceInput">NoInput</token>
+						<float name="ParamA">-0.5</float>
+						<float name="ParamB">0.5</float>
+					</Complex>
+					<Complex name="Bottom">
+						<token name="Type">Smooth</token>
+						<token name="Constraint">None</token>
+						<token name="SurfaceInput">NoInput</token>
+						<float name="ParamA">-0.5</float>
+						<float name="ParamB">0.5</float>
+					</Complex>
+					<Complex name="Left">
+						<token name="Type">Smooth</token>
+						<token name="Constraint">None</token>
+						<token name="SurfaceInput">NoInput</token>
+						<float name="ParamA">-0.5</float>
+						<float name="ParamB">0.5</float>
+					</Complex>
+					<Complex name="Right">
+						<token name="Type">Smooth</token>
+						<token name="Constraint">None</token>
+						<token name="SurfaceInput">NoInput</token>
+						<float name="ParamA">-0.5</float>
+						<float name="ParamB">0.5</float>
+					</Complex>
+					<Complex name="Front">
+						<token name="Type">Smooth</token>
+						<token name="Constraint">Motor</token>
+						<token name="SurfaceInput">Constant</token>
+						<float name="ParamA">-0.3</float>
+						<float name="ParamB">0.3</float>
+					</Complex>
+					<Complex name="Back">
+						<token name="Type">Smooth</token>
+						<token name="Constraint">Motor</token>
+						<token name="SurfaceInput">Constant</token>
+						<float name="ParamA">-0.3</float>
+						<float name="ParamB">0.3</float>
+					</Complex>
+				</Feature>
+			</Properties>
+		</Item>
+		<Item class="Model">
+			<Properties>
+				<string name="Name">Model</string>
+				<tokens name="Keywords" xsi:nil="true"></tokens>
+				<CoordinateFrame name="CoordinateFrame">
+					<X>-3</X>
+					<Y>1</Y>
+					<Z>5</Z>
+					<R00>-1</R00>
+					<R01>0</R01>
+					<R02>0</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>-1</R22>
+				</CoordinateFrame>
+				<Feature name="Item">
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<Vector3 name="RotVel">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<bool name="CanSelect">true</bool>
+					<bool name="CanUngroup">true</bool>
+					<bool name="NameShown">false</bool>
+					<token name="Controller">KeyboardRight</token>
+					<bool name="ControllerFlagShown">true</bool>
+				</Feature>
+			</Properties>
+			<Item class="Part">
+				<Properties>
+					<string name="Name">Ball</string>
+					<tokens name="Keywords">Part</tokens>
+					<CoordinateFrame name="CoordinateFrame">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>3</Z>
+						<R00>0</R00>
+						<R01>-1</R01>
+						<R02>0</R02>
+						<R10>-1</R10>
+						<R11>0</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>-1</R22>
+					</CoordinateFrame>
+					<Feature name="Item">
+						<Vector3 name="Velocity">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Vector3>
+						<Vector3 name="RotVel">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Vector3>
+						<bool name="CanSelect">true</bool>
+						<bool name="CanUngroup">true</bool>
+						<bool name="NameShown">false</bool>
+						<token name="Controller">KeyboardRight</token>
+						<bool name="ControllerFlagShown">true</bool>
+					</Feature>
+					<Color3 name="Color">
+						<R>0.7</R>
+						<G>0</G>
+						<B>0.7</B>
+					</Color3>
+					<float name="Transparency">0</float>
+					<bool name="Anchored">false</bool>
+					<bool name="CanCollide">true</bool>
+					<Feature name="Part">
+						<token name="shape">Cylinder</token>
+						<Vector3 name="size">
+							<X>1</X>
+							<Y>1</Y>
+							<Z>1</Z>
+						</Vector3>
+						<float name="Friction">0.3</float>
+						<float name="Elasticity">0.5</float>
+						<Complex name="Top">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Bottom">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Left">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Right">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Front">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">Hinge</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Back">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">Hinge</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+					</Feature>
+				</Properties>
+			</Item>
+			<Item class="Part">
+				<Properties>
+					<string name="Name">Smooth Block</string>
+					<tokens name="Keywords">Part</tokens>
+					<CoordinateFrame name="CoordinateFrame">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>3</Z>
+						<R00>-1</R00>
+						<R01>0</R01>
+						<R02>0</R02>
+						<R10>0</R10>
+						<R11>1</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>-1</R22>
+					</CoordinateFrame>
+					<Feature name="Item">
+						<Vector3 name="Velocity">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Vector3>
+						<Vector3 name="RotVel">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Vector3>
+						<bool name="CanSelect">true</bool>
+						<bool name="CanUngroup">true</bool>
+						<bool name="NameShown">false</bool>
+						<token name="Controller">KeyboardLeft</token>
+						<bool name="ControllerFlagShown">true</bool>
+					</Feature>
+					<Color3 name="Color">
+						<R>0.8</R>
+						<G>0</G>
+						<B>0</B>
+					</Color3>
+					<float name="Transparency">0</float>
+					<bool name="Anchored">false</bool>
+					<bool name="CanCollide">true</bool>
+					<Feature name="Part">
+						<token name="shape">Block</token>
+						<Vector3 name="Size">
+							<X referent="RBX80200EA141AB40EC841FDBE6D37567D4" xsi:nil="true"></X>
+							<Y referent="RBX05E1B08CA536490983A3FEE8B41C432A" xsi:nil="true"></Y>
+							<Z referent="RBX0B26DD046A314D6E806A02EA01EFCBE5" xsi:nil="true"></Z>
+						</Vector3>
+						<Vector3 name="size">
+							<X>1</X>
+							<Y>1</Y>
+							<Z>6</Z>
+						</Vector3>
+						<float name="Friction">1</float>
+						<float name="Elasticity">0.5</float>
+						<Complex name="Top">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.3</float>
+							<float name="ParamB">0.3</float>
+						</Complex>
+						<Complex name="Bottom">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.3</float>
+							<float name="ParamB">0.3</float>
+						</Complex>
+						<Complex name="Left">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Right">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Front">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Back">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+					</Feature>
+					<Feature name="Card">
+						<string name="Title">Smooth ROBLOX block</string>
+						<string name="Description">No Joiners</string>
+						<Color3 name="Color">
+							<R>0.690196</R>
+							<G>0.768627</G>
+							<B>0.870588</B>
+						</Color3>
+						<Content name="Image">0</Content>
+						<Complex name="Row0">
+							<string name="Label">X:</string>
+							<Refs name="Properties">RBX80200EA141AB40EC841FDBE6D37567D4</Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+						<Complex name="Row1">
+							<string name="Label">Y:</string>
+							<Refs name="Properties">RBX05E1B08CA536490983A3FEE8B41C432A</Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+						<Complex name="Row2">
+							<string name="Label">Z:</string>
+							<Refs name="Properties">RBX0B26DD046A314D6E806A02EA01EFCBE5</Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+						<Complex name="Row3">
+							<string name="Label"></string>
+							<Refs name="Properties" xsi:nil="true"></Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+						<Complex name="Row4">
+							<string name="Label"></string>
+							<Refs name="Properties" xsi:nil="true"></Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+					</Feature>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="Model">
+			<Properties>
+				<string name="Name">Model</string>
+				<tokens name="Keywords" xsi:nil="true"></tokens>
+				<CoordinateFrame name="CoordinateFrame">
+					<X>-5</X>
+					<Y>1</Y>
+					<Z>-3</Z>
+					<R00>0</R00>
+					<R01>0</R01>
+					<R02>1</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>-1</R20>
+					<R21>0</R21>
+					<R22>0</R22>
+				</CoordinateFrame>
+				<Feature name="Item">
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<Vector3 name="RotVel">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<bool name="CanSelect">true</bool>
+					<bool name="CanUngroup">true</bool>
+					<bool name="NameShown">false</bool>
+					<token name="Controller">KeyboardRight</token>
+					<bool name="ControllerFlagShown">true</bool>
+				</Feature>
+			</Properties>
+			<Item class="Part">
+				<Properties>
+					<string name="Name">Ball</string>
+					<tokens name="Keywords">Part</tokens>
+					<CoordinateFrame name="CoordinateFrame">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>3</Z>
+						<R00>0</R00>
+						<R01>-1</R01>
+						<R02>0</R02>
+						<R10>-1</R10>
+						<R11>0</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>-1</R22>
+					</CoordinateFrame>
+					<Feature name="Item">
+						<Vector3 name="Velocity">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Vector3>
+						<Vector3 name="RotVel">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Vector3>
+						<bool name="CanSelect">true</bool>
+						<bool name="CanUngroup">true</bool>
+						<bool name="NameShown">false</bool>
+						<token name="Controller">KeyboardRight</token>
+						<bool name="ControllerFlagShown">true</bool>
+					</Feature>
+					<Color3 name="Color">
+						<R>0.7</R>
+						<G>0</G>
+						<B>0.7</B>
+					</Color3>
+					<float name="Transparency">0</float>
+					<bool name="Anchored">false</bool>
+					<bool name="CanCollide">true</bool>
+					<Feature name="Part">
+						<token name="shape">Cylinder</token>
+						<Vector3 name="size">
+							<X>1</X>
+							<Y>1</Y>
+							<Z>1</Z>
+						</Vector3>
+						<float name="Friction">0.3</float>
+						<float name="Elasticity">0.5</float>
+						<Complex name="Top">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Bottom">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Left">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Right">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Front">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">Hinge</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Back">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">Hinge</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+					</Feature>
+				</Properties>
+			</Item>
+			<Item class="Part">
+				<Properties>
+					<string name="Name">Smooth Block</string>
+					<tokens name="Keywords">Part</tokens>
+					<CoordinateFrame name="CoordinateFrame">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>3</Z>
+						<R00>-1</R00>
+						<R01>0</R01>
+						<R02>0</R02>
+						<R10>0</R10>
+						<R11>1</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>-1</R22>
+					</CoordinateFrame>
+					<Feature name="Item">
+						<Vector3 name="Velocity">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Vector3>
+						<Vector3 name="RotVel">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Vector3>
+						<bool name="CanSelect">true</bool>
+						<bool name="CanUngroup">true</bool>
+						<bool name="NameShown">false</bool>
+						<token name="Controller">KeyboardLeft</token>
+						<bool name="ControllerFlagShown">true</bool>
+					</Feature>
+					<Color3 name="Color">
+						<R>0.8</R>
+						<G>0</G>
+						<B>0</B>
+					</Color3>
+					<float name="Transparency">0</float>
+					<bool name="Anchored">false</bool>
+					<bool name="CanCollide">true</bool>
+					<Feature name="Part">
+						<token name="shape">Block</token>
+						<Vector3 name="Size">
+							<X referent="RBX948BAA0376304A3F9CF141CC0E07B14A" xsi:nil="true"></X>
+							<Y referent="RBX65D4714B00CF4E0DB203858F54D52F4F" xsi:nil="true"></Y>
+							<Z referent="RBX447CF1C43C04464DADDEBD065A9ECD5E" xsi:nil="true"></Z>
+						</Vector3>
+						<Vector3 name="size">
+							<X>1</X>
+							<Y>1</Y>
+							<Z>6</Z>
+						</Vector3>
+						<float name="Friction">1</float>
+						<float name="Elasticity">0.5</float>
+						<Complex name="Top">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.3</float>
+							<float name="ParamB">0.3</float>
+						</Complex>
+						<Complex name="Bottom">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.3</float>
+							<float name="ParamB">0.3</float>
+						</Complex>
+						<Complex name="Left">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Right">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Front">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Back">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+					</Feature>
+					<Feature name="Card">
+						<string name="Title">Smooth ROBLOX block</string>
+						<string name="Description">No Joiners</string>
+						<Color3 name="Color">
+							<R>0.690196</R>
+							<G>0.768627</G>
+							<B>0.870588</B>
+						</Color3>
+						<Content name="Image">0</Content>
+						<Complex name="Row0">
+							<string name="Label">X:</string>
+							<Refs name="Properties">RBX948BAA0376304A3F9CF141CC0E07B14A</Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+						<Complex name="Row1">
+							<string name="Label">Y:</string>
+							<Refs name="Properties">RBX65D4714B00CF4E0DB203858F54D52F4F</Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+						<Complex name="Row2">
+							<string name="Label">Z:</string>
+							<Refs name="Properties">RBX447CF1C43C04464DADDEBD065A9ECD5E</Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+						<Complex name="Row3">
+							<string name="Label"></string>
+							<Refs name="Properties" xsi:nil="true"></Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+						<Complex name="Row4">
+							<string name="Label"></string>
+							<Refs name="Properties" xsi:nil="true"></Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+					</Feature>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="Model">
+			<Properties>
+				<string name="Name">Model</string>
+				<tokens name="Keywords" xsi:nil="true"></tokens>
+				<CoordinateFrame name="CoordinateFrame">
+					<X>3</X>
+					<Y>1</Y>
+					<Z>-5</Z>
+					<R00>1</R00>
+					<R01>0</R01>
+					<R02>0</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>1</R22>
+				</CoordinateFrame>
+				<Feature name="Item">
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<Vector3 name="RotVel">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<bool name="CanSelect">true</bool>
+					<bool name="CanUngroup">true</bool>
+					<bool name="NameShown">false</bool>
+					<token name="Controller">KeyboardRight</token>
+					<bool name="ControllerFlagShown">true</bool>
+				</Feature>
+			</Properties>
+			<Item class="Part">
+				<Properties>
+					<string name="Name">Ball</string>
+					<tokens name="Keywords">Part</tokens>
+					<CoordinateFrame name="CoordinateFrame">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>3</Z>
+						<R00>0</R00>
+						<R01>-1</R01>
+						<R02>0</R02>
+						<R10>-1</R10>
+						<R11>0</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>-1</R22>
+					</CoordinateFrame>
+					<Feature name="Item">
+						<Vector3 name="Velocity">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Vector3>
+						<Vector3 name="RotVel">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Vector3>
+						<bool name="CanSelect">true</bool>
+						<bool name="CanUngroup">true</bool>
+						<bool name="NameShown">false</bool>
+						<token name="Controller">KeyboardRight</token>
+						<bool name="ControllerFlagShown">true</bool>
+					</Feature>
+					<Color3 name="Color">
+						<R>0.7</R>
+						<G>0</G>
+						<B>0.7</B>
+					</Color3>
+					<float name="Transparency">0</float>
+					<bool name="Anchored">false</bool>
+					<bool name="CanCollide">true</bool>
+					<Feature name="Part">
+						<token name="shape">Cylinder</token>
+						<Vector3 name="size">
+							<X>1</X>
+							<Y>1</Y>
+							<Z>1</Z>
+						</Vector3>
+						<float name="Friction">0.3</float>
+						<float name="Elasticity">0.5</float>
+						<Complex name="Top">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Bottom">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Left">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Right">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Front">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">Hinge</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Back">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">Hinge</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+					</Feature>
+				</Properties>
+			</Item>
+			<Item class="Part">
+				<Properties>
+					<string name="Name">Smooth Block</string>
+					<tokens name="Keywords">Part</tokens>
+					<CoordinateFrame name="CoordinateFrame">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>3</Z>
+						<R00>-1</R00>
+						<R01>0</R01>
+						<R02>0</R02>
+						<R10>0</R10>
+						<R11>1</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>-1</R22>
+					</CoordinateFrame>
+					<Feature name="Item">
+						<Vector3 name="Velocity">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Vector3>
+						<Vector3 name="RotVel">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Vector3>
+						<bool name="CanSelect">true</bool>
+						<bool name="CanUngroup">true</bool>
+						<bool name="NameShown">false</bool>
+						<token name="Controller">KeyboardLeft</token>
+						<bool name="ControllerFlagShown">true</bool>
+					</Feature>
+					<Color3 name="Color">
+						<R>0.8</R>
+						<G>0</G>
+						<B>0</B>
+					</Color3>
+					<float name="Transparency">0</float>
+					<bool name="Anchored">false</bool>
+					<bool name="CanCollide">true</bool>
+					<Feature name="Part">
+						<token name="shape">Block</token>
+						<Vector3 name="Size">
+							<X referent="RBX7CEB16AD9D9B4186BE88FA8ED244BFD5" xsi:nil="true"></X>
+							<Y referent="RBXC8B0F2320BF6483EAC0525DCC5A32904" xsi:nil="true"></Y>
+							<Z referent="RBXDA3487D8488D44D2B490E81E2FC56C6E" xsi:nil="true"></Z>
+						</Vector3>
+						<Vector3 name="size">
+							<X>1</X>
+							<Y>1</Y>
+							<Z>6</Z>
+						</Vector3>
+						<float name="Friction">1</float>
+						<float name="Elasticity">0.5</float>
+						<Complex name="Top">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.3</float>
+							<float name="ParamB">0.3</float>
+						</Complex>
+						<Complex name="Bottom">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.3</float>
+							<float name="ParamB">0.3</float>
+						</Complex>
+						<Complex name="Left">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Right">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Front">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+						<Complex name="Back">
+							<token name="Type">Smooth</token>
+							<token name="Constraint">None</token>
+							<token name="SurfaceInput">NoInput</token>
+							<float name="ParamA">-0.5</float>
+							<float name="ParamB">0.5</float>
+						</Complex>
+					</Feature>
+					<Feature name="Card">
+						<string name="Title">Smooth ROBLOX block</string>
+						<string name="Description">No Joiners</string>
+						<Color3 name="Color">
+							<R>0.690196</R>
+							<G>0.768627</G>
+							<B>0.870588</B>
+						</Color3>
+						<Content name="Image">0</Content>
+						<Complex name="Row0">
+							<string name="Label">X:</string>
+							<Refs name="Properties">RBX7CEB16AD9D9B4186BE88FA8ED244BFD5</Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+						<Complex name="Row1">
+							<string name="Label">Y:</string>
+							<Refs name="Properties">RBXC8B0F2320BF6483EAC0525DCC5A32904</Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+						<Complex name="Row2">
+							<string name="Label">Z:</string>
+							<Refs name="Properties">RBXDA3487D8488D44D2B490E81E2FC56C6E</Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+						<Complex name="Row3">
+							<string name="Label"></string>
+							<Refs name="Properties" xsi:nil="true"></Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+						<Complex name="Row4">
+							<string name="Label"></string>
+							<Refs name="Properties" xsi:nil="true"></Refs>
+							<float name="Min">1</float>
+							<float name="Max">10</float>
+						</Complex>
+					</Feature>
+				</Properties>
+			</Item>
+		</Item>
+	</Item>
+</roblox>
