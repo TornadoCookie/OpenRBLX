@@ -21,3 +21,5 @@ Source model.c
 Source pvinstance.c
 Source trusspart.c
 Source basepart.c
+Source part.c
+Source formfactorpart.c

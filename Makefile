@@ -61,6 +61,8 @@ test_rbxmx_SOURCES+=src/model.c
 test_rbxmx_SOURCES+=src/pvinstance.c
 test_rbxmx_SOURCES+=src/trusspart.c
 test_rbxmx_SOURCES+=src/basepart.c
+test_rbxmx_SOURCES+=src/part.c
+test_rbxmx_SOURCES+=src/formfactorpart.c
 
 $(DISTDIR)/test_rbxmx$(EXEC_EXTENSION): $(test_rbxmx_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)

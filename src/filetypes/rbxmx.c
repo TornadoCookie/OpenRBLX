@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "trusspart.h"
+#include "part.h"
 
 static char *xml_easy_string(struct xml_string *str)
 {
@@ -21,6 +22,7 @@ typedef enum {
     Serialize_CoordinateFrame,
     Serialize_string,
     Serialize_Vector3,
+    Serialize_Color3,
 } XMLSerializationType;
 
 typedef struct XMLSerialization {
@@ -96,15 +98,32 @@ static void xmlserialize_BasePart(BasePart *basepart, XMLSerializeInstance *inst
     xmlserialize_atomic(float, basepart, Transparency);
     xmlserialize_atomic(Vector3, basepart, Velocity);
     xmlserialize_atomic(Vector3, basepart, size);
+    xmlserialize_atomic(Color3, basepart, Color);
 }
 
-static void xmlserialize_TrussPart(Model *mdl, XMLSerializeInstance *inst)
+static TrussPart *xmlserialize_TrussPart(XMLSerializeInstance *inst)
 {
-    TrussPart *trusspart = TrussPart_new(mdl);
+    TrussPart *trusspart = TrussPart_new(NULL);
 
     xmlserialize_BasePart(trusspart, inst);
     xmlserialize_atomic(token, trusspart, Style);
 
+    return trusspart;
+}
+
+static void xmlserialize_FormFactorPart(FormFactorPart *formfactorpart, XMLSerializeInstance *inst)
+{
+    xmlserialize_BasePart(formfactorpart, inst);
+}
+
+static Part *xmlserialize_Part(XMLSerializeInstance *inst)
+{
+    Part *part = Part_new(NULL);
+
+    xmlserialize_FormFactorPart(part, inst);
+    xmlserialize_atomic(token, part, Shape);
+
+    return part;
 }
 
 static void xmlserialize_coordinateframe(CoordinateFrame *cf, struct xml_node *node)
@@ -165,20 +184,46 @@ static void xmlserialize_vector3(Vector3 *v, struct xml_node *node)
     }
 }
 
-static void load_model_part_xml(Model *mdl, struct xml_node *node)
+static void xmlserialize_color3(Color3 *c, struct xml_node *node)
+{
+    for (int i = 0; i < xml_node_children(node); i++)
+    {
+        struct xml_node *child = xml_node_child(node, i);
+        char *propName = xml_easy_string(xml_node_attribute_content(child, 0));
+        char *prop = xml_easy_string(xml_node_content(child));
+        float propI = atof(prop);
+
+        switch (*propName)
+        {
+            case 'R': c->R = propI; break;
+            case 'G': c->G = propI; break;
+            case 'B': c->B = propI; break;
+        }
+
+        free(propName);
+        free(prop);
+    }
+}
+
+static Instance *load_model_part_xml(struct xml_node *node)
 {
     char *className = xml_easy_string(xml_node_attribute_content(node, 0));
 
     struct xml_node *propertyNode = xml_node_child(node, 0);
     XMLSerializeInstance inst = { 0 };
+    Instance *ret;
 
     if (!strcmp(className, "TrussPart"))
     {
-        xmlserialize_TrussPart(mdl, &inst);
+        ret = xmlserialize_TrussPart(&inst);
+    }
+    else if (!strcmp(className, "Part"))
+    {
+        ret = xmlserialize_Part(&inst);
     }
     else
     {
-        printf("error: no serializer for classname %s.", className);
+        printf("error: no serializer for classname %s.\n", className);
     }
 
     for (int i = 0; i < xml_node_children(propertyNode); i++)
@@ -189,7 +234,8 @@ static void load_model_part_xml(Model *mdl, struct xml_node *node)
         bool done = false;
         for (int j = 0; j < inst.serializationCount; j++)
         {
-            if (!strcmp(inst.serializations[j].name, propName))
+            if (!strcmp(inst.serializations[j].name, propName) ||
+                (!strcmp(inst.serializations[j].name, "CFrame") && !strcmp(propName, "CoordinateFrame")))
             {
                 done = true;
                 void *val = inst.serializations[j].val;
@@ -218,7 +264,11 @@ static void load_model_part_xml(Model *mdl, struct xml_node *node)
                     case Serialize_CoordinateFrame:
                     {
                         xmlserialize_coordinateframe(val, child);
-                    }
+                    } break;
+                    case Serialize_Color3:
+                    {
+                        xmlserialize_color3(val, child);
+                    } break;
                 }
                 break;
             }
@@ -232,6 +282,8 @@ static void load_model_part_xml(Model *mdl, struct xml_node *node)
     }
 
     free(className);
+
+    return ret;
 }
 
 Model *LoadModelRBXMX(const char *file)
@@ -240,17 +292,18 @@ Model *LoadModelRBXMX(const char *file)
     struct xml_document *document = xml_open_document(f);
 
     struct xml_node *root = xml_document_root(document);
-    Model *mdl = Model_new("Model", NULL);
+
+    Instance *ret;
 
     for (size_t i = 0; i < xml_node_children(root); i++)
     {
         struct xml_node *child = xml_node_child(root, i);
         uint8_t *name = xml_easy_name(child);
-        if (!strcmp(name, "Item")) load_model_part_xml(mdl, child);
+        if (!strcmp(name, "Item")) ret = load_model_part_xml(child);
         free(name);
     }
 
     xml_document_free(document, true);
 
-    return mdl;
+    return ret;
 }
