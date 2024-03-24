@@ -6,19 +6,19 @@
 #include "cframe.h"
 #include <raymath.h>
 
-typedef struct Model {
+typedef struct Model_Instance {
     PVInstance pvinstance;
 
     BasePart *PrimaryPart;
-} Model;
+} Model_Instance;
 
-Model *Model_new(const char *className, Instance *parent);
+Model_Instance *Model_new(const char *className, Instance *parent);
 
-void Model_BreakJoints(Model *this);
-CFrame Model_GetModelCFrame(Model *this);
-Vector3 Model_GetSize(Model *this);
-void Model_MakeJoints(Model *this);
-void Model_MoveTo(Model *this, Vector3 position);
-void Model_TranslateBy(Model *this, Vector3 delta);
+void Model_BreakJoints(Model_Instance *this);
+CFrame Model_GetModelCFrame(Model_Instance *this);
+Vector3 Model_GetSize(Model_Instance *this);
+void Model_MakeJoints(Model_Instance *this);
+void Model_MoveTo(Model_Instance *this, Vector3 position);
+void Model_TranslateBy(Model_Instance *this, Vector3 delta);
 
 #endif

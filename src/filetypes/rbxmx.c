@@ -5,6 +5,7 @@
 
 #include "trusspart.h"
 #include "part.h"
+#include "model.h"
 
 #include "debug.h"
 
@@ -131,7 +132,7 @@ static Part *xmlserialize_Part(XMLSerializeInstance *inst)
     return part;
 }
 
-static Model *xmlserialize_Model(Model *model, XMLSerializeInstance *inst)
+static Model_Instance *xmlserialize_Model(Model_Instance *model, XMLSerializeInstance *inst)
 {
     xmlserialize_PVInstance(model, inst);
 }
@@ -412,7 +413,7 @@ static Instance *load_model_part_xml(struct xml_node *node)
     return ret;
 }
 
-Model *LoadModelRBXMX(const char *file)
+Instance *LoadModelRBXMX(const char *file)
 {
     FILE *f = fopen(file, "r");
     struct xml_document *document = xml_open_document(f);

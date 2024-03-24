@@ -1,5 +1,6 @@
 DefaultPlatform linux64-debug
-UseRaylib False
+RaylibVersion 5
+UseRaylib True
 
 ExtraCFlag -Iinclude
 ExtraCFlag -Ilib/xml/include
@@ -23,3 +24,4 @@ Source trusspart.c
 Source basepart.c
 Source part.c
 Source formfactorpart.c
+Source camera.c

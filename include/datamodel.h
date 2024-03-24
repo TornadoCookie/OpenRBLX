@@ -36,4 +36,6 @@ bool DataModel_IsGearTypeAllowed(DataModel *this, int gearType);
 void DataModel_Load(DataModel *this, const char *url);
 void DataModel_Shutdown(DataModel *this);
 
+void DataModel_Draw(DataModel *this);
+
 #endif

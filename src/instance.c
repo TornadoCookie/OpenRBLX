@@ -23,8 +23,6 @@ Instance *Instance_new(const char *className, Instance *parent)
     newInst->childCount = 0;
     newInst->children = NULL;
 
-    if (parent) Instance_SetParent(newInst, parent);
-
     return newInst;
 }
 
@@ -96,6 +94,15 @@ char *Instance_GetFullName(Instance *this)
 
 bool Instance_IsA(Instance *this, const char *className)
 {
+    if (!strcmp(className, "Instance") || !strcmp(this->ClassName, className)) return true;
+
+    if (!strcmp(className, "PVInstance")) return Instance_IsA(this, "Model") || Instance_IsA(this, "BasePart");
+    if (!strcmp(className, "BasePart")) return Instance_IsA(this, "FormFactorPart") || Instance_IsA(this, "TrussPart");
+    if (!strcmp(className, "FormFactorPart")) return Instance_IsA(this, "Part");
+
+    if (!strcmp(className, "Model")) return Instance_IsA(this, "WorldRoot");
+    if (!strcmp(className, "WorldRoot")) return Instance_IsA(this, "Workspace");
+    
     return false;
 }
 

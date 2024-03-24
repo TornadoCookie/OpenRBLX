@@ -1,8 +1,10 @@
+#include "camera.h"
 #include "datamodel.h"
 #include <stddef.h>
 #include "debug.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 DataModel *DataModel_new(void)
 {
@@ -67,4 +69,42 @@ void DataModel_Shutdown(DataModel *this)
 {
     FIXME("this %p semi-stub\n", this);
     RBXScriptSignal_Fire(this->serviceprovider.Close, NULL);
+}
+
+static void draw_recursive(Instance *inst)
+{
+    if (Instance_IsA(inst, "PVInstance"))
+    {
+        PVInstance_Draw(inst);
+    }
+    for (int i = 0; i < inst->childCount; i++)
+    {
+        draw_recursive(inst->children[i]);
+    }
+}
+
+void DataModel_Draw(DataModel *this)
+{
+    Camera_Instance *cam;
+    Instance **children;
+    int childCount;
+
+    children = Instance_GetChildren(this->Workspace, &childCount);
+
+    for (int i = 0; i < childCount; i++)
+    {
+        if (!strcmp(children[i]->ClassName, "Camera"))
+        {
+            cam = children[i];
+        }
+    }
+
+
+    ClearBackground(BLUE);
+    DrawFPS(0, 0);
+
+    BeginMode3D(cam->camera);
+    DrawCube((Vector3){0, 0, 0}, 1.0f, 1.0f, 1.0f, WHITE);
+    draw_recursive(this);
+    EndMode3D();
 }

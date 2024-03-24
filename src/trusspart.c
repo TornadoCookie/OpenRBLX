@@ -6,5 +6,7 @@ TrussPart *TrussPart_new(Instance *parent)
 
     newInst->basepart.pvinstance.instance.DataCost = sizeof(TrussPart);
 
+    if (parent) Instance_SetParent(newInst, parent);
+
     return newInst;
 }

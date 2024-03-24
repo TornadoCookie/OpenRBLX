@@ -1,8 +1,8 @@
 #ifndef _FILETYPES_
 #define _FILETYPES_
 
-#include "model.h"
+#include "instance.h"
 
-Model *LoadModelRBXMX(const char *file);
+Instance *LoadModelRBXMX(const char *file);
 
 #endif

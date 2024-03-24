@@ -4,7 +4,7 @@
 #include "model.h"
 
 typedef struct RootInstance {
-    Model model;
+    Model_Instance model;
 } RootInstance;
 
 RootInstance *RootInstance_new(const char *className, Instance *parent);
