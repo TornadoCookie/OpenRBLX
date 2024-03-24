@@ -131,6 +131,11 @@ static Part *xmlserialize_Part(XMLSerializeInstance *inst)
     return part;
 }
 
+static Model *xmlserialize_Model(Model *model, XMLSerializeInstance *inst)
+{
+    xmlserialize_PVInstance(model, inst);
+}
+
 static void xmlserialize_coordinateframe(CoordinateFrame *cf, struct xml_node *node)
 {
     for (int i = 0; i < xml_node_children(node); i++)
@@ -351,6 +356,11 @@ static Instance *load_model_part_xml(struct xml_node *node)
     {
         ret = xmlserialize_Part(&inst);
     }
+    else if (!strcmp(className, "Model"))
+    {
+        ret = Model_new("Model", NULL);
+        xmlserialize_Model(ret, &inst);
+    }
     else
     {
         printf("error: no serializer for classname %s.\n", className);
@@ -380,6 +390,11 @@ static Instance *load_model_part_xml(struct xml_node *node)
                 free(propName);
                 free(prop);
             }
+        }
+        else if (!strcmp(type, "Item"))
+        {
+            Instance *new = load_model_part_xml(child);
+            Instance_SetParent(new, ret);
         }
         else
         {
