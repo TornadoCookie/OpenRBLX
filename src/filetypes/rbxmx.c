@@ -363,6 +363,14 @@ static Instance *load_model_part_xml(struct xml_node *node)
         char *type = xml_easy_string(xml_node_name(child));
         if (!strcmp(type, "Feature"))
         {
+            char *pName = xml_easy_string(xml_node_attribute_content(child, 0));
+            if (!strcmp(pName, "Card"))
+            {
+                FIXME("No support for %s Feature\n", "Card");
+                free(pName);
+                continue;
+            }
+            free(pName);
             for (int j = 0; j < xml_node_children(child); j++)
             {
                 struct xml_node *child2 = xml_node_child(child, j);
