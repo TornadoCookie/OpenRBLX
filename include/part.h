@@ -5,7 +5,7 @@
 
 typedef struct Part {
     FormFactorPart formfactorpart;
-    int Shape;
+    int shape;
 } Part;
 
 Part *Part_new(Instance *parent);
