@@ -332,6 +332,10 @@ static void serialize(XMLSerializeInstance inst, char *prop, char *propName, str
                 case Serialize_CoordinateFrame:
                 {
                     xmlserialize_coordinateframe(val, child);
+                    if (Instance_IsA(ret, "BasePart") && !strcmp(propName, "CoordinateFrame"))
+                    {
+                        BasePart_SetCFrame(ret, ((BasePart*)ret)->CFrame);
+                    }
                 } break;
                 case Serialize_Color3:
                 {
@@ -344,6 +348,10 @@ static void serialize(XMLSerializeInstance inst, char *prop, char *propName, str
                 case Serialize_Vector3:
                 {
                     xmlserialize_vector3(val, child);
+                    if (Instance_IsA(ret, "BasePart") && !strcmp(propName, "Position"))
+                    {
+                        BasePart_SetPosition(ret, ((BasePart*)ret)->Position);
+                    }
                 } break;
             }
             break;

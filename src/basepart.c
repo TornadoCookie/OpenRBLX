@@ -52,3 +52,17 @@ void BasePart_SetBrickColor(BasePart *this, int brickColor)
     this->BrickColor = brickColor;
     this->Color = GetBrickColorFromId(brickColor).color;
 }
+
+void BasePart_SetCFrame(BasePart *this, CFrame cf)
+{
+    this->CFrame = cf;
+    this->Position = (Vector3){cf.X, cf.Y, cf.Z};
+}
+
+void BasePart_SetPosition(BasePart *this, Vector3 pos)
+{
+    this->CFrame.X = pos.x;
+    this->CFrame.Y = pos.y;
+    this->CFrame.Z = pos.z;
+    this->Position = pos;
+}

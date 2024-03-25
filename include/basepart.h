@@ -67,5 +67,7 @@ bool BasePart_Resize(BasePart *this, int normalId, int deltaAmount);
 
 void BasePart_SetColor(BasePart *this, Color3 color);
 void BasePart_SetBrickColor(BasePart *this, int brickColor);
+void BasePart_SetCFrame(BasePart *this, CFrame cf);
+void BasePart_SetPosition(BasePart *this, Vector3 pos);
 
 #endif

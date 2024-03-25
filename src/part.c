@@ -32,14 +32,14 @@ void part_draw(Part *this)
                 this->formfactorpart.basepart.size.x,
                 this->formfactorpart.basepart.size.x,
                 this->formfactorpart.basepart.size.y,
-                6,
+                24,
                 rl_from_color3(this->formfactorpart.basepart.Color)
             );
         } break;
         case Shape_Block:
         {
             DrawCube(
-                this->formfactorpart.basepart.Position,
+                Vector3Add(this->formfactorpart.basepart.Position, Vector3Divide(this->formfactorpart.basepart.size, (Vector3){2, 2, 2})),
                 this->formfactorpart.basepart.size.x,
                 this->formfactorpart.basepart.size.y,
                 this->formfactorpart.basepart.size.z,

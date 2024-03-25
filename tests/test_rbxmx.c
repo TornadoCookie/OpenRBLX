@@ -19,6 +19,7 @@ int main(int argc, char **argv)
     Instance_SetParent(mdl, datamodel->Workspace);
 
     SetTargetFPS(60);
+    DisableCursor();
 
     while (!WindowShouldClose())
     {
