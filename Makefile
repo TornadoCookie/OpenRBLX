@@ -76,6 +76,7 @@ test_rbxmx_SOURCES+=src/basepart.c
 test_rbxmx_SOURCES+=src/part.c
 test_rbxmx_SOURCES+=src/formfactorpart.c
 test_rbxmx_SOURCES+=src/camera.c
+test_rbxmx_SOURCES+=src/brickcolor.c
 
 $(DISTDIR)/test_rbxmx$(EXEC_EXTENSION): $(test_rbxmx_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)

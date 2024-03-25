@@ -2,6 +2,8 @@
 #include "debug.h"
 #include <stdlib.h>
 
+DEFAULT_DEBUG_CHANNEL(camera)
+
 Camera_Instance *Camera_new(Instance *parent)
 {
     Camera_Instance *newInst = Instance_new("Camera", parent);
@@ -11,6 +13,11 @@ Camera_Instance *Camera_new(Instance *parent)
 
     newInst->CameraType = CameraType_Custom;
     newInst->camera = (Camera){ 0 };
+    newInst->camera.position = (Vector3){ 0.0f, 2.0f, 4.0f };    // Camera position
+    newInst->camera.target = (Vector3){ 0.0f, 2.0f, 0.0f };      // Camera looking at point
+    newInst->camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          // Camera up vector (rotation towards target)
+    newInst->camera.fovy = 60.0f;                                // Camera field-of-view Y
+    newInst->camera.projection = CAMERA_PERSPECTIVE;             // Camera projection type
 
     if (parent) Instance_SetParent(newInst, parent);
 
@@ -35,4 +42,5 @@ bool Camera_Zoom(Camera_Instance *this, float distance)
 void Camera_Process(Camera_Instance *this)
 {
     FIXME("this %p stub!\n", this);
+    UpdateCamera(&this->camera, CAMERA_ORBITAL);
 }

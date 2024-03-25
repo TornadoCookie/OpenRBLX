@@ -2,6 +2,9 @@
 #include "debug.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "brickcolor.h"
+
+DEFAULT_DEBUG_CHANNEL(basepart)
 
 BasePart *BasePart_new(const char *className, Instance *parent)
 {
@@ -36,4 +39,16 @@ bool BasePart_Resize(BasePart *this, int normalId, int deltaAmount)
 {
     FIXME("this %p, normalId %d, deltaAmount %d stub!\n", this, normalId, deltaAmount);
     return true;
+}
+
+void BasePart_SetColor(BasePart *this, Color3 color)
+{
+    this->Color = color;
+    this->BrickColor = GetBrickColorFromColor(color).paletteIndex;
+}
+
+void BasePart_SetBrickColor(BasePart *this, int brickColor)
+{
+    this->BrickColor = brickColor;
+    this->Color = GetBrickColorFromId(brickColor).color;
 }

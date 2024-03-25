@@ -9,6 +9,8 @@
 
 #include "debug.h"
 
+DEFAULT_DEBUG_CHANNEL(filetypes)
+
 static char *xml_easy_string(struct xml_string *str)
 {
     char *buf = malloc(xml_string_length(str) + 1);
@@ -142,7 +144,7 @@ static void xmlserialize_coordinateframe(CoordinateFrame *cf, struct xml_node *n
     for (int i = 0; i < xml_node_children(node); i++)
     {
         struct xml_node *child = xml_node_child(node, i);
-        char *propName = xml_easy_string(xml_node_attribute_content(child, 0));
+        char *propName = xml_easy_string(xml_node_name(child));
         char *prop = xml_easy_string(xml_node_content(child));
         float propI = atof(prop);
 
@@ -179,7 +181,7 @@ static void xmlserialize_vector3(Vector3 *v, struct xml_node *node)
     for (int i = 0; i < xml_node_children(node); i++)
     {
         struct xml_node *child = xml_node_child(node, i);
-        char *propName = xml_easy_string(xml_node_attribute_content(child, 0));
+        char *propName = xml_easy_string(xml_node_name(child));
         char *prop = xml_easy_string(xml_node_content(child));
         float propI = atof(prop);
 
@@ -200,7 +202,7 @@ static void xmlserialize_color3(Color3 *c, struct xml_node *node)
     for (int i = 0; i < xml_node_children(node); i++)
     {
         struct xml_node *child = xml_node_child(node, i);
-        char *propName = xml_easy_string(xml_node_attribute_content(child, 0));
+        char *propName = xml_easy_string(xml_node_name(child));
         char *prop = xml_easy_string(xml_node_content(child));
         float propI = atof(prop);
 
@@ -260,7 +262,7 @@ static void xmlserialize_token(int *val, char *prop, char *propName)
     }
 }
 
-static void serialize(XMLSerializeInstance inst, char *prop, char *propName, struct xml_node *child)
+static void serialize(XMLSerializeInstance inst, char *prop, char *propName, struct xml_node *child, Instance *ret)
 {
     bool done = false;
 
@@ -276,10 +278,10 @@ static void serialize(XMLSerializeInstance inst, char *prop, char *propName, str
         for (int i = 0; i < xml_node_children(child); i++)
         {
             struct xml_node *child2 = xml_node_child(child, i);
-            serialize(inst, prop, type_, child2);
-            serialize(inst, prop, surfaceInput, child2);
-            serialize(inst, prop, paramA, child2);
-            serialize(inst, prop, paramB, child2);
+            serialize(inst, prop, type_, child2, ret);
+            serialize(inst, prop, surfaceInput, child2, ret);
+            serialize(inst, prop, paramA, child2, ret);
+            serialize(inst, prop, paramB, child2, ret);
         }
 
         FIXME("no analogue for %s types\n", "Constraint");
@@ -315,6 +317,10 @@ static void serialize(XMLSerializeInstance inst, char *prop, char *propName, str
                 case Serialize_int:
                 {
                     *(int*)val = atoi(prop);
+                    if (Instance_IsA(ret, "BasePart") && !strcmp(propName, "BrickColor"))
+                    {
+                        BasePart_SetBrickColor(ret, atoi(prop));
+                    }
                 } break;
                 case Serialize_string:
                 {
@@ -330,6 +336,14 @@ static void serialize(XMLSerializeInstance inst, char *prop, char *propName, str
                 case Serialize_Color3:
                 {
                     xmlserialize_color3(val, child);
+                    if (Instance_IsA(ret, "BasePart") && !strcmp(propName, "Color"))
+                    {
+                        BasePart_SetColor(ret, ((BasePart*)ret)->Color);
+                    }
+                } break;
+                case Serialize_Vector3:
+                {
+                    xmlserialize_vector3(val, child);
                 } break;
             }
             break;
@@ -387,23 +401,30 @@ static Instance *load_model_part_xml(struct xml_node *node)
                 struct xml_node *child2 = xml_node_child(child, j);
                 char *propName = xml_easy_string(xml_node_attribute_content(child2, 0));
                 char *prop = xml_easy_string(xml_node_content(child2));
-                serialize(inst, prop, propName, child2);
+                serialize(inst, prop, propName, child2, ret);
                 free(propName);
                 free(prop);
             }
-        }
-        else if (!strcmp(type, "Item"))
-        {
-            Instance *new = load_model_part_xml(child);
-            Instance_SetParent(new, ret);
         }
         else
         {
             char *propName = xml_easy_string(xml_node_attribute_content(child, 0));
             char *prop = xml_easy_string(xml_node_content(child));
-            serialize(inst, prop, propName, child);
+            serialize(inst, prop, propName, child, ret);
             free(propName);
             free(prop);
+        }
+        free(type);
+    }
+
+    for (int i = 0; i < xml_node_children(node); i++)
+    {
+        struct xml_node *child = xml_node_child(node, i);
+        char *type = xml_easy_string(xml_node_name(child));
+        if (!strcmp(type, "Item"))
+        {
+            Instance *new = load_model_part_xml(child);
+            Instance_SetParent(new, ret);
         }
         free(type);
     }

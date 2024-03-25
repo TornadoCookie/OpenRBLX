@@ -5,7 +5,9 @@
 #include "debug.h"
 #include <stdio.h>
 
-Color rl_from_color3(Color3 col)
+DEFAULT_DEBUG_CHANNEL(part)
+
+static Color rl_from_color3(Color3 col)
 {
     return (Color){col.R * 255, col.G * 255, col.B * 255, 255};
 }

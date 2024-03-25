@@ -4,6 +4,8 @@
 #include "debug.h"
 #include "workspace.h"
 
+DEFAULT_DEBUG_CHANNEL(workspace)
+
 void workspace_draw(Workspace *this)
 {
 

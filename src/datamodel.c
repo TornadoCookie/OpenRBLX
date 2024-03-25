@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+DEFAULT_DEBUG_CHANNEL(datamodel)
+
 DataModel *DataModel_new(void)
 {
     DataModel *newInst = ServiceProvider_new("DataModel", NULL);
@@ -75,6 +77,7 @@ static void draw_recursive(Instance *inst)
 {
     if (Instance_IsA(inst, "PVInstance"))
     {
+        printf("draw %s.\n", inst->ClassName);
         PVInstance_Draw(inst);
     }
     for (int i = 0; i < inst->childCount; i++)
@@ -105,6 +108,8 @@ void DataModel_Draw(DataModel *this)
 
     BeginMode3D(cam->camera);
     DrawCube((Vector3){0, 0, 0}, 1.0f, 1.0f, 1.0f, WHITE);
-    draw_recursive(this);
+    draw_recursive(this->Workspace);
     EndMode3D();
+
+    Camera_Process(cam);
 }

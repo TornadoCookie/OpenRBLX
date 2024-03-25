@@ -12,17 +12,19 @@ int main(int argc, char **argv)
         printf("usage: test_rbxmx <mdl.rbxmx>\n");
         return 0;
     }
-    InitWindow(640, 480, "OpenRBLX");
+    InitWindow(640, 480, "rbxmx test");
     DataModel *datamodel = DataModel_new();
-    Model *mdl = LoadModelRBXMX(argv[1]);
+    Instance *mdl = LoadModelRBXMX(argv[1]);
 
-    Instance_SetParent(mdl, datamodel);
+    Instance_SetParent(mdl, datamodel->Workspace);
+
+    SetTargetFPS(60);
 
     while (!WindowShouldClose())
     {
         BeginDrawing();
         DataModel_Draw(datamodel);
-        BeginDrawing();
+        EndDrawing();
     }
     
     DataModel_Shutdown(datamodel);

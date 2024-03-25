@@ -25,3 +25,4 @@ Source basepart.c
 Source part.c
 Source formfactorpart.c
 Source camera.c
+Source brickcolor.c

@@ -3,11 +3,19 @@
 #include <stdio.h>
 #include <string.h>
 
+DEFAULT_DEBUG_CHANNEL(model)
+
+void model_draw(Model_Instance *mdl)
+{
+
+}
+
 Model_Instance *Model_new(const char *className, Instance *parent)
 {
     Model_Instance *newInst = PVInstance_new(className, parent);
 
     newInst->pvinstance.instance.DataCost = sizeof(Model_Instance);
+    newInst->pvinstance.drawFunc = model_draw;
 
     if (!strcmp(newInst->pvinstance.instance.ClassName, "Model") && parent) Instance_SetParent(newInst, parent);
 

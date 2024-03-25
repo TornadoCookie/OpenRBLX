@@ -65,4 +65,7 @@ float BasePart_GetMass(BasePart *this);
 void BasePart_MakeJoints(BasePart *this);
 bool BasePart_Resize(BasePart *this, int normalId, int deltaAmount);
 
+void BasePart_SetColor(BasePart *this, Color3 color);
+void BasePart_SetBrickColor(BasePart *this, int brickColor);
+
 #endif

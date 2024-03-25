@@ -10,10 +10,10 @@ const char *debugstr_vector3(Vector3 v)
     return buf;
 }
 
-void dbg_printf(const char *type, const char *func, const char *restrict format, ...)
+void dbg_printf(const char *type, const char *channel, const char *func, const char *restrict format, ...)
 {
     static char buf[1024];
-    snprintf(buf, 1024, "%s:%s %s", type, func, format);
+    snprintf(buf, 1024, "%s:%s:%s %s", type, channel, func, format);
     
     va_list args;
     va_start(args, format);
@@ -29,8 +29,10 @@ void dbg_printf(const char *type, const char *func, const char *restrict format,
 #include <raymath.h>
 
 const char *debugstr_vector3(Vector3 v);
-void dbg_printf(const char *type, const char *func, const char *restrict format, ...);
+void dbg_printf(const char *type, const char *channel, const char *func, const char *restrict format, ...);
 
-#define FIXME(fmt, ...) dbg_printf("FIXME", __func__, fmt, __VA_ARGS__)
+#define FIXME(fmt, ...) dbg_printf("FIXME", __dbg_channel, __func__, fmt, __VA_ARGS__)
+
+#define DEFAULT_DEBUG_CHANNEL(x) static const char *__dbg_channel = #x;
 
 #endif

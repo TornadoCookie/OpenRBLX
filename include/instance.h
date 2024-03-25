@@ -40,6 +40,8 @@ bool Instance_IsAncestorOf(Instance *this, Instance *descendant);
 bool Instance_IsDescendantOf(Instance *this, Instance *ancestor);
 void Instance_Remove(Instance *this);
 
+bool ClassName_IsA(const char *className1, const char *className2);
+
 void Instance_SetArchivable(Instance *this, bool archivable);
 void Instance_SetName(Instance *this, const char *name);
 void Instance_SetParent(Instance *this, Instance *parent);

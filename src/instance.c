@@ -58,7 +58,10 @@ Instance **Instance_GetChildren(Instance *this, int *childCount)
 
 const char *Instance_GetDebugId(Instance *this, int scopeLength)
 {
-    return this;
+    char *buf = malloc(1024);
+    snprintf(buf, 1023, "%p", this);
+    buf = realloc(buf, strlen(buf) + 1);
+    return buf;
 }
 
 static void memcpy_reverse(unsigned char *restrict dst, const unsigned char *restrict src, size_t n)
@@ -92,18 +95,23 @@ char *Instance_GetFullName(Instance *this)
     return fullName;
 }
 
+bool ClassName_IsA(const char *className1, const char *className)
+{
+    if (!strcmp(className, "Instance") || !strcmp(className1, className)) return true;
+
+    if (!strcmp(className, "PVInstance")) return ClassName_IsA(className1, "Model") || ClassName_IsA(className1, "BasePart");
+    if (!strcmp(className, "BasePart")) return ClassName_IsA(className1, "FormFactorPart") || ClassName_IsA(className1, "TrussPart");
+    if (!strcmp(className, "FormFactorPart")) return ClassName_IsA(className1, "Part");
+
+    if (!strcmp(className, "Model")) return ClassName_IsA(className1, "WorldRoot");
+    if (!strcmp(className, "WorldRoot")) return ClassName_IsA(className1, "Workspace");
+
+    return false;
+}
+
 bool Instance_IsA(Instance *this, const char *className)
 {
-    if (!strcmp(className, "Instance") || !strcmp(this->ClassName, className)) return true;
-
-    if (!strcmp(className, "PVInstance")) return Instance_IsA(this, "Model") || Instance_IsA(this, "BasePart");
-    if (!strcmp(className, "BasePart")) return Instance_IsA(this, "FormFactorPart") || Instance_IsA(this, "TrussPart");
-    if (!strcmp(className, "FormFactorPart")) return Instance_IsA(this, "Part");
-
-    if (!strcmp(className, "Model")) return Instance_IsA(this, "WorldRoot");
-    if (!strcmp(className, "WorldRoot")) return Instance_IsA(this, "Workspace");
-    
-    return false;
+    return ClassName_IsA(this->ClassName, className);
 }
 
 bool Instance_IsAncestorOf(Instance *this, Instance *descendant)
