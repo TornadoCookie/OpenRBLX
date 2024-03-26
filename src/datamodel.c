@@ -5,8 +5,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "meshcontentprovider.h"
 
 DEFAULT_DEBUG_CHANNEL(datamodel)
+
+static DataModel *game;
+
+
+static RenderTexture2D rt;
 
 DataModel *DataModel_new(void)
 {
@@ -22,6 +28,16 @@ DataModel *DataModel_new(void)
     newInst->JobId = "OpenRBLX";
 
     newInst->Workspace = Workspace_new(newInst);
+
+    if (game)
+    {
+        TraceLog(LOG_FATAL, "more than one instance of DataModel\n");
+    }
+    game = newInst;
+
+    MeshContentProvider_new(newInst);
+
+    rt = LoadRenderTexture(128, 128);
 
     return newInst;
 }
@@ -103,13 +119,20 @@ void DataModel_Draw(DataModel *this)
     }
 
 
-    ClearBackground(BLUE);
+    ClearBackground(SKYBLUE);
     DrawFPS(0, 0);
 
     BeginMode3D(cam->camera);
     DrawCube((Vector3){0, 0, 0}, 1.0f, 1.0f, 1.0f, WHITE);
     draw_recursive(this->Workspace);
+    DrawLine3D((Vector3){0, 0, 0}, (Vector3){100, 0, 0}, RED);
+    DrawLine3D((Vector3){0, 0, 0}, (Vector3){0, 100, 0}, GREEN);
+    DrawLine3D((Vector3){0, 0, 0}, (Vector3){0, 0, 100}, BLUE);
     EndMode3D();
-
     Camera_Process(cam);
+}
+
+DataModel *GetDataModel(void)
+{
+    return game;
 }

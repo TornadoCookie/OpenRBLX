@@ -5,8 +5,16 @@
 
 const char *debugstr_vector3(Vector3 v)
 {
+    char *buf = malloc(1024);
+    snprintf(buf, 1023, "{%f, %f, %f}", v.x, v.y, v.z);
+    buf = realloc(buf, strlen(buf) + 1);
+    return buf;
+}
+
+const char *debugstr_cframe(CFrame cf)
+{
     static char buf[1024];
-    snprintf(buf, 1024, "{%f, %f, %f}", v.x, v.y, v.z);
+    snprintf(buf, 1024, "{ XYZ %s, RX0 %s, RX1 %s, RX2 %s }", debugstr_vector3((Vector3){cf.X, cf.Y, cf.Z}), debugstr_vector3((Vector3){cf.R00, cf.R10, cf.R20}), debugstr_vector3((Vector3){cf.R01, cf.R11, cf.R21}), debugstr_vector3((Vector3){cf.R02, cf.R12, cf.R22}));
     return buf;
 }
 
@@ -27,8 +35,10 @@ void dbg_printf(const char *type, const char *channel, const char *func, const c
 #define _DEBUG_
 
 #include <raymath.h>
+#include "cframe.h"
 
 const char *debugstr_vector3(Vector3 v);
+const char *debugstr_cframe(CFrame cf);
 void dbg_printf(const char *type, const char *channel, const char *func, const char *restrict format, ...);
 
 #define FIXME(fmt, ...) dbg_printf("FIXME", __dbg_channel, __func__, fmt, __VA_ARGS__)

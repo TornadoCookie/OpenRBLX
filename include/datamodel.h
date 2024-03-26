@@ -38,4 +38,6 @@ void DataModel_Shutdown(DataModel *this);
 
 void DataModel_Draw(DataModel *this);
 
+DataModel *GetDataModel(void);
+
 #endif

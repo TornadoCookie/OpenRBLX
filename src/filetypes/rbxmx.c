@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "trusspart.h"
 #include "part.h"
+#include "trusspart.h"
 #include "model.h"
 
 #include "debug.h"
@@ -229,7 +229,7 @@ static const char *tokenPropNames[5] = {
 static const char *tokenTables[][50] = {
     { "Ball", "Cylinder", "Block", "Wedge", "CornerWedge", NULL }, // shape
     { "None", "Player", "KeyboardLeft", "KeyboardRight", "Joypad1", "Joypad2", "Chase", "Flee", NULL }, //Controller
-    { "Smooth", "Bumps", "Spawn", NULL }, // Type
+    { "Smooth", "Glue", "Weld", "Studs", "Inlet", "Universal", "Hinge", "Motor", "SteppingMotor", "Bumps", "Spawn", NULL }, // Type
     { "None", "Hinge", "Motor", "SteppingMotor", NULL }, //Constraint
     { "LeftTread", "RightTread", "Steer", "Throttle", "Updown", "Action1", "Action2", "Action3", "Action4", "Action5", "Sin", "Constant", NULL }, // SurfaceInput
 };
@@ -313,6 +313,10 @@ static void serialize(XMLSerializeInstance inst, char *prop, char *propName, str
                 case Serialize_token:
                 {
                     xmlserialize_token(val, prop, propName);
+                    if (Instance_IsA(ret, "Part") && !strcmp(propName, "shape"))
+                    {
+                        Part_SetShape(ret, ((Part*)ret)->shape);
+                    }
                 } break;
                 case Serialize_int:
                 {

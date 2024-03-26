@@ -5,6 +5,31 @@
 #include "faces.h"
 #include "color3.h"
 
+typedef enum {
+    SurfaceType_Smooth,
+    SurfaceType_Glue,
+    SurfaceType_Weld,
+    SurfaceType_Studs,
+    SurfaceType_Inlet,
+    SurfaceType_Universal,
+    SurfaceType_Hinge,
+    SurfaceType_Motor,
+    SurfaceType_SteppingMotor,
+
+    // 2005 SurfaceTypes
+    SurfaceType_Bumps = 1,
+    SurfaceType_Spawn
+} SurfaceType;
+
+typedef enum {
+    NormalId_Right,
+    NormalId_Top,
+    NormalId_Back,
+    NormalId_Left,
+    NormalId_Bottom,
+    NormalId_Front
+} NormalId;
+
 typedef struct BasePart {
     PVInstance pvinstance;
 

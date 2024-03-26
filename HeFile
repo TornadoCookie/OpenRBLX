@@ -26,3 +26,5 @@ Source part.c
 Source formfactorpart.c
 Source camera.c
 Source brickcolor.c
+Source meshcontentprovider.c
+Source cacheablecontentprovider.c
