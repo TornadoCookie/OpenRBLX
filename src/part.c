@@ -32,9 +32,22 @@ static Matrix rl_from_cframe_and_size(CFrame cf, Vector3 size, Shape shape)
     Vector3 scale = size;
     if (shape == Shape_Cylinder)
     {
-        float sizeX = scale.x;
-        scale.x = scale.z;
+        float sizeX = scale.y;
+        scale.y = scale.z;
         scale.z = sizeX;
+
+        rotated = (Matrix) {
+            .m4 = -cf.R00,
+            .m5 = -cf.R10,
+            .m6 = -cf.R20,
+            .m0 = -cf.R01,
+            .m1 = -cf.R11,
+            .m2 = -cf.R21,
+            .m8 = -cf.R02,
+            .m9 = -cf.R12,
+            .m10 = -cf.R22,
+            .m15 = 1.0f,
+        };
     }
     Vector3 translate = (Vector3){cf.X, cf.Y, cf.Z};
     if (shape == Shape_Ball)
