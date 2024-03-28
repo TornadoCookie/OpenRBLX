@@ -37,9 +37,9 @@ static Matrix rl_from_cframe_and_size(CFrame cf, Vector3 size, Shape shape)
         scale.z = sizeX;
     }
     Vector3 translate = (Vector3){cf.X, cf.Y, cf.Z};
-    if (shape == Shape_Block)
+    if (shape == Shape_Ball)
     {
-        //translate = Vector3Subtract(translate, Vector3Divide(scale, (Vector3){2, 2, 2}));
+        translate = Vector3Add(translate, Vector3Divide(scale, (Vector3){2, 2, 2}));
     }
     return MatrixMultiply(MatrixMultiply(MatrixScale(scale.x, scale.y, scale.z), rotated), MatrixTranslate(translate.x, translate.y, translate.z));
 }
