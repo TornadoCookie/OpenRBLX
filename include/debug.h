@@ -2,6 +2,8 @@
 #ifdef DEBUG_IMPL
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
+#include <stdlib.h>
 
 const char *debugstr_vector3(Vector3 v)
 {

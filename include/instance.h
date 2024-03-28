@@ -39,6 +39,8 @@ bool Instance_IsA(Instance *this, const char *className);
 bool Instance_IsAncestorOf(Instance *this, Instance *descendant);
 bool Instance_IsDescendantOf(Instance *this, Instance *ancestor);
 void Instance_Remove(Instance *this);
+Instance *Instance_FindFirstChildWhichIsA(Instance *this, const char *className, bool recursive);
+Instance *Instance_FindNextChildWhichIsA(Instance *this, const char *className, Instance *prev, bool recursive);
 
 bool ClassName_IsA(const char *className1, const char *className2);
 

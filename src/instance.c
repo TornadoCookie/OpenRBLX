@@ -157,6 +157,40 @@ void Instance_Remove(Instance *this)
     }
 }
 
+Instance *Instance_FindFirstChildWhichIsA(Instance *this, const char *className, bool recursive)
+{
+    for (int i = 0; i < this->childCount; i++)
+    {
+        if (Instance_IsA(this->children[i], className)) return this->children[i];
+        else if (recursive)
+        {
+            Instance *ret = Instance_FindFirstChildWhichIsA(this->children[i], className, recursive);
+            if (ret) return ret;
+        }
+    }
+
+    return NULL;
+}
+
+Instance *Instance_FindNextChildWhichIsA(Instance *this, const char *className, Instance *prev, bool recursive)
+{
+    if (prev == NULL) return NULL;
+
+    bool afterPrev = false;
+    for (int i = 0; i < this->childCount; i++)
+    {
+        if (afterPrev && Instance_IsA(this->children[i], className)) return this->children[i];
+        else if (recursive && Instance_IsAncestorOf(this->children[i], prev))
+        {
+            Instance *x = Instance_FindNextChildWhichIsA(this->children[i], className, prev, recursive);
+            if (x) return x;
+        }
+        if (this->children[i] == prev || (recursive && Instance_IsAncestorOf(this->children[i], prev))) afterPrev = true;
+    }
+
+    return NULL;
+}
+
 void Instance_SetArchivable(Instance *this, bool archivable) 
 {
     this->archivable = archivable;

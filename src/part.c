@@ -14,7 +14,7 @@ static Color rl_from_color3(Color3 col)
     return (Color){col.R * 255, col.G * 255, col.B * 255, 255};
 }
 
-static Matrix rl_from_cframe_and_size(CFrame cf, Vector3 size)
+static Matrix rl_from_cframe_and_size(CFrame cf, Vector3 size, Shape shape)
 {
     Matrix rotated = {
         .m0 = -cf.R00,
@@ -29,29 +29,26 @@ static Matrix rl_from_cframe_and_size(CFrame cf, Vector3 size)
         .m15 = 1.0f,
     };
     printf("rotated = %s.\n", debugstr_cframe(cf));
-    return MatrixMultiply(MatrixMultiply(MatrixScale(size.x, size.y, size.z), rotated), MatrixTranslate(cf.X, cf.Y, cf.Z));
+    Vector3 scale = size;
+    if (shape == Shape_Cylinder)
+    {
+        float sizeX = scale.x;
+        scale.x = scale.z;
+        scale.z = sizeX;
+    }
+    Vector3 translate = (Vector3){cf.X, cf.Y, cf.Z};
+    if (shape == Shape_Block)
+    {
+        //translate = Vector3Subtract(translate, Vector3Divide(scale, (Vector3){2, 2, 2}));
+    }
+    return MatrixMultiply(MatrixMultiply(MatrixScale(scale.x, scale.y, scale.z), rotated), MatrixTranslate(translate.x, translate.y, translate.z));
 }
 
 void part_draw(Part *this)
 {
     printf("drawing part %p.\n", this);
     this->material.maps[MATERIAL_MAP_DIFFUSE].color = rl_from_color3(this->formfactorpart.basepart.Color);
-    DrawMesh(this->mesh, this->material, rl_from_cframe_and_size(this->formfactorpart.basepart.CFrame, this->formfactorpart.basepart.size));
-
-    if (this->shape == Shape_Block)
-    {
-        if (this->formfactorpart.basepart.TopSurface == SurfaceType_Bumps)
-        {
-            printf("Draw Bumps\n");
-            for (int x = 0; x < this->formfactorpart.basepart.size.x; x++)
-            {
-                for (int z = 0; z < this->formfactorpart.basepart.size.z; z++)
-                {
-                    DrawCube((Vector3){x + this->formfactorpart.basepart.Position.x + 0.5f, this->formfactorpart.basepart.size.y + this->formfactorpart.basepart.Position.y, z + this->formfactorpart.basepart.Position.z + 0.5f}, 0.9, 0.9f, 0.9f, rl_from_color3(this->formfactorpart.basepart.Color));
-                }
-            }
-        }
-    }
+    DrawMesh(this->mesh, this->material, rl_from_cframe_and_size(this->formfactorpart.basepart.CFrame, this->formfactorpart.basepart.size, this->shape));
 }
 
 Part *Part_new(Instance *parent)

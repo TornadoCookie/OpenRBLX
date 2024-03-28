@@ -17,7 +17,7 @@ typedef enum {
     SurfaceType_SteppingMotor,
 
     // 2005 SurfaceTypes
-    SurfaceType_Bumps = 1,
+    SurfaceType_Bumps,
     SurfaceType_Spawn
 } SurfaceType;
 

@@ -39,6 +39,7 @@ typedef struct XMLSerialization {
 typedef struct XMLSerializeInstance {
     XMLSerialization *serializations;
     int serializationCount;
+    CFrame modelOffset;
 } XMLSerializeInstance;
 
 static void _xmlserialize_atomic(XMLSerializeInstance *inst, XMLSerialization serialization)
@@ -134,9 +135,11 @@ static Part *xmlserialize_Part(XMLSerializeInstance *inst)
     return part;
 }
 
-static Model_Instance *xmlserialize_Model(Model_Instance *model, XMLSerializeInstance *inst)
+static void xmlserialize_Model(Model_Instance *model, XMLSerializeInstance *inst)
 {
     xmlserialize_PVInstance(model, inst);
+
+    _xmlserialize_atomic(inst, (XMLSerialization){Serialize_CoordinateFrame, "CoordinateFrame", &inst->modelOffset});
 }
 
 static void xmlserialize_coordinateframe(CoordinateFrame *cf, struct xml_node *node)
@@ -262,7 +265,7 @@ static void xmlserialize_token(int *val, char *prop, char *propName)
     }
 }
 
-static void serialize(XMLSerializeInstance inst, char *prop, char *propName, struct xml_node *child, Instance *ret)
+static void serialize(XMLSerializeInstance *inst, char *prop, char *propName, struct xml_node *child, Instance *ret)
 {
     bool done = false;
 
@@ -290,17 +293,17 @@ static void serialize(XMLSerializeInstance inst, char *prop, char *propName, str
     }
     free(type);
 
-    for (int j = 0; j < inst.serializationCount; j++)
+    for (int j = 0; j < inst->serializationCount; j++)
     {
-        if (!strcmp(inst.serializations[j].name, propName) ||
-            (!strcmp(inst.serializations[j].name, "CFrame") && !strcmp(propName, "CoordinateFrame")) ||
-            (!strcmp(inst.serializations[j].name, "RotVelocity") && !strcmp(propName, "RotVel")) ||
-            (!strcmp(inst.serializations[j].name, "Locked") && !strcmp(propName, "CanSelect")) ||
-            (!strcmp(inst.serializations[j].name, "ClassName") && !strcmp(propName, "Keywords")))
+        if (!strcmp(inst->serializations[j].name, propName) ||
+            (!strcmp(inst->serializations[j].name, "CFrame") && !strcmp(propName, "CoordinateFrame")) ||
+            (!strcmp(inst->serializations[j].name, "RotVelocity") && !strcmp(propName, "RotVel")) ||
+            (!strcmp(inst->serializations[j].name, "Locked") && !strcmp(propName, "CanSelect")) ||
+            (!strcmp(inst->serializations[j].name, "ClassName") && !strcmp(propName, "Keywords")))
         {
             done = true;
-            void *val = inst.serializations[j].val;
-            switch (inst.serializations[j].type)
+            void *val = inst->serializations[j].val;
+            switch (inst->serializations[j].type)
             {
                 case Serialize_bool:
                 {
@@ -413,7 +416,7 @@ static Instance *load_model_part_xml(struct xml_node *node)
                 struct xml_node *child2 = xml_node_child(child, j);
                 char *propName = xml_easy_string(xml_node_attribute_content(child2, 0));
                 char *prop = xml_easy_string(xml_node_content(child2));
-                serialize(inst, prop, propName, child2, ret);
+                serialize(&inst, prop, propName, child2, ret);
                 free(propName);
                 free(prop);
             }
@@ -422,7 +425,7 @@ static Instance *load_model_part_xml(struct xml_node *node)
         {
             char *propName = xml_easy_string(xml_node_attribute_content(child, 0));
             char *prop = xml_easy_string(xml_node_content(child));
-            serialize(inst, prop, propName, child, ret);
+            serialize(&inst, prop, propName, child, ret);
             free(propName);
             free(prop);
         }
@@ -439,6 +442,11 @@ static Instance *load_model_part_xml(struct xml_node *node)
             Instance_SetParent(new, ret);
         }
         free(type);
+    }
+
+    if (!strcmp(className, "Model"))
+    {
+        Model_MoveTo(ret, (Vector3){inst.modelOffset.X, inst.modelOffset.Y, inst.modelOffset.Z});
     }
 
     free(className);
