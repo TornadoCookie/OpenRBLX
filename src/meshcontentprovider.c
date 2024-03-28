@@ -15,7 +15,7 @@ MeshContentProvider *MeshContentProvider_new(Instance *parent)
 
     newInst->ballMesh = GenMeshSphere(1.0f, 12, 24);
     newInst->blockMesh = GenMeshCube(1.0f, 1.0f, 1.0f);
-    newInst->cylinderMesh = GenMeshCylinder(1.0f, 1.0f, 24);
+    newInst->cylinderMesh = GenMeshCylinder(0.5f, 1.0f, 24);
 
     newInst->studs = LoadTexture("staticdata/studs.png");
 

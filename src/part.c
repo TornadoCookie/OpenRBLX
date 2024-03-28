@@ -28,7 +28,6 @@ static Matrix rl_from_cframe_and_size(CFrame cf, Vector3 size, Shape shape)
         .m10 = -cf.R22,
         .m15 = 1.0f,
     };
-    printf("rotated = %s.\n", debugstr_cframe(cf));
     Vector3 scale = size;
     if (shape == Shape_Cylinder)
     {
@@ -50,10 +49,17 @@ static Matrix rl_from_cframe_and_size(CFrame cf, Vector3 size, Shape shape)
         };
     }
     Vector3 translate = (Vector3){cf.X, cf.Y, cf.Z};
-    if (shape == Shape_Ball || shape == Shape_Cylinder)
+    if (shape == Shape_Ball)
     {
         translate = Vector3Add(translate, Vector3Divide(scale, (Vector3){2, 2, 2}));
     }
+    else if (shape == Shape_Cylinder)
+    {
+        translate.x += scale.x / 2;
+        translate.y += scale.y / 5;
+        translate.z -= scale.z;
+    }
+    printf("rotated = %s.\n", debugstr_cframe(cf));
     return MatrixMultiply(MatrixMultiply(MatrixScale(scale.x, scale.y, scale.z), rotated), MatrixTranslate(translate.x, translate.y, translate.z));
 }
 
