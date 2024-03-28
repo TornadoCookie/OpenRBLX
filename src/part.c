@@ -50,7 +50,7 @@ static Matrix rl_from_cframe_and_size(CFrame cf, Vector3 size, Shape shape)
         };
     }
     Vector3 translate = (Vector3){cf.X, cf.Y, cf.Z};
-    if (shape == Shape_Ball)
+    if (shape == Shape_Ball || shape == Shape_Cylinder)
     {
         translate = Vector3Add(translate, Vector3Divide(scale, (Vector3){2, 2, 2}));
     }
