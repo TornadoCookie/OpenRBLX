@@ -8,6 +8,12 @@ TODO:
 - matrices aren't converted from CFrames correctly necessarily yet. we need to test more.
 - surfaces
 - 2005 constraints to SurfaceTypes
+- physics
+- 2005 controllers impl
+- more modern roblox functions as well, such as Humanoids
+- more camera functions
+- models need to be positioned correctly (bugs in Model_SetModelCFrame)
 
 Testing:
-- test_rbxmx: Test all of the .rbxmx files in res/
+- test_rbxmx: add the .rbxmx file to the datamodel and render it.
+- part cframe alignment tests + results in datamodel.c.

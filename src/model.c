@@ -1,8 +1,10 @@
+#include <raylib.h>
 #include "model.h"
 #include "debug.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "part.h"
 
 DEFAULT_DEBUG_CHANNEL(model)
 
@@ -35,54 +37,45 @@ CFrame Model_GetModelCFrame(Model_Instance *this)
 {
     if (this->PrimaryPart) return this->PrimaryPart->CFrame;
 
-    CFrame sum = { 0 };
-    int size = 0;
-
-    BasePart *x = Instance_FindFirstChildWhichIsA(this, "BasePart", true);
-
-    while (x)
-    {
-        size++;
-        CFrame new = x->CFrame;
-        sum.X += new.X;
-        sum.Y += new.Y;
-        sum.Z += new.Z;
-        sum.R00 += new.R00;
-        sum.R01 += new.R01;
-        sum.R02 += new.R02;
-        sum.R10 += new.R10;
-        sum.R11 += new.R11;
-        sum.R12 += new.R12;
-        sum.R20 += new.R20;
-        sum.R21 += new.R21;
-        sum.R22 += new.R22;
-        x = Instance_FindNextChildWhichIsA(this, "BasePart", x, true);
-    }
-
-    printf("cframe sum %s.\n", debugstr_cframe(sum));
-
-    sum.X /= size;
-    sum.Y /= size;
-    sum.Z /= size;
-    sum.R00 /= size;
-    sum.R01 /= size;
-    sum.R02 /= size;
-    sum.R10 /= size;
-    sum.R11 /= size;
-    sum.R12 /= size;
-    sum.R20 /= size;
-    sum.R21 /= size;
-    sum.R22 /= size;
-
-    printf("cframe result %s.\n", debugstr_cframe(sum));
-
-    return sum;
+    return Model_GetBoundingBox(this).orientation;
 }
 
-Vector3 Model_GetSize(Model_Instance *this)
+Vector3 Model_GetModelSize(Model_Instance *this)
 {
-    FIXME("this %p stub!\n", this);
-    return (Vector3){0};
+    return Model_GetBoundingBox(this).size;
+}
+
+ModelBoundingBox Model_GetBoundingBox(Model_Instance *this)
+{
+    ModelBoundingBox ret = { 0 };
+    Model mdl = { 0 };
+
+    int descendantCount = 0;
+    Instance **descendants = Instance_GetDescendants(this, &descendantCount);
+
+    for (int i = 0; i < descendantCount; i++)
+    {
+        if (Instance_IsA(descendants[i], "Part"))
+        {
+            mdl.meshCount++;
+            mdl.meshes = realloc(mdl.meshes, mdl.meshCount * sizeof(Mesh));
+            mdl.meshes[mdl.meshCount - 1] = ((Part*)descendants[i])->mesh;
+        }
+    }
+
+    BoundingBox box = GetModelBoundingBox(mdl);
+
+    free(mdl.meshes);
+    free(descendants);
+
+    ret.size = Vector3Subtract(box.max, box.min);
+    Vector3 position = Vector3Lerp(box.min, box.max, 0.5f);
+
+    ret.orientation.X = position.x;
+    ret.orientation.Y = position.y;
+    ret.orientation.Z = position.z;
+
+    return ret;
 }
 
 void Model_MakeJoints(Model_Instance *this)

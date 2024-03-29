@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "debug.h"
+
+DEFAULT_DEBUG_CHANNEL(instance)
 
 Instance *Instance_new(const char *className, Instance *parent)
 {
@@ -172,23 +175,27 @@ Instance *Instance_FindFirstChildWhichIsA(Instance *this, const char *className,
     return NULL;
 }
 
-Instance *Instance_FindNextChildWhichIsA(Instance *this, const char *className, Instance *prev, bool recursive)
+Instance **Instance_GetDescendants(Instance *this, int *childCount)
 {
-    if (prev == NULL) return NULL;
+    Instance **ret = malloc(sizeof(Instance*) * this->childCount);
+    int count = this->childCount;
 
-    bool afterPrev = false;
     for (int i = 0; i < this->childCount; i++)
     {
-        if (afterPrev && Instance_IsA(this->children[i], className)) return this->children[i];
-        else if (recursive && Instance_IsAncestorOf(this->children[i], prev))
+        ret[i] = this->children[i];
+        int oldCount = count;
+        Instance **childDesc = Instance_GetDescendants(this->children[i], &count);
+        ret = realloc(ret, sizeof(Instance*)*count);
+        for (int j = oldCount; j < count; j++)
         {
-            Instance *x = Instance_FindNextChildWhichIsA(this->children[i], className, prev, recursive);
-            if (x) return x;
+            ret[j] = childDesc[j - oldCount];
         }
-        if (this->children[i] == prev || (recursive && Instance_IsAncestorOf(this->children[i], prev))) afterPrev = true;
+        free(childDesc);
     }
 
-    return NULL;
+    *childCount += count;
+
+    return ret;
 }
 
 void Instance_SetArchivable(Instance *this, bool archivable) 
@@ -217,6 +224,8 @@ void Instance_SetParent(Instance *this, Instance *parent)
     RBXScriptSignal_Fire(this->Changed, "Parent");
     RBXScriptSignal_Fire(this->AncestryChanged, eventarg);
     RBXScriptSignal_Fire(parent->ChildAdded, this);
+
+    free(eventarg);
     
     //Instance *x = parent;
     //while (x != NULL)

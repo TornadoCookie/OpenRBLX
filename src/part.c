@@ -41,17 +41,26 @@ static Matrix cf_size_to_matrix(CFrame cf, Vector3 size)
 
 static void draw_block(Part *this)
 {
-    Vector3 size = this->formfactorpart.basepart.size;
-    float sizeX = size.x;
-    size.x = size.z;
-    size.z = sizeX;
-
-    DrawMesh(this->mesh, this->material, cf_size_to_matrix(this->formfactorpart.basepart.CFrame, size));
+    DrawMesh(this->mesh, this->material, cf_size_to_matrix(this->formfactorpart.basepart.CFrame, this->formfactorpart.basepart.size));
 }
 
 static void draw_cylinder(Part *this)
 {
-    DrawMesh(this->mesh, this->material, cf_size_to_matrix(this->formfactorpart.basepart.CFrame, this->formfactorpart.basepart.size));
+    CFrame cf = this->formfactorpart.basepart.CFrame;
+    float r00 = cf.R00, r10 = cf.R10, r20 = cf.R20;
+    cf.R00 = cf.R01;
+    cf.R10 = cf.R11;
+    cf.R20 = cf.R21;
+    cf.R01 = r00;
+    cf.R11 = r10;
+    cf.R21 = r20;
+    cf.R02 = -cf.R02;
+    cf.R12 = -cf.R12;
+    cf.R22 = -cf.R22;
+    cf.X -= this->formfactorpart.basepart.size.x / 2;
+    cf.Y += this->formfactorpart.basepart.size.y / 4;
+    cf.Z -= this->formfactorpart.basepart.size.z;
+    DrawMesh(this->mesh, this->material, cf_size_to_matrix(cf, this->formfactorpart.basepart.size));
 }
 
 static void draw_ball(Part *this)

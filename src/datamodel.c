@@ -130,8 +130,28 @@ void DataModel_Draw(DataModel *this)
     DrawLine3D((Vector3){0, 0, 0}, (Vector3){0, 100, 0}, GREEN);
     DrawLine3D((Vector3){0, 0, 0}, (Vector3){0, 0, 100}, BLUE);
 
+    // Part CFrame alignment tests.
+    // Tags:
+    // [NOSURFACE] there is a surface that hasn't been implemented yet.
+    // [WORKS] everything is working properly with this model.
+    // [NOCONSTRAINT] there is a constraint that hasn't been implemented yet.
+    // [MISALIGN] something about the model is not aligned properly.
+    // [NOBOTHER] won't bother with testing as the model is difficult to represent.
+
+    // To test:
+    // Uncomment the code that draws the model in magenta.
+    // Load rbxmx_test with the corresponding model filename.
+    // Check if they match up exactly and tweak the code in part.c accordingly.
+
+    //TODO: Put these in a separate location.
+    //TODO: Factor in model transformation whenever that gets implemented correctly.
+
     // 771 Block 2x4x1.rbxmx [NOSURFACE]
-    //DrawCube((Vector3){-17, 0, 6}, 2, 1, 4, MAGENTA);
+    //rlPushMatrix();
+    //rlTranslatef(-17, 0, 6);
+    //rlRotatef(90, 0, 1, 0);
+    //DrawCube((Vector3){0, 0, 0}, 2, 1, 4, MAGENTA);
+    //rlPopMatrix();
 
     // 772 Block 2x4x1 no join.rbxmx [WORKS]
     //DrawCube((Vector3){-13, 1, 8}, 2, 1, 4, MAGENTA);
@@ -142,15 +162,48 @@ void DataModel_Draw(DataModel *this)
     // 774 Block 2x2x6.rbxmx [NOSURFACE]
     //DrawCube((Vector3){-12, 0, 4}, 2, 6, 2, MAGENTA);
 
-    // 775 Block 4x8x1.rbxmx
-    DrawCube((Vector3){-8, 0, 2}, 8, 1, 4, MAGENTA);
+    // 775 Block 4x8x1.rbxmx [NOSURFACE]
+    //DrawCube((Vector3){-8, 0, 2}, 8, 1, 4, MAGENTA);
+
+    // 776 Block 4x4x1 turntable.rbxmx [NOSURFACE] [NOCONSTRAINT]
+    //DrawCube((Vector3){1, 0, 6}, 4, 1, 4, MAGENTA);
 
     // 777 Ball 2x2x2.rbxmx [WORKS]
     //DrawSphere((Vector3){-25 + 1, 0, 4 + 1}, 1, MAGENTA);
 
+    // 780 Vertical Motor - Controllable.rbxmx [NOSURFACE] [NOCONSTRAINT]
+    //DrawCube((Vector3){-24, 0, 14}, 4, 1, 4, MAGENTA);
+
+    // 781 Motorized Block Pair - Controllable.rbxmx [NOSURFACE] [NOCONSTRAINT]
+    //DrawCube((Vector3){-2, 1, -2}, 4, 1, 4, MAGENTA);
+    //DrawCube((Vector3){-2, -1, 2}, 4, 1, 4, MAGENTA);
+
+    // 782 Motorized Block Pair - Controllable.rbxmx [NOSURFACE] [NOCONSTRAINT]
+    //DrawCube((Vector3){0, -1, -1}, 2, 2, 2, MAGENTA);
+    //DrawCube((Vector3){-2, -1, -1}, 2, 2, 2, MAGENTA);
+
+    // 783 Constant Velocity Motor Pair.rbxmx [NOSURFACE] [NOCONSTRAINT]
+    //DrawCube((Vector3){-2, 1, -2}, 4, 1, 4, MAGENTA);
+    //DrawCube((Vector3){-2, -1, 2}, 4, 1, 4, MAGENTA);
+
+    // 784 Motorized Block - Controllable.rbxmx [NOSURFACE] [NOCONSTRAINT]
+    //rlPushMatrix();
+    //rlTranslatef(-38, 1, 3);
+    //rlRotatef(90, 0, 1, 0);
+    //DrawCube((Vector3){0, 0, 0}, 2, 2, 4, MAGENTA);
+    //rlPopMatrix();
+
     // 788 Tree.rbxmx [MISALIGN] [NOSURFACE]
     //DrawCube((Vector3){-1, -9, 1}, 2, 8, 2, MAGENTA);
     //DrawSphere((Vector3){-5 + 5, -1.0f, -5 + 5}, 5, MAGENTA);
+
+    // 789 Chassis.rbxmx [NOSURFACE] [NOCONSTRAINT] [NOBOTHER]
+    // 794 Dog.rbxmx [MISALIGN] [NOSURFACE] [NOBOTHER]
+    // 796 Skateboard.rbxmx [NOSURFACE] [NOCONSTRAINT] [NOBOTHER]
+    // 797 Skooter.rbxmx [MISALIGN] [NOSURFACE] [NOBOTHER]
+    // 801 Bouncy Chassis.rbxmx [MISALIGN] [NOSURFACE] [NOCONSTRAINT] [NOBOTHER]
+
+    // 802 Micro Chassis.rbxmx
 
     EndMode3D();
     Camera_Process(cam);
