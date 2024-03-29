@@ -9,9 +9,9 @@
 
 DEFAULT_DEBUG_CHANNEL(part)
 
-static Color rl_from_color3(Color3 col)
+static Color rl_from_color3(Color3 col, float transparency)
 {
-    return (Color){col.R * 255, col.G * 255, col.B * 255, 255};
+    return (Color){col.R * 255, col.G * 255, col.B * 255, transparency * 255};
 }
 
 static Matrix cf_to_rot_matrix(CFrame cf)
@@ -74,7 +74,7 @@ static void draw_ball(Part *this)
 void part_draw(Part *this)
 {
     printf("drawing part %p.\n", this);
-    this->material.maps[MATERIAL_MAP_DIFFUSE].color = rl_from_color3(this->formfactorpart.basepart.Color);
+    this->material.maps[MATERIAL_MAP_DIFFUSE].color = rl_from_color3(this->formfactorpart.basepart.Color, this->formfactorpart.basepart.Transparency);
 
     switch (this->shape)
     {
