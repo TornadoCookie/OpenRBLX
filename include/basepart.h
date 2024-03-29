@@ -22,6 +22,13 @@ typedef enum {
 } SurfaceType;
 
 typedef enum {
+    Constraint05_None,
+    Constraint05_Hinge,
+    Constraint05_Motor,
+    Constraint05_SteppingMotor,
+} Constraint05;
+
+typedef enum {
     NormalId_Right,
     NormalId_Top,
     NormalId_Back,

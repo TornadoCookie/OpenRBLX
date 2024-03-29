@@ -7,7 +7,6 @@ Features:
 TODO:
 - matrices aren't converted from CFrames correctly necessarily yet. we need to test more.
 - surfaces
-- 2005 constraints to SurfaceTypes
 - physics
 - 2005 controllers impl
 - more modern roblox functions as well, such as Humanoids

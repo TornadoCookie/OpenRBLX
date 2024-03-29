@@ -40,6 +40,7 @@ typedef struct XMLSerializeInstance {
     XMLSerialization *serializations;
     int serializationCount;
     CFrame modelOffset;
+    int TopConstraint, BottomConstraint, LeftConstraint, RightConstraint, FrontConstraint, BackConstraint;
 } XMLSerializeInstance;
 
 static void _xmlserialize_atomic(XMLSerializeInstance *inst, XMLSerialization serialization)
@@ -108,6 +109,13 @@ static void xmlserialize_BasePart(BasePart *basepart, XMLSerializeInstance *inst
     xmlserialize_atomic(Vector3, basepart, Velocity);
     xmlserialize_atomic(Vector3, basepart, size);
     xmlserialize_atomic(Color3, basepart, Color);
+
+    xmlserialize_atomic(token, inst, TopConstraint);
+    xmlserialize_atomic(token, inst, BottomConstraint);
+    xmlserialize_atomic(token, inst, LeftConstraint);
+    xmlserialize_atomic(token, inst, RightConstraint);
+    xmlserialize_atomic(token, inst, FrontConstraint);
+    xmlserialize_atomic(token, inst, BackConstraint);
 }
 
 static TrussPart *xmlserialize_TrussPart(XMLSerializeInstance *inst)
@@ -272,11 +280,12 @@ static void serialize(XMLSerializeInstance *inst, char *prop, char *propName, st
     char *type = xml_easy_string(xml_node_name(child));
     if (!strcmp(type, "Complex"))
     {
-        char type_[128], surfaceInput[128], paramA[128], paramB[128];
+        char type_[128], surfaceInput[128], paramA[128], paramB[128], constraint[128];
         snprintf(type_, 128, "%sSurface", propName);
         snprintf(surfaceInput, 128, "%sSurfaceInput", propName);
         snprintf(paramA, 128, "%sParamA", propName);
         snprintf(paramB, 128, "%sParamB", propName);
+        snprintf(constraint, 128, "%sConstraint", propName);
 
         for (int i = 0; i < xml_node_children(child); i++)
         {
@@ -285,9 +294,9 @@ static void serialize(XMLSerializeInstance *inst, char *prop, char *propName, st
             serialize(inst, prop, surfaceInput, child2, ret);
             serialize(inst, prop, paramA, child2, ret);
             serialize(inst, prop, paramB, child2, ret);
+            serialize(inst, prop, constraint, child2, ret);
         }
 
-        FIXME("no analogue for %s types\n", "Constraint");
         free(type);
         return;
     }
@@ -370,6 +379,18 @@ static void serialize(XMLSerializeInstance *inst, char *prop, char *propName, st
     }
 }
 
+static int SurfaceType_from_Constraint05(int constraint05)
+{
+    switch (constraint05)
+    {
+        case Constraint05_None: return -1;
+        case Constraint05_Hinge: return SurfaceType_Hinge;
+        case Constraint05_Motor: return SurfaceType_Motor;
+        case Constraint05_SteppingMotor: return SurfaceType_SteppingMotor;
+    }
+    return -1;
+}
+
 static Instance *load_model_part_xml(struct xml_node *node)
 {
     char *className = xml_easy_string(xml_node_attribute_content(node, 0));
@@ -450,6 +471,19 @@ static Instance *load_model_part_xml(struct xml_node *node)
     if (!strcmp(className, "Model"))
     {
         Model_MoveTo(ret, (Vector3){inst.modelOffset.X, inst.modelOffset.Y, inst.modelOffset.Z});
+    }
+
+    if (Instance_IsA(ret, "BasePart"))
+    {
+        BasePart *basepart = ret;
+        #define X(face) if (inst.face##Constraint) basepart->face##Surface = SurfaceType_from_Constraint05(inst.face##Constraint);
+        X(Top)
+        X(Bottom)
+        X(Left)
+        X(Right)
+        X(Front)
+        X(Back)
+        #undef X
     }
 
     free(className);
