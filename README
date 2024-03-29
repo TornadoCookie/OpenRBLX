@@ -1,0 +1,13 @@
+OpenRBLX is an open-source recreation of the Roblox engine.
+
+Features:
+- rbxmx parsing.
+- parsing 2005 models with original colour and form.
+
+TODO:
+- matrices aren't converted from CFrames correctly necessarily yet. we need to test more.
+- surfaces
+- 2005 constraints to SurfaceTypes
+
+Testing:
+- test_rbxmx: Test all of the .rbxmx files in res/
