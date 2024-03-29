@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "meshcontentprovider.h"
+#include "rlgl.h"
 
 DEFAULT_DEBUG_CHANNEL(datamodel)
 
@@ -128,6 +129,29 @@ void DataModel_Draw(DataModel *this)
     DrawLine3D((Vector3){0, 0, 0}, (Vector3){100, 0, 0}, RED);
     DrawLine3D((Vector3){0, 0, 0}, (Vector3){0, 100, 0}, GREEN);
     DrawLine3D((Vector3){0, 0, 0}, (Vector3){0, 0, 100}, BLUE);
+
+    // 771 Block 2x4x1.rbxmx [NOSURFACE]
+    //DrawCube((Vector3){-17, 0, 6}, 2, 1, 4, MAGENTA);
+
+    // 772 Block 2x4x1 no join.rbxmx [WORKS]
+    //DrawCube((Vector3){-13, 1, 8}, 2, 1, 4, MAGENTA);
+
+    // 773 Block 2x4x1 hinged.rbxmx [NOCONSTRAINT]
+    //DrawCube((Vector3){6, 0, 6}, 2, 1, 4, MAGENTA);
+
+    // 774 Block 2x2x6.rbxmx [NOSURFACE]
+    //DrawCube((Vector3){-12, 0, 4}, 2, 6, 2, MAGENTA);
+
+    // 775 Block 4x8x1.rbxmx
+    DrawCube((Vector3){-8, 0, 2}, 8, 1, 4, MAGENTA);
+
+    // 777 Ball 2x2x2.rbxmx [WORKS]
+    //DrawSphere((Vector3){-25 + 1, 0, 4 + 1}, 1, MAGENTA);
+
+    // 788 Tree.rbxmx [MISALIGN] [NOSURFACE]
+    //DrawCube((Vector3){-1, -9, 1}, 2, 8, 2, MAGENTA);
+    //DrawSphere((Vector3){-5 + 5, -1.0f, -5 + 5}, 5, MAGENTA);
+
     EndMode3D();
     Camera_Process(cam);
 }

@@ -13,7 +13,8 @@ MeshContentProvider *MeshContentProvider_new(Instance *parent)
     newInst->cacheablecontentprovider.instance.DataCost = sizeof(MeshContentProvider);
     newInst = realloc(newInst, sizeof(MeshContentProvider));
 
-    newInst->ballMesh = GenMeshSphere(1.0f, 12, 24);
+    // We use 0.5f as the radius for curved shapes because BasePart.Size is in diameter.
+    newInst->ballMesh = GenMeshSphere(0.5f, 12, 24);
     newInst->blockMesh = GenMeshCube(1.0f, 1.0f, 1.0f);
     newInst->cylinderMesh = GenMeshCylinder(0.5f, 1.0f, 24);
 

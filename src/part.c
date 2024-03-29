@@ -14,60 +14,66 @@ static Color rl_from_color3(Color3 col)
     return (Color){col.R * 255, col.G * 255, col.B * 255, 255};
 }
 
-static Matrix rl_from_cframe_and_size(CFrame cf, Vector3 size, Shape shape)
+static Matrix cf_to_rot_matrix(CFrame cf)
 {
-    Matrix rotated = {
-        .m0 = -cf.R00,
-        .m1 = -cf.R10,
-        .m2 = -cf.R20,
-        .m4 = cf.R01,
-        .m5 = cf.R11,
-        .m6 = cf.R21,
-        .m8 = -cf.R02,
-        .m9 = -cf.R12,
-        .m10 = -cf.R22,
-        .m15 = 1.0f,
-    };
-    Vector3 scale = size;
-    if (shape == Shape_Cylinder)
-    {
-        float sizeX = scale.y;
-        scale.y = scale.z;
-        scale.z = sizeX;
+    return (Matrix) {
+        // Right to Left, Up to Up, Back to Forward
+        -cf.R00, cf.R01, -cf.R02, 0.0f,
+        -cf.R10, cf.R11, -cf.R12, 0.0f,
+        -cf.R20, cf.R21, -cf.R22, 0.0f,
+           0.0f,   0.0f,    0.0f, 1.0f };
+}
 
-        rotated = (Matrix) {
-            .m4 = -cf.R00,
-            .m5 = -cf.R10,
-            .m6 = -cf.R20,
-            .m0 = -cf.R01,
-            .m1 = -cf.R11,
-            .m2 = -cf.R21,
-            .m8 = -cf.R02,
-            .m9 = -cf.R12,
-            .m10 = -cf.R22,
-            .m15 = 1.0f,
-        };
-    }
-    Vector3 translate = (Vector3){cf.X, cf.Y, cf.Z};
-    if (shape == Shape_Ball)
-    {
-        translate = Vector3Add(translate, Vector3Divide(scale, (Vector3){2, 2, 2}));
-    }
-    else if (shape == Shape_Cylinder)
-    {
-        translate.x += scale.x / 2;
-        translate.y += scale.y / 5;
-        translate.z -= scale.z;
-    }
-    printf("rotated = %s.\n", debugstr_cframe(cf));
-    return MatrixMultiply(MatrixMultiply(MatrixScale(scale.x, scale.y, scale.z), rotated), MatrixTranslate(translate.x, translate.y, translate.z));
+static Matrix cf_to_trans_matrix(CFrame cf)
+{
+    return MatrixTranslate(cf.X, cf.Y, cf.Z);
+}
+
+static Matrix size_to_scale_matrix(Vector3 size)
+{
+    return MatrixScale(size.x, size.y, size.z);
+}
+
+static Matrix cf_size_to_matrix(CFrame cf, Vector3 size)
+{
+    return MatrixMultiply(MatrixMultiply(size_to_scale_matrix(size), cf_to_rot_matrix(cf)), cf_to_trans_matrix(cf));
+}
+
+static void draw_block(Part *this)
+{
+    Vector3 size = this->formfactorpart.basepart.size;
+    float sizeX = size.x;
+    size.x = size.z;
+    size.z = sizeX;
+
+    DrawMesh(this->mesh, this->material, cf_size_to_matrix(this->formfactorpart.basepart.CFrame, size));
+}
+
+static void draw_cylinder(Part *this)
+{
+    DrawMesh(this->mesh, this->material, cf_size_to_matrix(this->formfactorpart.basepart.CFrame, this->formfactorpart.basepart.size));
+}
+
+static void draw_ball(Part *this)
+{
+    CFrame cf = this->formfactorpart.basepart.CFrame;
+    cf.X += this->formfactorpart.basepart.size.x / 2;
+    cf.Z += this->formfactorpart.basepart.size.z / 2;
+    DrawMesh(this->mesh, this->material, cf_size_to_matrix(cf, this->formfactorpart.basepart.size));
 }
 
 void part_draw(Part *this)
 {
     printf("drawing part %p.\n", this);
     this->material.maps[MATERIAL_MAP_DIFFUSE].color = rl_from_color3(this->formfactorpart.basepart.Color);
-    DrawMesh(this->mesh, this->material, rl_from_cframe_and_size(this->formfactorpart.basepart.CFrame, this->formfactorpart.basepart.size, this->shape));
+
+    switch (this->shape)
+    {
+        case Shape_Block: draw_block(this); break;
+        case Shape_Cylinder: draw_cylinder(this); break;
+        case Shape_Ball: draw_ball(this); break;
+        default: FIXME("not implemented: %d.\n", this->shape); break;
+    }
 }
 
 Part *Part_new(Instance *parent)

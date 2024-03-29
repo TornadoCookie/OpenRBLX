@@ -99,12 +99,12 @@ bool ClassName_IsA(const char *className1, const char *className)
 {
     if (!strcmp(className, "Instance") || !strcmp(className1, className)) return true;
 
-    if (!strcmp(className, "PVInstance")) return ClassName_IsA(className1, "Model") || ClassName_IsA(className1, "BasePart");
-    if (!strcmp(className, "BasePart")) return ClassName_IsA(className1, "FormFactorPart") || ClassName_IsA(className1, "TrussPart");
-    if (!strcmp(className, "FormFactorPart")) return ClassName_IsA(className1, "Part");
+    else if (!strcmp(className, "PVInstance")) return ClassName_IsA(className1, "Model") || ClassName_IsA(className1, "BasePart");
+    else if (!strcmp(className, "BasePart")) return ClassName_IsA(className1, "FormFactorPart") || ClassName_IsA(className1, "TrussPart");
+    else if (!strcmp(className, "FormFactorPart")) return ClassName_IsA(className1, "Part");
 
-    if (!strcmp(className, "Model")) return ClassName_IsA(className1, "WorldRoot");
-    if (!strcmp(className, "WorldRoot")) return ClassName_IsA(className1, "Workspace");
+    else if (!strcmp(className, "Model")) return ClassName_IsA(className1, "WorldRoot");
+    else if (!strcmp(className, "WorldRoot")) return ClassName_IsA(className1, "Workspace");
 
     return false;
 }
