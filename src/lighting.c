@@ -45,3 +45,8 @@ void Lighting_SetMinutesAfterMidnight(Lighting *this, double minutes)
 {
     FIXME("this %p, minutes %lf stub!\n", this, minutes);
 }
+
+void Lighting_draw(Lighting *this)
+{
+    
+}

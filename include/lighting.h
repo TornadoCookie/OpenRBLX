@@ -26,4 +26,6 @@ float Lighting_GetMoonPhase(Lighting *this);
 Vector3 Lighting_GetSunDirection(Lighting *this);
 void Lighting_SetMinutesAfterMidnight(Lighting *this, double minutes);
 
+void Lighting_draw(Lighting *this);
+
 #endif

@@ -529,7 +529,7 @@ static Instance *load_model_part_xml(struct xml_node *node)
     return ret;
 }
 
-Instance *LoadModelRBXMX(const char *file)
+Instance **LoadModelRBXMX(const char *file, int *mdlCount)
 {
     FILE *f = fopen(file, "r");
     if (!f) return NULL;
@@ -537,13 +537,18 @@ Instance *LoadModelRBXMX(const char *file)
 
     struct xml_node *root = xml_document_root(document);
 
-    Instance *ret;
+    Instance **ret = NULL;
+    *mdlCount = 0;
 
     for (size_t i = 0; i < xml_node_children(root); i++)
     {
         struct xml_node *child = xml_node_child(root, i);
         uint8_t *name = xml_easy_name(child);
-        if (!strcmp(name, "Item")) ret = load_model_part_xml(child);
+        if (!strcmp(name, "Item")) {
+            (*mdlCount)++;
+            ret = realloc(ret, sizeof(Instance *) * *mdlCount);
+            ret[*mdlCount - 1] = load_model_part_xml(child);
+        }
         free(name);
     }
 

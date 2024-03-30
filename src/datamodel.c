@@ -126,6 +126,7 @@ void DataModel_Draw(DataModel *this)
     DrawFPS(0, 0);
 
     BeginMode3D(cam->camera);
+    Lighting_draw(Instance_FindFirstChild(this, "Lighting", false));
     DrawCube((Vector3){0, 0, 0}, 1.0f, 1.0f, 1.0f, WHITE);
     draw_recursive(this->Workspace);
     DrawLine3D((Vector3){0, 0, 0}, (Vector3){100, 0, 0}, RED);
