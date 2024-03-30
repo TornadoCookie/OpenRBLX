@@ -532,6 +532,7 @@ static Instance *load_model_part_xml(struct xml_node *node)
 Instance *LoadModelRBXMX(const char *file)
 {
     FILE *f = fopen(file, "r");
+    if (!f) return NULL;
     struct xml_document *document = xml_open_document(f);
 
     struct xml_node *root = xml_document_root(document);

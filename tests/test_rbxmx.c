@@ -16,6 +16,12 @@ int main(int argc, char **argv)
     DataModel *datamodel = DataModel_new();
     Instance *mdl = LoadModelRBXMX(argv[1]);
 
+    if (!mdl)
+    {
+        perror("file error");
+        return 0;
+    }
+
     Instance_SetParent(mdl, datamodel->Workspace);
 
     SetTargetFPS(60);
