@@ -29,3 +29,4 @@ Source brickcolor.c
 Source meshcontentprovider.c
 Source cacheablecontentprovider.c
 Source physicalcharacter.c
+Source lighting.c

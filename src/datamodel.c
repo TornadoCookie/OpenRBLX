@@ -7,6 +7,7 @@
 #include <string.h>
 #include "meshcontentprovider.h"
 #include "rlgl.h"
+#include "lighting.h"
 
 DEFAULT_DEBUG_CHANNEL(datamodel)
 
@@ -37,6 +38,7 @@ DataModel *DataModel_new(void)
     game = newInst;
 
     MeshContentProvider_new(newInst);
+    Lighting_new(newInst);
 
     rt = LoadRenderTexture(128, 128);
 
