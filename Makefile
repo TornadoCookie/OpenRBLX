@@ -38,7 +38,7 @@ CFLAGS+=-D EXEC_EXTENSION=\".exe\"
 CFLAGS+=-D LIB_EXTENSION=\".dll\"
 endif
 
-PROGRAMS=test_rbxmx
+PROGRAMS=test_rbxmx test_rbxlx
 LIBRARIES=
 
 all: $(DISTDIR) $(foreach prog, $(PROGRAMS), $(DISTDIR)/$(prog)$(EXEC_EXTENSION)) $(foreach lib, $(LIBRARIES), $(DISTDIR)/$(lib)$(LIB_EXTENSION))
@@ -85,5 +85,32 @@ test_rbxmx_SOURCES+=src/lighting.c
 $(DISTDIR)/test_rbxmx$(EXEC_EXTENSION): $(test_rbxmx_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
+test_rbxlx_SOURCES+=src/../tests/test_rbxlx.c
+test_rbxlx_SOURCES+=src/filetypes/rbxlx.c
+test_rbxlx_SOURCES+=src/filetypes/rbxmx.c
+test_rbxlx_SOURCES+=src/datamodel.c
+test_rbxlx_SOURCES+=src/instance.c
+test_rbxlx_SOURCES+=src/../lib/xml/src/xml.c
+test_rbxlx_SOURCES+=src/rbxscriptsignal.c
+test_rbxlx_SOURCES+=src/workspace.c
+test_rbxlx_SOURCES+=src/serviceprovider.c
+test_rbxlx_SOURCES+=src/rootinstance.c
+test_rbxlx_SOURCES+=src/model.c
+test_rbxlx_SOURCES+=src/pvinstance.c
+test_rbxlx_SOURCES+=src/trusspart.c
+test_rbxlx_SOURCES+=src/basepart.c
+test_rbxlx_SOURCES+=src/part.c
+test_rbxlx_SOURCES+=src/formfactorpart.c
+test_rbxlx_SOURCES+=src/camera.c
+test_rbxlx_SOURCES+=src/brickcolor.c
+test_rbxlx_SOURCES+=src/meshcontentprovider.c
+test_rbxlx_SOURCES+=src/cacheablecontentprovider.c
+test_rbxlx_SOURCES+=src/physicalcharacter.c
+test_rbxlx_SOURCES+=src/lighting.c
+
+$(DISTDIR)/test_rbxlx$(EXEC_EXTENSION): $(test_rbxlx_SOURCES)
+	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+
 clean:
 	rm -f $(DISTDIR)/test_rbxmx$(EXEC_EXTENSION)
+	rm -f $(DISTDIR)/test_rbxlx$(EXEC_EXTENSION)

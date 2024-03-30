@@ -30,3 +30,27 @@ Source meshcontentprovider.c
 Source cacheablecontentprovider.c
 Source physicalcharacter.c
 Source lighting.c
+
+Program test_rbxlx
+Source ../tests/test_rbxlx.c
+Source filetypes/rbxlx.c
+Source filetypes/rbxmx.c
+Source datamodel.c
+Source instance.c
+Source ../lib/xml/src/xml.c
+Source rbxscriptsignal.c
+Source workspace.c
+Source serviceprovider.c
+Source rootinstance.c
+Source model.c
+Source pvinstance.c
+Source trusspart.c
+Source basepart.c
+Source part.c
+Source formfactorpart.c
+Source camera.c
+Source brickcolor.c
+Source meshcontentprovider.c
+Source cacheablecontentprovider.c
+Source physicalcharacter.c
+Source lighting.c
