@@ -1,0 +1,3 @@
+[submodule "res/rbx-test-files"]
+	path = res/rbx-test-files
+	url = https://github.com/rojo-rbx/rbx-test-files/
