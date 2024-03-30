@@ -11,7 +11,7 @@ DEFAULT_DEBUG_CHANNEL(part)
 
 static Color rl_from_color3(Color3 col, float transparency)
 {
-    return (Color){col.R * 255, col.G * 255, col.B * 255, transparency * 255};
+    return (Color){col.R * 255, col.G * 255, col.B * 255, (1.0f-transparency) * 255};
 }
 
 static Matrix cf_to_rot_matrix(CFrame cf)
@@ -41,6 +41,7 @@ static Matrix cf_size_to_matrix(CFrame cf, Vector3 size)
 
 static void draw_block(Part *this)
 {
+    printf("position %s.\n", debugstr_vector3(this->formfactorpart.basepart.Position));
     DrawMesh(this->mesh, this->material, cf_size_to_matrix(this->formfactorpart.basepart.CFrame, this->formfactorpart.basepart.size));
 }
 

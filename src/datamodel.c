@@ -202,8 +202,11 @@ void DataModel_Draw(DataModel *this)
     // 796 Skateboard.rbxmx [NOSURFACE] [NOCONSTRAINT] [NOBOTHER]
     // 797 Skooter.rbxmx [MISALIGN] [NOSURFACE] [NOBOTHER]
     // 801 Bouncy Chassis.rbxmx [MISALIGN] [NOSURFACE] [NOCONSTRAINT] [NOBOTHER]
-
     // 802 Micro Chassis.rbxmx
+
+    // 843 25 Point flag.rbxmx [MISALIGN] [NOSURFACE]
+    //DrawCube((Vector3){-1, -2, -1}, 1, 4, 1, MAGENTA);
+    //DrawCube((Vector3){1, 0, -1}, 1, 2, 2, MAGENTA);
 
     EndMode3D();
     Camera_Process(cam);

@@ -8,10 +8,11 @@ TODO:
 - matrices aren't converted from CFrames correctly necessarily yet. we need to test more.
 - surfaces
 - physics
-- 2005 controllers impl
+- 2005 controllers impl (might not have to implement)
 - more modern roblox functions as well, such as Humanoids
 - more camera functions
 - models need to be positioned correctly (bugs in Model_SetModelCFrame)
+- 2005 minigame compatibility (might not have to implement)
 
 Testing:
 - test_rbxmx: add the .rbxmx file to the datamodel and render it.
