@@ -26,6 +26,7 @@ typedef struct Instance {
     // Internal members
     Instance **children;
     int childCount;
+    char *xmlref;
 } Instance;
 
 Instance *Instance_new(const char *className, Instance *parent);

@@ -79,6 +79,7 @@ test_rbxmx_SOURCES+=src/camera.c
 test_rbxmx_SOURCES+=src/brickcolor.c
 test_rbxmx_SOURCES+=src/meshcontentprovider.c
 test_rbxmx_SOURCES+=src/cacheablecontentprovider.c
+test_rbxmx_SOURCES+=src/physicalcharacter.c
 
 $(DISTDIR)/test_rbxmx$(EXEC_EXTENSION): $(test_rbxmx_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)

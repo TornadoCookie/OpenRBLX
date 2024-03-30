@@ -6,6 +6,7 @@
 #include "part.h"
 #include "trusspart.h"
 #include "model.h"
+#include "physicalcharacter.h"
 
 #include "debug.h"
 
@@ -28,6 +29,7 @@ typedef enum {
     Serialize_string,
     Serialize_Vector3,
     Serialize_Color3,
+    Serialize_Ref,
 } XMLSerializationType;
 
 typedef struct XMLSerialization {
@@ -150,6 +152,24 @@ static void xmlserialize_Model(Model_Instance *model, XMLSerializeInstance *inst
     _xmlserialize_atomic(inst, (XMLSerialization){Serialize_CoordinateFrame, "CoordinateFrame", &inst->modelOffset});
 }
 
+static PhysicalCharacter *xmlserialize_PhysicalCharacter(XMLSerializeInstance *inst)
+{
+    PhysicalCharacter *physicalcharacter = PhysicalCharacter_new(NULL);
+
+    xmlserialize_Model(physicalcharacter, inst);
+
+    xmlserialize_atomic(token, physicalcharacter, PostureXML);
+    xmlserialize_atomic(Ref, physicalcharacter, Head);
+    xmlserialize_atomic(Ref, physicalcharacter, UpperBody);
+    xmlserialize_atomic(Ref, physicalcharacter, LowerBody);
+    xmlserialize_atomic(Ref, physicalcharacter, LeftLeg);
+    xmlserialize_atomic(Ref, physicalcharacter, RightLeg);
+    xmlserialize_atomic(Ref, physicalcharacter, LeftArm);
+    xmlserialize_atomic(Ref, physicalcharacter, RightArm);
+
+    return physicalcharacter;
+}
+
 static void xmlserialize_coordinateframe(CoordinateFrame *cf, struct xml_node *node)
 {
     for (int i = 0; i < xml_node_children(node); i++)
@@ -229,12 +249,13 @@ static void xmlserialize_color3(Color3 *c, struct xml_node *node)
     }
 }
 
-static const char *tokenPropNames[5] = {
+static const char *tokenPropNames[] = {
     "shape",
     "Controller",
     "Type",
     "Constraint",
     "SurfaceInput",
+    "PostureXML",
 };
 
 static const char *tokenTables[][50] = {
@@ -243,6 +264,7 @@ static const char *tokenTables[][50] = {
     { "Smooth", "Glue", "Weld", "Studs", "Inlet", "Universal", "Hinge", "Motor", "SteppingMotor", "Bumps", "Spawn", NULL }, // Type
     { "None", "Hinge", "Motor", "SteppingMotor", NULL }, //Constraint
     { "LeftTread", "RightTread", "Steer", "Throttle", "Updown", "Action1", "Action2", "Action3", "Action4", "Action5", "Sin", "Constant", NULL }, // SurfaceInput
+    { "Stand", NULL } // PostureXML
 };
 
 static void xmlserialize_token(int *val, char *prop, char *propName)
@@ -270,6 +292,11 @@ static void xmlserialize_token(int *val, char *prop, char *propName)
     {
         if (tokenTables[index][i] == NULL) break;
         if (!strcmp(tokenTables[index][i], prop)) *val = i;
+    }
+
+    if (*val == 0 && index == -1 && strlen(prop) > 1)
+    {
+        FIXME("token not serialized: %s\n", prop);
     }
 }
 
@@ -369,6 +396,10 @@ static void serialize(XMLSerializeInstance *inst, char *prop, char *propName, st
                         BasePart_SetPosition(ret, ((BasePart*)ret)->Position);
                     }
                 } break;
+                default:
+                {
+                    FIXME("serialization type %d not implemented.\n", inst->serializations[j].type);
+                } break;
             }
             break;
         }
@@ -412,10 +443,17 @@ static Instance *load_model_part_xml(struct xml_node *node)
         ret = Model_new("Model", NULL);
         xmlserialize_Model(ret, &inst);
     }
+    else if (!strcmp(className, "PhysicalCharacter"))
+    {
+        ret = xmlserialize_PhysicalCharacter(&inst);
+    }
     else
     {
         printf("error: no serializer for classname %s.\n", className);
+        return NULL;
     }
+
+    ret->xmlref = xml_easy_string(xml_node_attribute_content(node, 1));
 
     for (int i = 0; i < xml_node_children(propertyNode); i++)
     {
