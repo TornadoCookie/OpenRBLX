@@ -38,7 +38,7 @@ CFLAGS+=-D EXEC_EXTENSION=\".exe\"
 CFLAGS+=-D LIB_EXTENSION=\".dll\"
 endif
 
-PROGRAMS=test_rbxmx test_rbxlx
+PROGRAMS=test_rbxmx test_rbxlx studio
 LIBRARIES=
 
 all: $(DISTDIR) $(foreach prog, $(PROGRAMS), $(DISTDIR)/$(prog)$(EXEC_EXTENSION)) $(foreach lib, $(LIBRARIES), $(DISTDIR)/$(lib)$(LIB_EXTENSION))
@@ -111,6 +111,33 @@ test_rbxlx_SOURCES+=src/lighting.c
 $(DISTDIR)/test_rbxlx$(EXEC_EXTENSION): $(test_rbxlx_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
+studio_SOURCES+=src/../studio/studio.c
+studio_SOURCES+=src/filetypes/rbxlx.c
+studio_SOURCES+=src/filetypes/rbxmx.c
+studio_SOURCES+=src/datamodel.c
+studio_SOURCES+=src/instance.c
+studio_SOURCES+=src/../lib/xml/src/xml.c
+studio_SOURCES+=src/rbxscriptsignal.c
+studio_SOURCES+=src/workspace.c
+studio_SOURCES+=src/serviceprovider.c
+studio_SOURCES+=src/rootinstance.c
+studio_SOURCES+=src/model.c
+studio_SOURCES+=src/pvinstance.c
+studio_SOURCES+=src/trusspart.c
+studio_SOURCES+=src/basepart.c
+studio_SOURCES+=src/part.c
+studio_SOURCES+=src/formfactorpart.c
+studio_SOURCES+=src/camera.c
+studio_SOURCES+=src/brickcolor.c
+studio_SOURCES+=src/meshcontentprovider.c
+studio_SOURCES+=src/cacheablecontentprovider.c
+studio_SOURCES+=src/physicalcharacter.c
+studio_SOURCES+=src/lighting.c
+
+$(DISTDIR)/studio$(EXEC_EXTENSION): $(studio_SOURCES)
+	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+
 clean:
 	rm -f $(DISTDIR)/test_rbxmx$(EXEC_EXTENSION)
 	rm -f $(DISTDIR)/test_rbxlx$(EXEC_EXTENSION)
+	rm -f $(DISTDIR)/studio$(EXEC_EXTENSION)

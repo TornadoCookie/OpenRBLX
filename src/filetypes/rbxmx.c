@@ -624,7 +624,11 @@ static Instance *load_model_part_xml(struct xml_node *node, XMLRefsInstance *ref
 static void load_model_refs(XMLRefsInstance *inst, Instance *top)
 {
     int descendantCount;
-    Instance **descendants = Instance_GetDescendants(top, &descendantCount);
+    Instance **descendants;
+    
+    if (!inst) return;
+
+    descendants = Instance_GetDescendants(top, &descendantCount);
 
     for (int i = 0; i < descendantCount; i++)
     {
