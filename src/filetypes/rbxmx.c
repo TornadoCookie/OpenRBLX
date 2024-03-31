@@ -51,6 +51,16 @@ typedef struct XMLSerializeInstance {
     int TopConstraint, BottomConstraint, LeftConstraint, RightConstraint, FrontConstraint, BackConstraint;
 } XMLSerializeInstance;
 
+typedef struct XMLRef {
+    const char *ref;
+    Instance **val;
+} XMLRef;
+
+typedef struct XMLRefsInstance {
+    int refCount;
+    XMLRef *refs;
+} XMLRefsInstance;
+
 static void _xmlserialize_atomic(XMLSerializeInstance *inst, XMLSerialization serialization)
 {
     inst->serializationCount++;
@@ -348,7 +358,7 @@ static void xmlserialize_token(int *val, char *prop, char *propName)
     }
 }
 
-static void serialize(XMLSerializeInstance *inst, char *prop, char *propName, struct xml_node *child, Instance *ret)
+static void serialize(XMLSerializeInstance *inst, char *prop, char *propName, struct xml_node *child, Instance *ret, XMLRefsInstance *refsInst)
 {
     bool done = false;
 
@@ -365,11 +375,11 @@ static void serialize(XMLSerializeInstance *inst, char *prop, char *propName, st
         for (int i = 0; i < xml_node_children(child); i++)
         {
             struct xml_node *child2 = xml_node_child(child, i);
-            serialize(inst, prop, type_, child2, ret);
-            serialize(inst, prop, surfaceInput, child2, ret);
-            serialize(inst, prop, paramA, child2, ret);
-            serialize(inst, prop, paramB, child2, ret);
-            serialize(inst, prop, constraint, child2, ret);
+            serialize(inst, prop, type_, child2, ret, refsInst);
+            serialize(inst, prop, surfaceInput, child2, ret, refsInst);
+            serialize(inst, prop, paramA, child2, ret, refsInst);
+            serialize(inst, prop, paramB, child2, ret, refsInst);
+            serialize(inst, prop, constraint, child2, ret, refsInst);
         }
 
         free(type);
@@ -448,6 +458,12 @@ static void serialize(XMLSerializeInstance *inst, char *prop, char *propName, st
                 {
                     *(double*)val = atof(prop);
                 } break;
+                case Serialize_Ref:
+                {
+                    refsInst->refCount++;
+                    refsInst->refs = realloc(refsInst->refs, refsInst->refCount * sizeof(XMLRef));
+                    refsInst->refs[refsInst->refCount - 1] = (XMLRef){prop, val};
+                } break;
                 default:
                 {
                     FIXME("serialization type %d not implemented.\n", inst->serializations[j].type);
@@ -474,7 +490,7 @@ static int SurfaceType_from_Constraint05(int constraint05)
     return -1;
 }
 
-static Instance *load_model_part_xml(struct xml_node *node)
+static Instance *load_model_part_xml(struct xml_node *node, XMLRefsInstance *refsInst)
 {
     char *className = xml_easy_string(xml_node_attribute_content(node, 0));
 
@@ -536,7 +552,7 @@ static Instance *load_model_part_xml(struct xml_node *node)
                 struct xml_node *child2 = xml_node_child(child, j);
                 char *propName = xml_easy_string(xml_node_attribute_content(child2, 0));
                 char *prop = xml_easy_string(xml_node_content(child2));
-                serialize(&inst, prop, propName, child2, ret);
+                serialize(&inst, prop, propName, child2, ret, refsInst);
                 free(propName);
                 free(prop);
             }
@@ -545,7 +561,7 @@ static Instance *load_model_part_xml(struct xml_node *node)
         {
             char *propName = xml_easy_string(xml_node_attribute_content(child, 0));
             char *prop = xml_easy_string(xml_node_content(child));
-            serialize(&inst, prop, propName, child, ret);
+            serialize(&inst, prop, propName, child, ret, refsInst);
             free(propName);
             free(prop);
         }
@@ -560,7 +576,7 @@ static Instance *load_model_part_xml(struct xml_node *node)
         char *type = xml_easy_string(xml_node_name(child));
         if (!strcmp(type, "Item"))
         {
-            Instance *new = load_model_part_xml(child);
+            Instance *new = load_model_part_xml(child, refsInst);
             if (new) Instance_SetParent(new, ret);
         }
         free(type);
@@ -600,6 +616,26 @@ static Instance *load_model_part_xml(struct xml_node *node)
     return ret;
 }
 
+static void load_model_refs(XMLRefsInstance *inst, Instance *top)
+{
+    int descendantCount;
+    Instance **descendants = Instance_GetDescendants(top, &descendantCount);
+
+    for (int i = 0; i < descendantCount; i++)
+    {
+        if (!descendants[i]) continue;
+        for (int j = 0; j < inst->refCount; j++)
+        {
+            if (!strcmp(descendants[i]->xmlref, inst->refs[j].ref))
+            {
+                *(inst->refs[j].val) = descendants[i];
+            }
+        }
+    }
+
+    free(descendants);
+}
+
 Instance **LoadModelRBXMX(const char *file, int *mdlCount)
 {
     FILE *f = fopen(file, "r");
@@ -611,6 +647,8 @@ Instance **LoadModelRBXMX(const char *file, int *mdlCount)
     Instance **ret = NULL;
     *mdlCount = 0;
 
+    XMLRefsInstance refsInst = { 0 };
+
     for (size_t i = 0; i < xml_node_children(root); i++)
     {
         struct xml_node *child = xml_node_child(root, i);
@@ -618,9 +656,21 @@ Instance **LoadModelRBXMX(const char *file, int *mdlCount)
         if (!strcmp(name, "Item")) {
             (*mdlCount)++;
             ret = realloc(ret, sizeof(Instance *) * *mdlCount);
-            ret[*mdlCount - 1] = load_model_part_xml(child);
+            ret[*mdlCount - 1] = load_model_part_xml(child, &refsInst);
         }
         free(name);
+    }
+
+    if (*mdlCount != 0)
+    {
+        if (*mdlCount > 1)
+        {
+            printf("limitation: refs don't work with multiple top-level instances in a model.\n");
+        }
+        else
+        {
+            load_model_refs(&refsInst, ret[0]);
+        }
     }
 
     xml_document_free(document, true);
