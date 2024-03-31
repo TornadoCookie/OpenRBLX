@@ -10,7 +10,8 @@ DEFAULT_DEBUG_CHANNEL(model)
 
 void model_draw(Model_Instance *mdl)
 {
-
+    CFrame cf = Model_GetModelCFrame(mdl);
+    DrawCube((Vector3){cf.X, cf.Y, cf.Z}, 1, 1, 1, WHITE);
 }
 
 Model_Instance *Model_new(const char *className, Instance *parent)
@@ -45,6 +46,36 @@ Vector3 Model_GetModelSize(Model_Instance *this)
     return Model_GetBoundingBox(this).size;
 }
 
+static BoundingBox GetModelBoundingBoxNoTransform(Model model, Vector3 *positions)
+{
+    BoundingBox bounds = { 0 };
+
+    if (model.meshCount > 0)
+    {
+        Vector3 temp = { 0 };
+        bounds = GetMeshBoundingBox(model.meshes[0]);
+
+        for (int i = 1; i < model.meshCount; i++)
+        {
+            BoundingBox tempBounds = GetMeshBoundingBox(model.meshes[i]);
+            tempBounds.max = Vector3Add(tempBounds.max, positions[i]);
+            tempBounds.min = Vector3Add(tempBounds.min, positions[i]);
+
+            temp.x = (bounds.min.x < tempBounds.min.x)? bounds.min.x : tempBounds.min.x;
+            temp.y = (bounds.min.y < tempBounds.min.y)? bounds.min.y : tempBounds.min.y;
+            temp.z = (bounds.min.z < tempBounds.min.z)? bounds.min.z : tempBounds.min.z;
+            bounds.min = temp;
+
+            temp.x = (bounds.max.x > tempBounds.max.x)? bounds.max.x : tempBounds.max.x;
+            temp.y = (bounds.max.y > tempBounds.max.y)? bounds.max.y : tempBounds.max.y;
+            temp.z = (bounds.max.z > tempBounds.max.z)? bounds.max.z : tempBounds.max.z;
+            bounds.max = temp;
+        }
+    }
+
+    return bounds;
+}
+
 ModelBoundingBox Model_GetBoundingBox(Model_Instance *this)
 {
     ModelBoundingBox ret = { 0 };
@@ -52,6 +83,7 @@ ModelBoundingBox Model_GetBoundingBox(Model_Instance *this)
 
     int descendantCount = 0;
     Instance **descendants = Instance_GetDescendants(this, &descendantCount);
+    Vector3 *positions = NULL;
 
     for (int i = 0; i < descendantCount; i++)
     {
@@ -60,16 +92,19 @@ ModelBoundingBox Model_GetBoundingBox(Model_Instance *this)
             mdl.meshCount++;
             mdl.meshes = realloc(mdl.meshes, mdl.meshCount * sizeof(Mesh));
             mdl.meshes[mdl.meshCount - 1] = ((Part*)descendants[i])->mesh;
+            positions = realloc(positions, mdl.meshCount * sizeof(Vector3));
+            positions[mdl.meshCount - 1] = ((Part*)descendants[i])->formfactorpart.basepart.Position;
         }
     }
 
-    BoundingBox box = GetModelBoundingBox(mdl);
+    BoundingBox box = GetModelBoundingBoxNoTransform(mdl, positions);
 
     free(mdl.meshes);
     free(descendants);
 
     ret.size = Vector3Subtract(box.max, box.min);
     Vector3 position = Vector3Lerp(box.min, box.max, 0.5f);
+    printf("max = %s, min = %s.\n", debugstr_vector3(box.max), debugstr_vector3(box.min));
 
     ret.orientation.X = position.x;
     ret.orientation.Y = position.y;
