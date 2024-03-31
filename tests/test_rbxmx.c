@@ -1,6 +1,7 @@
 #include <raylib.h>
 #include "datamodel.h"
 #include "filetypes.h"
+#include <malloc.h>
 
 #define DEBUG_IMPL
 #include "debug.h"
@@ -27,6 +28,7 @@ int main(int argc, char **argv)
     {
         Instance_SetParent(mdls[i], datamodel->Workspace);
     }
+    free(mdls);
 
     SetTargetFPS(60);
     DisableCursor();
@@ -39,5 +41,6 @@ int main(int argc, char **argv)
     }
     
     DataModel_Shutdown(datamodel);
+
     return 0;
 }

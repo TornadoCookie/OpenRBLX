@@ -42,7 +42,6 @@ static Matrix cf_size_to_matrix(CFrame cf, Vector3 size)
 static void draw_block(Part *this)
 {
     CFrame cf = this->formfactorpart.basepart.CFrame;
-    printf("position %s.\n", debugstr_vector3(this->formfactorpart.basepart.Position));
     DrawMesh(this->mesh, this->material, cf_size_to_matrix(this->formfactorpart.basepart.CFrame, this->formfactorpart.basepart.size));
 }
 
