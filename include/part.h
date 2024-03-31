@@ -6,8 +6,8 @@
 
 typedef enum {
     Shape_Ball,
-    Shape_Cylinder,
     Shape_Block,
+    Shape_Cylinder,
     Shape_Wedge,
     Shape_CornerWedge,
 } Shape;

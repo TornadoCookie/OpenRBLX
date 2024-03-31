@@ -94,6 +94,7 @@ void DataModel_Shutdown(DataModel *this)
 
 static void draw_recursive(Instance *inst)
 {
+    if (!inst) return;
     if (Instance_IsA(inst, "PVInstance"))
     {
         printf("draw %s.\n", inst->ClassName);
@@ -115,6 +116,7 @@ void DataModel_Draw(DataModel *this)
 
     for (int i = 0; i < childCount; i++)
     {
+        if (!children[i]) continue;
         if (!strcmp(children[i]->ClassName, "Camera"))
         {
             cam = children[i];
@@ -126,7 +128,8 @@ void DataModel_Draw(DataModel *this)
     DrawFPS(0, 0);
 
     BeginMode3D(cam->camera);
-    Lighting_draw(Instance_FindFirstChild(this, "Lighting", false));
+    Lighting *lighting = Instance_FindFirstChildOfClass(this, "Lighting");
+    Lighting_draw(lighting);
     DrawCube((Vector3){0, 0, 0}, 1.0f, 1.0f, 1.0f, WHITE);
     draw_recursive(this->Workspace);
     DrawLine3D((Vector3){0, 0, 0}, (Vector3){100, 0, 0}, RED);

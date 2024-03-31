@@ -19,10 +19,5 @@ ServiceProvider *ServiceProvider_new(const char *className, Instance *parent)
 
 Instance *ServiceProvider_GetService(ServiceProvider *this, const char *className)
 {
-    for (int i = 0; i < this->instance.childCount; i++)
-    {
-        if (!strcmp(this->instance.children[i]->ClassName, className)) return this->instance.children[i];
-    }
-
-    return NULL;
+    return Instance_FindFirstChildOfClass(this, className);
 }

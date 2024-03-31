@@ -7,6 +7,10 @@
 #include "trusspart.h"
 #include "model.h"
 #include "physicalcharacter.h"
+#include "workspace.h"
+#include "rootinstance.h"
+#include "datamodel.h"
+#include "camera.h"
 
 #include "debug.h"
 
@@ -30,6 +34,7 @@ typedef enum {
     Serialize_Vector3,
     Serialize_Color3,
     Serialize_Ref,
+    Serialize_double,
 } XMLSerializationType;
 
 typedef struct XMLSerialization {
@@ -42,6 +47,7 @@ typedef struct XMLSerializeInstance {
     XMLSerialization *serializations;
     int serializationCount;
     CFrame modelOffset;
+    uint32_t Color3uint8;
     int TopConstraint, BottomConstraint, LeftConstraint, RightConstraint, FrontConstraint, BackConstraint;
 } XMLSerializeInstance;
 
@@ -118,6 +124,7 @@ static void xmlserialize_BasePart(BasePart *basepart, XMLSerializeInstance *inst
     xmlserialize_atomic(token, inst, RightConstraint);
     xmlserialize_atomic(token, inst, FrontConstraint);
     xmlserialize_atomic(token, inst, BackConstraint);
+    xmlserialize_atomic(int, inst, Color3uint8);
 }
 
 static TrussPart *xmlserialize_TrussPart(XMLSerializeInstance *inst)
@@ -168,6 +175,47 @@ static PhysicalCharacter *xmlserialize_PhysicalCharacter(XMLSerializeInstance *i
     xmlserialize_atomic(Ref, physicalcharacter, RightArm);
 
     return physicalcharacter;
+}
+
+static void xmlserialize_RootInstance(RootInstance *rootinstance, XMLSerializeInstance *inst)
+{
+    xmlserialize_Model(rootinstance, inst);
+}
+
+static Workspace *xmlserialize_Workspace(XMLSerializeInstance *inst)
+{
+    Workspace *workspace = Workspace_new(NULL);
+    DataModel *datamodel = GetDataModel();
+
+    Instance_Remove(datamodel->Workspace);
+    datamodel->Workspace = workspace;
+
+    xmlserialize_Instance(workspace, inst);
+
+    workspace->rootinstance.model.pvinstance.instance.ClassName = "Workspace";
+
+    xmlserialize_atomic(double, workspace, DistributedGameTime);
+
+    return workspace;
+}
+
+static Camera_Instance *xmlserialize_Camera(XMLSerializeInstance *inst)
+{
+    Camera_Instance *camera = Camera_new(NULL);
+    DataModel *datamodel = GetDataModel();
+
+    Instance_Remove(Instance_FindFirstChildOfClass(datamodel->Workspace, "Camera"));
+
+    xmlserialize_Instance(camera, inst);
+
+    camera->instance.ClassName = "Camera";
+
+    xmlserialize_atomic(Ref, camera, CameraSubject);
+    xmlserialize_atomic(token, camera, CameraType);
+    xmlserialize_atomic(CoordinateFrame, camera, CoordinateFrame);
+    xmlserialize_atomic(CoordinateFrame, camera, Focus);
+
+    return camera;
 }
 
 static void xmlserialize_coordinateframe(CoordinateFrame *cf, struct xml_node *node)
@@ -259,7 +307,7 @@ static const char *tokenPropNames[] = {
 };
 
 static const char *tokenTables[][50] = {
-    { "Ball", "Cylinder", "Block", "Wedge", "CornerWedge", NULL }, // shape
+    { "Ball", "Block", "Cylinder", "Wedge", "CornerWedge", NULL }, // shape
     { "None", "Player", "KeyboardLeft", "KeyboardRight", "Joypad1", "Joypad2", "Chase", "Flee", NULL }, //Controller
     { "Smooth", "Glue", "Weld", "Studs", "Inlet", "Universal", "Hinge", "Motor", "SteppingMotor", "Bumps", "Spawn", NULL }, // Type
     { "None", "Hinge", "Motor", "SteppingMotor", NULL }, //Constraint
@@ -396,6 +444,10 @@ static void serialize(XMLSerializeInstance *inst, char *prop, char *propName, st
                         BasePart_SetPosition(ret, ((BasePart*)ret)->Position);
                     }
                 } break;
+                case Serialize_double:
+                {
+                    *(double*)val = atof(prop);
+                } break;
                 default:
                 {
                     FIXME("serialization type %d not implemented.\n", inst->serializations[j].type);
@@ -446,6 +498,14 @@ static Instance *load_model_part_xml(struct xml_node *node)
     else if (!strcmp(className, "PhysicalCharacter"))
     {
         ret = xmlserialize_PhysicalCharacter(&inst);
+    }
+    else if (!strcmp(className, "Workspace"))
+    {
+        ret = xmlserialize_Workspace(&inst);
+    }
+    else if (!strcmp(className, "Camera"))
+    {
+        ret = xmlserialize_Camera(&inst);
     }
     else
     {
@@ -501,7 +561,7 @@ static Instance *load_model_part_xml(struct xml_node *node)
         if (!strcmp(type, "Item"))
         {
             Instance *new = load_model_part_xml(child);
-            Instance_SetParent(new, ret);
+            if (new) Instance_SetParent(new, ret);
         }
         free(type);
     }
@@ -522,6 +582,17 @@ static Instance *load_model_part_xml(struct xml_node *node)
         X(Front)
         X(Back)
         #undef X
+        if (inst.Color3uint8)
+        {
+            int r, g, b;
+            b = inst.Color3uint8 & 0x0000FF;
+            g = inst.Color3uint8 & 0x00FF00;
+            r = inst.Color3uint8 & 0xFF0000;
+
+            g >>= 8;
+            r >>= 16;
+            BasePart_SetColor(basepart, (Color3){(float)r/255, (float)g/255, (float)b/255});
+        }
     }
 
     free(className);

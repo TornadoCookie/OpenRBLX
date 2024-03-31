@@ -141,12 +141,6 @@ void Instance_Remove(Instance *this)
 {
     if (this->Parent)
     {
-        Instance *parent = this->Parent;
-        while (parent != NULL)
-        {
-            RBXScriptSignal_Fire(this->Parent->DescendantRemoving, this);
-            parent = parent->Parent;
-        }
 
         for (int i = 0; i < this->Parent->childCount; i++)
         {
@@ -196,6 +190,18 @@ Instance **Instance_GetDescendants(Instance *this, int *childCount)
     *childCount += count;
 
     return ret;
+}
+
+Instance *Instance_FindFirstChildOfClass(Instance *this, const char *className)
+{
+    for (int i = 0; i < this->childCount; i++)
+    {
+        if (!this->children[i]) continue;
+        if (!strcmp(this->children[i]->ClassName, className))
+            return this->children[i];
+    }
+
+    return NULL;
 }
 
 void Instance_SetArchivable(Instance *this, bool archivable) 

@@ -9,6 +9,6 @@ void LoadPlaceRBXLX(const char *file)
 
     for (int i = 0; i < mdlCount; i++)
     {
-        Instance_SetParent(instances[i], dataModel);
+        if (instances[i]) Instance_SetParent(instances[i], dataModel);
     }
 }
