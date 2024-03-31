@@ -2,7 +2,9 @@ OpenRBLX is an open-source recreation of the Roblox engine.
 
 Features:
 - rbxmx parsing.
+- rbxlx parsing.
 - parsing 2005 models with original colour and form.
+- parsing modern models as well.
 
 TODO:
 - matrices aren't converted from CFrames correctly necessarily yet. we need to test more.
@@ -13,6 +15,13 @@ TODO:
 - more camera functions
 - models need to be positioned correctly (bugs in Model_SetModelCFrame)
 - 2005 minigame compatibility (might not have to implement)
+- lighting
+- skybox
+- celestial bodies
+- studio-like editor
+- binary formats (rbxm, rbxl) parsing
+- rccservice + server software
+- netcode, httpservice, replication
 
 Testing:
 - test_rbxmx: add the .rbxmx file to the datamodel and render it.
