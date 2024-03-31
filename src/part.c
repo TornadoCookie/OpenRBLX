@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "meshcontentprovider.h"
 #include "datamodel.h"
+#include "rlgl.h"
 
 DEFAULT_DEBUG_CHANNEL(part)
 
@@ -39,10 +40,68 @@ static Matrix cf_size_to_matrix(CFrame cf, Vector3 size)
     return MatrixMultiply(MatrixMultiply(size_to_scale_matrix(size), cf_to_rot_matrix(cf)), cf_to_trans_matrix(cf));
 }
 
+static void draw_bump_surface(Part *this, Vector3 unit)
+{
+    unit = Vector3Multiply(unit, Vector3Divide(this->formfactorpart.basepart.size, (Vector3){2, 2, 2}));
+    Vector3 start = unit, end;
+    if (unit.y)
+    {
+        start.x = -this->formfactorpart.basepart.size.x / 2;
+        start.z = -this->formfactorpart.basepart.size.z / 2;
+        end = Vector3Add(start, this->formfactorpart.basepart.size);
+
+        for (int x = start.x; x < end.x; x++)
+        {
+            for (int z = start.z; z < end.z; z++)
+            {
+                printf("draw {%f, %f, %f}\n", x, unit.y, z);
+                rlPushMatrix();
+                Vector3 axis;
+                float angle;
+                QuaternionToAxisAngle(QuaternionFromMatrix(cf_to_rot_matrix(this->formfactorpart.basepart.CFrame)), &axis, &angle);\
+                rlRotatef(angle, axis.x, axis.y, axis.z);
+                rlTranslatef(this->formfactorpart.basepart.Position.x, this->formfactorpart.basepart.Position.y, this->formfactorpart.basepart.Position.z);
+                DrawCube((Vector3){x, unit.y, z}, 0.75f, 0.75f, 0.75f, rl_from_color3(this->formfactorpart.basepart.Color, this->formfactorpart.basepart.Transparency));
+                rlPopMatrix();
+            }
+        }   
+    }
+}
+
+static void draw_bumps(Part *this)
+{
+    printf("topsurface %d.\n", this->formfactorpart.basepart.TopSurface);
+    if (this->formfactorpart.basepart.BackSurface == SurfaceType_Bumps)
+    {
+        draw_bump_surface(this, (Vector3){0, 0, -1});    
+    }
+    if (this->formfactorpart.basepart.FrontSurface == SurfaceType_Bumps)
+    {
+        draw_bump_surface(this, (Vector3){0, 0, 1});    
+    }
+    if (this->formfactorpart.basepart.BottomSurface == SurfaceType_Bumps)
+    {
+        draw_bump_surface(this, (Vector3){0, -1, 0});    
+    }
+    if (this->formfactorpart.basepart.TopSurface == SurfaceType_Bumps)
+    {
+        draw_bump_surface(this, (Vector3){0, 1, 0});    
+    }
+    if (this->formfactorpart.basepart.LeftSurface == SurfaceType_Bumps)
+    {
+        draw_bump_surface(this, (Vector3){-1, 0, 0});    
+    }
+    if (this->formfactorpart.basepart.RightSurface == SurfaceType_Bumps)
+    {
+        draw_bump_surface(this, (Vector3){1, 0, 0});    
+    }
+}
+
 static void draw_block(Part *this)
 {
     CFrame cf = this->formfactorpart.basepart.CFrame;
     DrawMesh(this->mesh, this->material, cf_size_to_matrix(this->formfactorpart.basepart.CFrame, this->formfactorpart.basepart.size));
+    //draw_bumps(this);
 }
 
 static void draw_cylinder(Part *this)

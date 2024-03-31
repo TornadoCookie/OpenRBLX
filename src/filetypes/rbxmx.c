@@ -321,7 +321,7 @@ static const char *tokenTables[][50] = {
     { "None", "Player", "KeyboardLeft", "KeyboardRight", "Joypad1", "Joypad2", "Chase", "Flee", NULL }, //Controller
     { "Smooth", "Glue", "Weld", "Studs", "Inlet", "Universal", "Hinge", "Motor", "SteppingMotor", "Bumps", "Spawn", NULL }, // Type
     { "None", "Hinge", "Motor", "SteppingMotor", NULL }, //Constraint
-    { "LeftTread", "RightTread", "Steer", "Throttle", "Updown", "Action1", "Action2", "Action3", "Action4", "Action5", "Sin", "Constant", NULL }, // SurfaceInput
+    { "NoInput", "LeftTread", "RightTread", "Steer", "Throttle", "Updown", "Action1", "Action2", "Action3", "Action4", "Action5", "Sin", "Constant", NULL }, // SurfaceInput
     { "Stand", NULL } // PostureXML
 };
 
@@ -329,7 +329,15 @@ static void xmlserialize_token(int *val, char *prop, char *propName)
 {
     int size = sizeof(tokenPropNames) / sizeof(char *);
 
-    *val = atoi(prop);
+    char *endptr;
+    unsigned long asNumber = strtoul(prop, &endptr, 10);
+
+    if (endptr != prop)
+    {
+        *val = asNumber;
+    }
+
+    printf("xmlserialize_token: prop %s, propName %s, asNumber %d.\n", prop, propName, asNumber);
 
     if (strstr(propName, "SurfaceInput"))
     {
@@ -365,21 +373,18 @@ static void serialize(XMLSerializeInstance *inst, char *prop, char *propName, st
     char *type = xml_easy_string(xml_node_name(child));
     if (!strcmp(type, "Complex"))
     {
-        char type_[128], surfaceInput[128], paramA[128], paramB[128], constraint[128];
-        snprintf(type_, 128, "%sSurface", propName);
-        snprintf(surfaceInput, 128, "%sSurfaceInput", propName);
-        snprintf(paramA, 128, "%sParamA", propName);
-        snprintf(paramB, 128, "%sParamB", propName);
-        snprintf(constraint, 128, "%sConstraint", propName);
-
         for (int i = 0; i < xml_node_children(child); i++)
         {
             struct xml_node *child2 = xml_node_child(child, i);
-            serialize(inst, prop, type_, child2, ret, refsInst);
-            serialize(inst, prop, surfaceInput, child2, ret, refsInst);
-            serialize(inst, prop, paramA, child2, ret, refsInst);
-            serialize(inst, prop, paramB, child2, ret, refsInst);
-            serialize(inst, prop, constraint, child2, ret, refsInst);
+            char *prop2 = xml_easy_string(xml_node_content(child2));
+            char *propName2 = xml_easy_string(xml_node_attribute_content(child2, 0));
+            char *propName2_Concat[128];
+            char *propName2_trans = propName2;
+            if (!strcmp(propName2_trans, "Type")) propName2_trans = "Surface";
+            snprintf(propName2_Concat, 128, "%s%s", propName, propName2_trans);
+            serialize(inst, prop2, propName2_Concat, child2, ret, refsInst);
+            free(propName2);
+            free(prop2);
         }
 
         free(type);
