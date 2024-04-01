@@ -19,6 +19,7 @@ Workspace *Workspace_new(Instance *parent)
     newInst = realloc(newInst, sizeof(Workspace));
 
     Camera_Instance *camera = Camera_new(newInst);
+    newInst->CurrentCamera = camera;
 
     newInst->rootinstance.model.pvinstance.drawFunc = workspace_draw;
 

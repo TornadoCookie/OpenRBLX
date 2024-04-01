@@ -194,27 +194,23 @@ static void xmlserialize_RootInstance(RootInstance *rootinstance, XMLSerializeIn
 
 static Workspace *xmlserialize_Workspace(XMLSerializeInstance *inst)
 {
-    Workspace *workspace = Workspace_new(NULL);
     DataModel *datamodel = GetDataModel();
-
-    Instance_Remove(datamodel->Workspace);
-    datamodel->Workspace = workspace;
+    Workspace *workspace = datamodel->Workspace;
 
     xmlserialize_Instance(workspace, inst);
 
     workspace->rootinstance.model.pvinstance.instance.ClassName = "Workspace";
 
     xmlserialize_atomic(double, workspace, DistributedGameTime);
+    xmlserialize_atomic(Ref, workspace, CurrentCamera);
 
     return workspace;
 }
 
 static Camera_Instance *xmlserialize_Camera(XMLSerializeInstance *inst)
 {
-    Camera_Instance *camera = Camera_new(NULL);
     DataModel *datamodel = GetDataModel();
-
-    Instance_Remove(Instance_FindFirstChildOfClass(datamodel->Workspace, "Camera"));
+    Camera_Instance *camera = datamodel->Workspace->CurrentCamera;
 
     xmlserialize_Instance(camera, inst);
 

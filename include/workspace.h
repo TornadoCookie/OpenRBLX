@@ -1,12 +1,14 @@
 #ifndef _WORKSPACE_
 #define _WORKSPACE_
 
+#include "camera.h"
 #include "rootinstance.h"
 
 typedef struct Workspace {
     RootInstance rootinstance;
 
     double DistributedGameTime;
+    Camera_Instance *CurrentCamera;
 } Workspace;
 
 Workspace *Workspace_new(Instance *parent);

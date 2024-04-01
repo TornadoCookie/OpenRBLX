@@ -108,24 +108,10 @@ static void draw_recursive(Instance *inst)
 
 void DataModel_Draw(DataModel *this)
 {
-    Camera_Instance *cam;
-    Instance **children;
-    int childCount;
-
-    children = Instance_GetChildren(this->Workspace, &childCount);
-
-    for (int i = 0; i < childCount; i++)
-    {
-        if (!children[i]) continue;
-        if (!strcmp(children[i]->ClassName, "Camera"))
-        {
-            cam = children[i];
-        }
-    }
-
+    Camera_Instance *cam = this->Workspace->CurrentCamera;
 
     ClearBackground(SKYBLUE);
-    DrawFPS(0, 0);
+    DrawFPS(0, 20);
 
     BeginMode3D(cam->camera);
     Lighting *lighting = Instance_FindFirstChildOfClass(this, "Lighting");
