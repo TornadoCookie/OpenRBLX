@@ -1,16 +1,33 @@
 #include <raylib.h>
 #include "datamodel.h"
+#include "filetypes.h"
 
 #define DEBUG_IMPL
 #include "debug.h"
 
+DEFAULT_DEBUG_CHANNEL(studio)
+
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
+
+#undef RAYGUI_IMPLEMENTATION
+#define GUI_WINDOW_FILE_DIALOG_IMPLEMENTATION
+#include "gui_window_file_dialog.h"
+
+typedef struct StudioUIState {
+    char *status;
+    int topbarActive;
+    char *topBarText;
+    GuiWindowFileDialogState windowFileDialogState;
+    bool guiFocus;
+} StudioUIState;
+
+static StudioUIState uiState;
 
 #define MAX_TOOLBAR_BUTTONS 10
 
 typedef struct StudioUIButton {
-    void *func;
+    void (*func) (void);
     const char *name;
 } StudioUIButton;
 
@@ -24,6 +41,18 @@ typedef struct StudioUILayout {
     StudioUIToolbar toolbars[];
 } StudioUILayout;
 
+static void open()
+{
+    uiState.windowFileDialogState.windowActive = true;
+    uiState.windowFileDialogState.saveFileMode = false;
+}
+
+static void saveas()
+{
+    uiState.windowFileDialogState.windowActive = true;
+    uiState.windowFileDialogState.saveFileMode = true;
+}
+
 static const StudioUILayout uiLayout = {
     // layout
     1,
@@ -32,21 +61,11 @@ static const StudioUILayout uiLayout = {
         "File",
         {
             // buttons
-            {NULL, "New"},
-            {NULL, "Open"},
-            {NULL, "Save"},
-            {NULL, "Save As"},
+            {open, "Open"},
+            {saveas, "Save As"},
         }
     }
 };
-
-typedef struct StudioUIState {
-    char *status;
-    int topbarActive;
-    char *topBarText;
-} StudioUIState;
-
-static StudioUIState uiState;
 
 static void load_studio_ui()
 {
@@ -60,6 +79,8 @@ static void load_studio_ui()
         if (i != uiLayout.toolbarCount - 1) uiState.topBarText[totalSize - 1] = ';';
         uiState.topBarText[totalSize] = 0;
     }
+
+    uiState.windowFileDialogState = InitGuiWindowFileDialog(GetWorkingDirectory());
 }
 
 static void draw_studio_ui()
@@ -74,7 +95,10 @@ static void draw_studio_ui()
     for (int i = 0; i < MAX_TOOLBAR_BUTTONS; i++)
     {
         if (!uiLayout.toolbars[uiState.topbarActive].buttons[i].name) continue;
-        GuiButton((Rectangle){60 + i * 50, 0, 50, 20}, uiLayout.toolbars[uiState.topbarActive].buttons[i].name);
+        if (GuiButton((Rectangle){60 + i * 50, 0, 50, 20}, uiLayout.toolbars[uiState.topbarActive].buttons[i].name))
+        {
+            if (uiLayout.toolbars[uiState.topbarActive].buttons[i].func) uiLayout.toolbars[uiState.topbarActive].buttons[i].func();
+        }
     }
 }
 
@@ -93,21 +117,57 @@ int main()
     {
         BeginDrawing();
         DataModel_Draw(datamodel);
+
+        if (uiState.windowFileDialogState.windowActive) GuiLock();
         draw_studio_ui();
         if (IsKeyPressed(KEY_ESCAPE))
         {
-            if (GuiIsLocked())
+            if (uiState.guiFocus)
             {
                 GuiUnlock();
                 EnableCursor();
+                uiState.guiFocus = false;
             }
             else
             {
                 GuiLock();
                 DisableCursor();
+                uiState.guiFocus = true;
             }
         }
+
+        GuiUnlock();
+
+        GuiWindowFileDialog(&uiState.windowFileDialogState);
         EndDrawing();
+
+        if (uiState.windowFileDialogState.SelectFilePressed)
+        {
+            uiState.windowFileDialogState.SelectFilePressed = false;
+            if (uiState.windowFileDialogState.saveFileMode)
+            {
+                FIXME("save files not implemented: %s.\n", uiState.windowFileDialogState.fileNameText);
+            }
+            else
+            {
+                const char *x = TextFormat("%s/%s", uiState.windowFileDialogState.dirPathText, uiState.windowFileDialogState.fileNameText);
+                if (IsFileExtension(uiState.windowFileDialogState.fileNameText, ".rbxmx"))
+                {
+                    int objCount;
+                    Instance **objs = LoadModelRBXMX(x, &objCount);
+
+                    for (int i = 0; i < objCount; i++)
+                    {
+                        if (!objs[i]) continue;
+                        Instance_SetParent(objs[i], datamodel->Workspace);
+                    }
+                }
+                else if (IsFileExtension(uiState.windowFileDialogState.fileNameText, ".rbxmx"))
+                {
+                    LoadPlaceRBXLX(x);
+                }
+            }
+        }
     }
 
     DataModel_Shutdown(datamodel);
