@@ -20,6 +20,8 @@ MeshContentProvider *MeshContentProvider_new(Instance *parent)
 
     newInst->studs = LoadTexture("staticdata/studs.png");
 
+    newInst->cacheablecontentprovider.instance.Name = "MeshContentProvider";
+
     if (parent) Instance_SetParent(newInst, parent);
 
     return newInst;

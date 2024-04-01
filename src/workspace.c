@@ -22,6 +22,7 @@ Workspace *Workspace_new(Instance *parent)
     newInst->CurrentCamera = camera;
 
     newInst->rootinstance.model.pvinstance.drawFunc = workspace_draw;
+    newInst->rootinstance.model.pvinstance.instance.Name = "Workspace";
 
     if (parent) Instance_SetParent(newInst, parent);
 

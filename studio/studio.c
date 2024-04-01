@@ -14,12 +14,17 @@ DEFAULT_DEBUG_CHANNEL(studio)
 #define GUI_WINDOW_FILE_DIALOG_IMPLEMENTATION
 #include "gui_window_file_dialog.h"
 
+#define GUI_FLOATING_WINDOW_IMPLEMENTATION
+#include "gui_floating_window.h"
+
 typedef struct StudioUIState {
     char *status;
     int topbarActive;
     char *topBarText;
     GuiWindowFileDialogState windowFileDialogState;
     bool guiFocus;
+    GuiFloatingWindowState explorerWindowState;
+    int explorerWindowActive;
 } StudioUIState;
 
 static StudioUIState uiState;
@@ -67,20 +72,40 @@ static const StudioUILayout uiLayout = {
     }
 };
 
+#define LOAD_STRING_INTO_SEMICOLON_SEPARATED(count, way, dest) \
+    {int totalSize = 0; \
+    for (int i = 0; i < count; i++) \
+    { \
+        int oldTotalSize = totalSize; \
+        totalSize += strlen(way) + 1; \
+        dest = realloc(dest, totalSize + 1); \
+        memcpy(dest + oldTotalSize, way, strlen(way)); \
+        if (i != count - 1) dest[totalSize - 1] = ';'; \
+        dest[totalSize] = 0; \
+    }}
+
 static void load_studio_ui()
 {
-    int totalSize = 0;
-    for (int i = 0; i < uiLayout.toolbarCount; i++)
-    {
-        int oldTotalSize = totalSize;
-        totalSize += strlen(uiLayout.toolbars[i].name) + 1;
-        uiState.topBarText = realloc(uiState.topBarText, totalSize + 1);
-        memcpy(uiState.topBarText + oldTotalSize, uiLayout.toolbars[i].name, strlen(uiLayout.toolbars[i].name));
-        if (i != uiLayout.toolbarCount - 1) uiState.topBarText[totalSize - 1] = ';';
-        uiState.topBarText[totalSize] = 0;
-    }
+    LOAD_STRING_INTO_SEMICOLON_SEPARATED(uiLayout.toolbarCount, uiLayout.toolbars[i].name, uiState.topBarText)    
 
     uiState.windowFileDialogState = InitGuiWindowFileDialog(GetWorkingDirectory());
+    uiState.explorerWindowState.position = (Vector2){0, 40};
+    uiState.explorerWindowState.size = (Vector2){200, 300};
+}
+
+static void draw_explorer_window(Vector2 position, Vector2 scroll)
+{
+    char *text = NULL;
+    int childCount;
+    Instance **children;
+
+    children = Instance_GetChildren(GetDataModel(), &childCount);
+
+    LOAD_STRING_INTO_SEMICOLON_SEPARATED(childCount, children[i]->Name, text);
+
+    GuiListView((Rectangle){position.x, position.y + RAYGUI_WINDOWBOX_STATUSBAR_HEIGHT, uiState.explorerWindowState.size.x - RAYGUI_PANEL_BORDER_WIDTH, uiState.explorerWindowState.size.y - RAYGUI_PANEL_BORDER_WIDTH - RAYGUI_WINDOWBOX_STATUSBAR_HEIGHT}, text, &scroll.y, &uiState.explorerWindowActive);
+
+    free(text);
 }
 
 static void draw_studio_ui()
@@ -100,6 +125,9 @@ static void draw_studio_ui()
             if (uiLayout.toolbars[uiState.topbarActive].buttons[i].func) uiLayout.toolbars[uiState.topbarActive].buttons[i].func();
         }
     }
+
+    // explorer window
+    GuiWindowFloating(&uiState.explorerWindowState, draw_explorer_window, uiState.explorerWindowState.size, "Explorer");
 }
 
 int main()

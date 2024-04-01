@@ -13,6 +13,9 @@ Lighting *Lighting_new(Instance *parent)
     newInst = realloc(newInst, sizeof(Lighting));
     
     newInst->LightingChanged = RBXScriptSignal_new();
+    newInst->instance.Name = "Lighting";
+
+    if (parent) Instance_SetParent(newInst, parent);
 
     return newInst;
 }
