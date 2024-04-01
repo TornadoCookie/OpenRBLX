@@ -644,7 +644,13 @@ static void load_model_refs(XMLRefsInstance *inst, Instance *top)
 Instance **LoadModelRBXMX(const char *file, int *mdlCount)
 {
     FILE *f = fopen(file, "r");
-    if (!f) return NULL;
+    if (!f)
+    {
+        fprintf(stderr, "an error occurred while parsing file \"%s\": ", file);
+        perror("error");
+        *mdlCount = 0;
+        return NULL;
+    }
     struct xml_document *document = xml_open_document(f);
 
     struct xml_node *root = xml_document_root(document);
