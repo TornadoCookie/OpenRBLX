@@ -3,7 +3,7 @@ OpenRBLX is an open-source recreation of the Roblox engine.
 Features:
 - rbxmx parsing.
 - rbxlx parsing.
-- parsing 2005 models with original colour and form.
+- parsing models from the 2005 era with original colour and form.
 - parsing modern models as well.
 
 TODO:
