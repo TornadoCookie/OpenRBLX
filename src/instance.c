@@ -26,6 +26,8 @@ Instance *Instance_new(const char *className, Instance *parent)
     newInst->childCount = 0;
     newInst->children = NULL;
 
+    newInst->Parent = NULL;
+
     return newInst;
 }
 

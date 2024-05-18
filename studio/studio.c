@@ -25,6 +25,7 @@ typedef struct StudioUIState {
     bool guiFocus;
     GuiFloatingWindowState explorerWindowState;
     int explorerWindowActive;
+    Instance *explorerSelection;
 } StudioUIState;
 
 static StudioUIState uiState;
@@ -73,7 +74,7 @@ static const StudioUILayout uiLayout = {
 };
 
 #define LOAD_STRING_INTO_SEMICOLON_SEPARATED(count, way, dest) \
-    {int totalSize = 0; \
+    {int totalSize = dest ? strlen(dest) : 0; \
     for (int i = 0; i < count; i++) \
     { \
         int oldTotalSize = totalSize; \
@@ -91,6 +92,8 @@ static void load_studio_ui()
     uiState.windowFileDialogState = InitGuiWindowFileDialog(GetWorkingDirectory());
     uiState.explorerWindowState.position = (Vector2){0, 40};
     uiState.explorerWindowState.size = (Vector2){200, 300};
+    uiState.explorerWindowActive = 0;
+    uiState.explorerSelection = GetDataModel();
 }
 
 static void draw_explorer_window(Vector2 position, Vector2 scroll)
@@ -98,12 +101,40 @@ static void draw_explorer_window(Vector2 position, Vector2 scroll)
     char *text = NULL;
     int childCount;
     Instance **children;
+    bool hasTextBefore = false;
 
-    children = Instance_GetChildren(GetDataModel(), &childCount);
+    if (uiState.explorerSelection && uiState.explorerSelection->Parent)
+    {
+        const char *text1 = TextFormat("Up (%s);", uiState.explorerSelection->Parent->Name);
+        text = malloc(strlen(text1) + 1);
+        strcpy(text, text1);
+        hasTextBefore = true;
+    }
+
+    children = Instance_GetChildren(uiState.explorerSelection, &childCount);
 
     LOAD_STRING_INTO_SEMICOLON_SEPARATED(childCount, children[i]->Name, text);
 
+    int prevActive = uiState.explorerWindowActive;
     GuiListView((Rectangle){position.x, position.y + RAYGUI_WINDOWBOX_STATUSBAR_HEIGHT, uiState.explorerWindowState.size.x - RAYGUI_PANEL_BORDER_WIDTH, uiState.explorerWindowState.size.y - RAYGUI_PANEL_BORDER_WIDTH - RAYGUI_WINDOWBOX_STATUSBAR_HEIGHT}, text, &scroll.y, &uiState.explorerWindowActive);
+
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && prevActive != -1 && uiState.explorerWindowActive == -1)
+    {
+        //double click
+        if (uiState.explorerSelection == GetDataModel())
+        {
+            uiState.explorerSelection = children[uiState.explorerWindowActive];
+        }
+        else if (uiState.explorerWindowActive == 0)
+        {
+            uiState.explorerSelection = uiState.explorerSelection->Parent;
+        }
+        else
+        {
+            uiState.explorerSelection = children[uiState.explorerWindowActive - 1];
+        }
+        uiState.explorerWindowActive = 0;
+    }
 
     free(text);
 }
