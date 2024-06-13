@@ -20,7 +20,7 @@ void trusspart_draw(TrussPart *this)
     );
 }
 
-TrussPart *TrussPart_new(Instance *parent)
+TrussPart *TrussPart_new(const char *className, Instance *parent)
 {
     TrussPart *newInst = BasePart_new("TrussPart", parent);
 

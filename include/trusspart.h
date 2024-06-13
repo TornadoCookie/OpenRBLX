@@ -8,6 +8,6 @@ typedef struct TrussPart {
     int Style;
 } TrussPart;
 
-TrussPart *TrussPart_new(Instance *parent);
+TrussPart *TrussPart_new(const char *className, Instance *parent);
 
 #endif

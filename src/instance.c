@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <raylib.h>
 #include "debug.h"
+#include <dlfcn.h>
+#include "serialize.h"
 
 DEFAULT_DEBUG_CHANNEL(instance)
 
@@ -241,4 +244,38 @@ void Instance_SetParent(Instance *this, Instance *parent)
      //   RBXScriptSignal_Fire(x->DescendantAdded, this);
      //   x = x->Parent;
     //}
+}
+
+Instance *Instance_dynNew(const char *className, Instance *parent)
+{
+    printf("Instance_dynNew(%s, %p)\n", className, parent);
+
+    void *ourselves = dlopen(NULL, RTLD_LAZY);
+
+    Instance *(*constructor)(const char *, Instance *);
+    const char *constructorName = TextFormat("%s_new", className);
+    constructor = dlsym(ourselves, constructorName);
+    dlclose(ourselves);
+
+    return constructor(className, parent);
+}
+
+void Instance_Serialize(Instance *obj, SerializeInstance *inst)
+{
+    printf("Instance_Serialize(%p, %p)\n", obj, inst);
+
+    void *ourselves = dlopen(NULL, RTLD_LAZY);
+
+    void (*serializer)(Instance*, SerializeInstance*);
+    const char *serializerName = TextFormat("serialize_%s", obj->ClassName);
+    serializer = dlsym(ourselves, serializerName);
+    printf("dlerror: %s\n", dlerror());
+    dlclose(ourselves);
+
+    if (!serializer)
+    {
+        printf("error: serializer for classname %s (serialize_%s() missing)\n", obj->ClassName, obj->ClassName);
+        return;
+    }
+    serializer(obj, inst);
 }

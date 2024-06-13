@@ -5,6 +5,7 @@ UseRaylib True
 ExtraCFlag -Iinclude
 ExtraCFlag -Ilib/xml/include
 ExtraCFlag -Wno-incompatible-pointer-types
+ExtraCFlag -rdynamic
 
 Dependency xml
 

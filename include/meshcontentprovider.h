@@ -14,7 +14,7 @@ typedef struct MeshContentProvider {
     Texture2D studs;
 } MeshContentProvider;
 
-MeshContentProvider *MeshContentProvider_new(Instance *parent);
+MeshContentProvider *MeshContentProvider_new(const char *className, Instance *parent);
 
 Mesh MeshContentProvider_GetPartMesh(MeshContentProvider *this, Shape shape);
 

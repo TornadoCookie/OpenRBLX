@@ -11,10 +11,11 @@
 #include "rootinstance.h"
 #include "datamodel.h"
 #include "camera.h"
+#include "serialize.h"
 
 #include "debug.h"
 
-DEFAULT_DEBUG_CHANNEL(filetypes)
+DEFAULT_DEBUG_CHANNEL(rbxmx)
 
 static char *xml_easy_string(struct xml_string *str)
 {
@@ -23,7 +24,7 @@ static char *xml_easy_string(struct xml_string *str)
     buf[xml_string_length(str)] = 0;
     return buf;
 }
-
+/*
 typedef enum {
     Serialize_bool,
     Serialize_float,
@@ -35,21 +36,21 @@ typedef enum {
     Serialize_Color3,
     Serialize_Ref,
     Serialize_double,
-} XMLSerializationType;
+} SerializationType;
 
-typedef struct XMLSerialization {
-    XMLSerializationType type;
+typedef struct Serialization {
+    SerializationType type;
     const char *name;
     void *val;
-} XMLSerialization;
+} Serialization;
 
-typedef struct XMLSerializeInstance {
-    XMLSerialization *serializations;
+typedef struct SerializeInstance {
+    Serialization *serializations;
     int serializationCount;
     CFrame modelOffset;
     uint32_t Color3uint8;
     int TopConstraint, BottomConstraint, LeftConstraint, RightConstraint, FrontConstraint, BackConstraint;
-} XMLSerializeInstance;
+} SerializeInstance;*/
 
 typedef struct XMLRef {
     const char *ref;
@@ -60,168 +61,156 @@ typedef struct XMLRefsInstance {
     int refCount;
     XMLRef *refs;
 } XMLRefsInstance;
-
-static void _xmlserialize_atomic(XMLSerializeInstance *inst, XMLSerialization serialization)
+/*
+static void _serialize_atomic(SerializeInstance *inst, Serialization serialization)
 {
     inst->serializationCount++;
-    inst->serializations = realloc(inst->serializations, inst->serializationCount * sizeof(XMLSerialization));
+    inst->serializations = realloc(inst->serializations, inst->serializationCount * sizeof(Serialization));
     inst->serializations[inst->serializationCount - 1] = serialization;
 }
 
-#define xmlserialize_atomic(type, thing, prop) _xmlserialize_atomic(inst, (XMLSerialization){Serialize_##type, #prop, &thing->prop})
-
-static void xmlserialize_Instance(Instance *instance, XMLSerializeInstance *inst)
+#define serialize_atomic(type, thing, prop) _serialize_atomic(inst, (Serialization){Serialize_##type, #prop, &thing->prop})
+*/
+void serialize_Instance(Instance *instance, SerializeInstance *inst)
 {
-    xmlserialize_atomic(string, instance, Name);
-    xmlserialize_atomic(bool, instance, archivable);
+    serialize_atomic(string, instance, Name);
+    serialize_atomic(bool, instance, archivable);
 }
 
-static void xmlserialize_PVInstance(PVInstance *pvinstance, XMLSerializeInstance *inst)
+void serialize_PVInstance(PVInstance *pvinstance, SerializeInstance *inst)
 {
-    xmlserialize_Instance(pvinstance, inst);
+    serialize_Instance(pvinstance, inst);
 
-    xmlserialize_atomic(token, pvinstance, Controller);
-    xmlserialize_atomic(bool, pvinstance, ControllerFlagShown);
+    serialize_atomic(token, pvinstance, Controller);
+    serialize_atomic(bool, pvinstance, ControllerFlagShown);
 }
 
-static void xmlserialize_BasePart(BasePart *basepart, XMLSerializeInstance *inst)
+void serialize_BasePart(BasePart *basepart, SerializeInstance *inst)
 {
-    xmlserialize_PVInstance(basepart, inst);
+    serialize_PVInstance(basepart, inst);
 
-    xmlserialize_atomic(bool, basepart, Anchored);
-    xmlserialize_atomic(float, basepart, BackParamA);
-    xmlserialize_atomic(float, basepart, BackParamB);
-    xmlserialize_atomic(token, basepart, BackSurface);
-    xmlserialize_atomic(token, basepart, BackSurfaceInput);
-    xmlserialize_atomic(float, basepart, BottomParamA);
-    xmlserialize_atomic(float, basepart, BottomParamB);
-    xmlserialize_atomic(token, basepart, BottomSurface);
-    xmlserialize_atomic(token, basepart, BottomSurfaceInput);
-    xmlserialize_atomic(int, basepart, BrickColor);
-    xmlserialize_atomic(CoordinateFrame, basepart, CFrame);
-    xmlserialize_atomic(bool, basepart, CanCollide);
-    xmlserialize_atomic(bool, basepart, DraggingV1);
-    xmlserialize_atomic(float, basepart, Elasticity);
-    xmlserialize_atomic(float, basepart, Friction);
-    xmlserialize_atomic(float, basepart, FrontParamA);
-    xmlserialize_atomic(float, basepart, FrontParamB);
-    xmlserialize_atomic(token, basepart, FrontSurface);
-    xmlserialize_atomic(token, basepart, FrontSurfaceInput);
-    xmlserialize_atomic(float, basepart, LeftParamA);
-    xmlserialize_atomic(float, basepart, LeftParamB);
-    xmlserialize_atomic(token, basepart, LeftSurface);
-    xmlserialize_atomic(token, basepart, LeftSurfaceInput);
-    xmlserialize_atomic(bool, basepart, Locked);
-    xmlserialize_atomic(token, basepart, Material);
-    xmlserialize_atomic(float, basepart, Reflectance);
-    xmlserialize_atomic(float, basepart, RightParamA);
-    xmlserialize_atomic(float, basepart, RightParamB);
-    xmlserialize_atomic(token, basepart, RightSurface);
-    xmlserialize_atomic(token, basepart, RightSurfaceInput);
-    xmlserialize_atomic(Vector3, basepart, RotVelocity);
-    xmlserialize_atomic(float, basepart, TopParamA);
-    xmlserialize_atomic(float, basepart, TopParamB);
-    xmlserialize_atomic(token, basepart, TopSurface);
-    xmlserialize_atomic(token, basepart, TopSurfaceInput);
-    xmlserialize_atomic(float, basepart, Transparency);
-    xmlserialize_atomic(Vector3, basepart, Velocity);
-    xmlserialize_atomic(Vector3, basepart, size);
-    xmlserialize_atomic(Color3, basepart, Color);
+    serialize_atomic(bool, basepart, Anchored);
+    serialize_atomic(float, basepart, BackParamA);
+    serialize_atomic(float, basepart, BackParamB);
+    serialize_atomic(token, basepart, BackSurface);
+    serialize_atomic(token, basepart, BackSurfaceInput);
+    serialize_atomic(float, basepart, BottomParamA);
+    serialize_atomic(float, basepart, BottomParamB);
+    serialize_atomic(token, basepart, BottomSurface);
+    serialize_atomic(token, basepart, BottomSurfaceInput);
+    serialize_atomic(int, basepart, BrickColor);
+    serialize_atomic(CoordinateFrame, basepart, CFrame);
+    serialize_atomic(bool, basepart, CanCollide);
+    serialize_atomic(bool, basepart, DraggingV1);
+    serialize_atomic(float, basepart, Elasticity);
+    serialize_atomic(float, basepart, Friction);
+    serialize_atomic(float, basepart, FrontParamA);
+    serialize_atomic(float, basepart, FrontParamB);
+    serialize_atomic(token, basepart, FrontSurface);
+    serialize_atomic(token, basepart, FrontSurfaceInput);
+    serialize_atomic(float, basepart, LeftParamA);
+    serialize_atomic(float, basepart, LeftParamB);
+    serialize_atomic(token, basepart, LeftSurface);
+    serialize_atomic(token, basepart, LeftSurfaceInput);
+    serialize_atomic(bool, basepart, Locked);
+    serialize_atomic(token, basepart, Material);
+    serialize_atomic(float, basepart, Reflectance);
+    serialize_atomic(float, basepart, RightParamA);
+    serialize_atomic(float, basepart, RightParamB);
+    serialize_atomic(token, basepart, RightSurface);
+    serialize_atomic(token, basepart, RightSurfaceInput);
+    serialize_atomic(Vector3, basepart, RotVelocity);
+    serialize_atomic(float, basepart, TopParamA);
+    serialize_atomic(float, basepart, TopParamB);
+    serialize_atomic(token, basepart, TopSurface);
+    serialize_atomic(token, basepart, TopSurfaceInput);
+    serialize_atomic(float, basepart, Transparency);
+    serialize_atomic(Vector3, basepart, Velocity);
+    serialize_atomic(Vector3, basepart, size);
+    serialize_atomic(Color3, basepart, Color);
 
-    xmlserialize_atomic(token, inst, TopConstraint);
-    xmlserialize_atomic(token, inst, BottomConstraint);
-    xmlserialize_atomic(token, inst, LeftConstraint);
-    xmlserialize_atomic(token, inst, RightConstraint);
-    xmlserialize_atomic(token, inst, FrontConstraint);
-    xmlserialize_atomic(token, inst, BackConstraint);
-    xmlserialize_atomic(int, inst, Color3uint8);
+    serialize_atomic(token, inst, TopConstraint);
+    serialize_atomic(token, inst, BottomConstraint);
+    serialize_atomic(token, inst, LeftConstraint);
+    serialize_atomic(token, inst, RightConstraint);
+    serialize_atomic(token, inst, FrontConstraint);
+    serialize_atomic(token, inst, BackConstraint);
+    serialize_atomic(int, inst, Color3uint8);
 }
 
-static TrussPart *xmlserialize_TrussPart(XMLSerializeInstance *inst)
+void serialize_TrussPart(TrussPart *trusspart, SerializeInstance *inst)
 {
-    TrussPart *trusspart = TrussPart_new(NULL);
+    //TrussPart *trusspart = TrussPart_new(NULL);
 
-    xmlserialize_BasePart(trusspart, inst);
-    xmlserialize_atomic(token, trusspart, Style);
-
-    return trusspart;
+    serialize_BasePart(trusspart, inst);
+    serialize_atomic(token, trusspart, Style);
 }
 
-static void xmlserialize_FormFactorPart(FormFactorPart *formfactorpart, XMLSerializeInstance *inst)
+void serialize_FormFactorPart(FormFactorPart *formfactorpart, SerializeInstance *inst)
 {
-    xmlserialize_BasePart(formfactorpart, inst);
+    serialize_BasePart(formfactorpart, inst);
 }
 
-static Part *xmlserialize_Part(XMLSerializeInstance *inst)
+void serialize_Part(Part *part, SerializeInstance *inst)
 {
-    Part *part = Part_new(NULL);
+    //Part *part = Part_new(NULL);
 
-    xmlserialize_FormFactorPart(part, inst);
-    xmlserialize_atomic(token, part, shape);
+    printf("serialize_Part\n");
 
-    return part;
+    serialize_FormFactorPart(part, inst);
+    serialize_atomic(token, part, shape);
 }
 
-static void xmlserialize_Model(Model_Instance *model, XMLSerializeInstance *inst)
+void serialize_Model(Model_Instance *model, SerializeInstance *inst)
 {
-    xmlserialize_PVInstance(model, inst);
+    serialize_PVInstance(model, inst);
 
-    _xmlserialize_atomic(inst, (XMLSerialization){Serialize_CoordinateFrame, "CoordinateFrame", &inst->modelOffset});
+    _serialize_atomic(inst, (Serialization){Serialize_CoordinateFrame, "CoordinateFrame", &inst->modelOffset});
 }
 
-static PhysicalCharacter *xmlserialize_PhysicalCharacter(XMLSerializeInstance *inst)
+void serialize_PhysicalCharacter(PhysicalCharacter *physicalcharacter, SerializeInstance *inst)
 {
-    PhysicalCharacter *physicalcharacter = PhysicalCharacter_new(NULL);
+    serialize_Model(physicalcharacter, inst);
 
-    xmlserialize_Model(physicalcharacter, inst);
-
-    xmlserialize_atomic(token, physicalcharacter, PostureXML);
-    xmlserialize_atomic(Ref, physicalcharacter, Head);
-    xmlserialize_atomic(Ref, physicalcharacter, UpperBody);
-    xmlserialize_atomic(Ref, physicalcharacter, LowerBody);
-    xmlserialize_atomic(Ref, physicalcharacter, LeftLeg);
-    xmlserialize_atomic(Ref, physicalcharacter, RightLeg);
-    xmlserialize_atomic(Ref, physicalcharacter, LeftArm);
-    xmlserialize_atomic(Ref, physicalcharacter, RightArm);
-
-    return physicalcharacter;
+    serialize_atomic(token, physicalcharacter, PostureXML);
+    serialize_atomic(Ref, physicalcharacter, Head);
+    serialize_atomic(Ref, physicalcharacter, UpperBody);
+    serialize_atomic(Ref, physicalcharacter, LowerBody);
+    serialize_atomic(Ref, physicalcharacter, LeftLeg);
+    serialize_atomic(Ref, physicalcharacter, RightLeg);
+    serialize_atomic(Ref, physicalcharacter, LeftArm);
+    serialize_atomic(Ref, physicalcharacter, RightArm);
 }
 
-static void xmlserialize_RootInstance(RootInstance *rootinstance, XMLSerializeInstance *inst)
+void serialize_RootInstance(RootInstance *rootinstance, SerializeInstance *inst)
 {
-    xmlserialize_Model(rootinstance, inst);
+    serialize_Model(rootinstance, inst);
 }
 
-static Workspace *xmlserialize_Workspace(XMLSerializeInstance *inst)
+void serialize_Workspace(Workspace *workspace, SerializeInstance *inst)
 {
-    DataModel *datamodel = GetDataModel();
-    Workspace *workspace = datamodel->Workspace;
-
-    xmlserialize_Instance(workspace, inst);
+    workspace = GetDataModel()->Workspace;
+    serialize_Instance(workspace, inst);
 
     workspace->rootinstance.model.pvinstance.instance.ClassName = "Workspace";
 
-    xmlserialize_atomic(double, workspace, DistributedGameTime);
-    xmlserialize_atomic(Ref, workspace, CurrentCamera);
-
-    return workspace;
+    serialize_atomic(double, workspace, DistributedGameTime);
+    serialize_atomic(Ref, workspace, CurrentCamera);
 }
 
-static Camera_Instance *xmlserialize_Camera(XMLSerializeInstance *inst)
+void serialize_Camera(Camera_Instance *camera, SerializeInstance *inst)
 {
     DataModel *datamodel = GetDataModel();
-    Camera_Instance *camera = datamodel->Workspace->CurrentCamera;
+    camera = datamodel->Workspace->CurrentCamera;
 
-    xmlserialize_Instance(camera, inst);
+    serialize_Instance(camera, inst);
 
     camera->instance.ClassName = "Camera";
 
-    xmlserialize_atomic(Ref, camera, CameraSubject);
-    xmlserialize_atomic(token, camera, CameraType);
-    xmlserialize_atomic(CoordinateFrame, camera, CoordinateFrame);
-    xmlserialize_atomic(CoordinateFrame, camera, Focus);
-
-    return camera;
+    serialize_atomic(Ref, camera, CameraSubject);
+    serialize_atomic(token, camera, CameraType);
+    serialize_atomic(CoordinateFrame, camera, CoordinateFrame);
+    serialize_atomic(CoordinateFrame, camera, Focus);
 }
 
 static void xmlserialize_coordinateframe(CoordinateFrame *cf, struct xml_node *node)
@@ -333,7 +322,7 @@ static void xmlserialize_token(int *val, char *prop, char *propName)
         *val = asNumber;
     }
 
-    printf("xmlserialize_token: prop %s, propName %s, asNumber %d.\n", prop, propName, asNumber);
+    printf("serialize_token: prop %s, propName %s, asNumber %d.\n", prop, propName, asNumber);
 
     if (strstr(propName, "SurfaceInput"))
     {
@@ -362,7 +351,7 @@ static void xmlserialize_token(int *val, char *prop, char *propName)
     }
 }
 
-static void serialize(XMLSerializeInstance *inst, char *prop, char *propName, struct xml_node *child, Instance *ret, XMLRefsInstance *refsInst)
+static void serialize(SerializeInstance *inst, char *prop, char *propName, struct xml_node *child, Instance *ret, XMLRefsInstance *refsInst)
 {
     bool done = false;
 
@@ -496,39 +485,42 @@ static Instance *load_model_part_xml(struct xml_node *node, XMLRefsInstance *ref
     char *className = xml_easy_string(xml_node_attribute_content(node, 0));
 
     struct xml_node *propertyNode = xml_node_child(node, 0);
-    XMLSerializeInstance inst = { 0 };
+    SerializeInstance inst = { 0 };
     Instance *ret;
 
+    ret = Instance_dynNew(className, NULL);
+    Instance_Serialize(ret, &inst);
+/*
     if (!strcmp(className, "TrussPart"))
     {
-        ret = xmlserialize_TrussPart(&inst);
+        ret = serialize_TrussPart(&inst);
     }
     else if (!strcmp(className, "Part"))
     {
-        ret = xmlserialize_Part(&inst);
+        ret = serialize_Part(&inst);
     }
     else if (!strcmp(className, "Model"))
     {
         ret = Model_new("Model", NULL);
-        xmlserialize_Model(ret, &inst);
+        serialize_Model(ret, &inst);
     }
     else if (!strcmp(className, "PhysicalCharacter"))
     {
-        ret = xmlserialize_PhysicalCharacter(&inst);
+        ret = serialize_PhysicalCharacter(&inst);
     }
     else if (!strcmp(className, "Workspace"))
     {
-        ret = xmlserialize_Workspace(&inst);
+        ret = serialize_Workspace(&inst);
     }
     else if (!strcmp(className, "Camera"))
     {
-        ret = xmlserialize_Camera(&inst);
+        ret = serialize_Camera(&inst);
     }
     else
     {
         printf("error: no serializer for classname %s.\n", className);
         return NULL;
-    }
+    }*/
 
     ret->xmlref = xml_easy_string(xml_node_attribute_content(node, 1));
 

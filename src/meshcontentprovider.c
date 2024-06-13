@@ -6,7 +6,7 @@
 
 DEFAULT_DEBUG_CHANNEL(meshcontentprovider)
 
-MeshContentProvider *MeshContentProvider_new(Instance *parent)
+MeshContentProvider *MeshContentProvider_new(const char *className, Instance *parent)
 {
     MeshContentProvider *newInst = CacheableContentProvider_new("MeshContentProvider", parent);
 

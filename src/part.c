@@ -131,7 +131,7 @@ static void draw_ball(Part *this)
 
 void part_draw(Part *this)
 {
-    printf("drawing part %p.\n", this);
+    printf("drawing part %p, position %s.\n", this, debugstr_vector3(this->formfactorpart.basepart.Position));
     this->material.maps[MATERIAL_MAP_DIFFUSE].color = rl_from_color3(this->formfactorpart.basepart.Color, this->formfactorpart.basepart.Transparency);
 
     switch (this->shape)
@@ -143,7 +143,7 @@ void part_draw(Part *this)
     }
 }
 
-Part *Part_new(Instance *parent)
+Part *Part_new(const char *className, Instance *parent)
 {
     Part *newInst = FormFactorPart_new("Part", parent);
 
@@ -154,6 +154,8 @@ Part *Part_new(Instance *parent)
 
     newInst->material = LoadMaterialDefault();
     newInst->shape = Shape_Block;
+
+    Part_SetShape(newInst, newInst->shape);
 
     MeshContentProvider *mcp = ServiceProvider_GetService(GetDataModel(), "MeshContentProvider");
 

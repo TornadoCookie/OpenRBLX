@@ -50,6 +50,8 @@ void Instance_SetArchivable(Instance *this, bool archivable);
 void Instance_SetName(Instance *this, const char *name);
 void Instance_SetParent(Instance *this, Instance *parent);
 
+Instance *Instance_dynNew(const char *className, Instance *parent);
+
 typedef struct EventArg_Instance_AncestryChanged {
     Instance *child;
     Instance *parent;

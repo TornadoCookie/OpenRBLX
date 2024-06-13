@@ -47,11 +47,13 @@ $(DISTDIR):
 	mkdir -p $@
 
 CFLAGS+=-Isrc
+CFLAGS+=-Iinclude
 CFLAGS+=-Ilib/xml/src
 CFLAGS+=-D PLATFORM=\"$(PLATFORM)\"
 CFLAGS+=-Iinclude
 CFLAGS+=-Ilib/xml/include
 CFLAGS+=-Wno-incompatible-pointer-types
+CFLAGS+=-rdynamic
 
 CFLAGS+=-Ilib/$(RAYLIB_NAME)/include
 CFLAGS+=-Wl,-rpath,lib/$(RAYLIB_NAME)/lib

@@ -37,7 +37,7 @@ DataModel *DataModel_new(void)
     }
     game = newInst;
 
-    MeshContentProvider_new(newInst);
+    MeshContentProvider_new(NULL, newInst);
     Lighting_new(newInst);
 
     rt = LoadRenderTexture(128, 128);
