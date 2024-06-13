@@ -19,7 +19,7 @@ typedef struct Part {
     Material material;
 } Part;
 
-Part *Part_new(const char *className,Instance *parent);
+Part *Part_new(const char *className, Instance *parent);
 
 void Part_SetShape(Part *this, Shape shape);
 
