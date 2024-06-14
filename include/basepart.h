@@ -102,4 +102,6 @@ void BasePart_SetBrickColor(BasePart *this, int brickColor);
 void BasePart_SetCFrame(BasePart *this, CFrame cf);
 void BasePart_SetPosition(BasePart *this, Vector3 pos);
 
+void serialize_BasePart(BasePart *basepart, SerializeInstance *inst);
+
 #endif

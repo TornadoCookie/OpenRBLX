@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "brickcolor.h"
+#include "serialize.h"
 
 DEFAULT_DEBUG_CHANNEL(basepart)
 
@@ -65,4 +66,57 @@ void BasePart_SetPosition(BasePart *this, Vector3 pos)
     this->CFrame.Y = pos.y;
     this->CFrame.Z = pos.z;
     this->Position = pos;
+}
+
+void serialize_BasePart(BasePart *basepart, SerializeInstance *inst)
+{
+    serialize_PVInstance(basepart, inst);
+
+    serialize_atomic(bool, basepart, Anchored);
+    serialize_atomic(float, basepart, BackParamA);
+    serialize_atomic(float, basepart, BackParamB);
+    serialize_atomic(token, basepart, BackSurface);
+    serialize_atomic(token, basepart, BackSurfaceInput);
+    serialize_atomic(float, basepart, BottomParamA);
+    serialize_atomic(float, basepart, BottomParamB);
+    serialize_atomic(token, basepart, BottomSurface);
+    serialize_atomic(token, basepart, BottomSurfaceInput);
+    serialize_atomic(int, basepart, BrickColor);
+    serialize_atomic(CoordinateFrame, basepart, CFrame);
+    serialize_atomic(bool, basepart, CanCollide);
+    serialize_atomic(bool, basepart, DraggingV1);
+    serialize_atomic(float, basepart, Elasticity);
+    serialize_atomic(float, basepart, Friction);
+    serialize_atomic(float, basepart, FrontParamA);
+    serialize_atomic(float, basepart, FrontParamB);
+    serialize_atomic(token, basepart, FrontSurface);
+    serialize_atomic(token, basepart, FrontSurfaceInput);
+    serialize_atomic(float, basepart, LeftParamA);
+    serialize_atomic(float, basepart, LeftParamB);
+    serialize_atomic(token, basepart, LeftSurface);
+    serialize_atomic(token, basepart, LeftSurfaceInput);
+    serialize_atomic(bool, basepart, Locked);
+    serialize_atomic(token, basepart, Material);
+    serialize_atomic(float, basepart, Reflectance);
+    serialize_atomic(float, basepart, RightParamA);
+    serialize_atomic(float, basepart, RightParamB);
+    serialize_atomic(token, basepart, RightSurface);
+    serialize_atomic(token, basepart, RightSurfaceInput);
+    serialize_atomic(Vector3, basepart, RotVelocity);
+    serialize_atomic(float, basepart, TopParamA);
+    serialize_atomic(float, basepart, TopParamB);
+    serialize_atomic(token, basepart, TopSurface);
+    serialize_atomic(token, basepart, TopSurfaceInput);
+    serialize_atomic(float, basepart, Transparency);
+    serialize_atomic(Vector3, basepart, Velocity);
+    serialize_atomic(Vector3, basepart, size);
+    serialize_atomic(Color3, basepart, Color);
+
+    serialize_atomic(token, inst, TopConstraint);
+    serialize_atomic(token, inst, BottomConstraint);
+    serialize_atomic(token, inst, LeftConstraint);
+    serialize_atomic(token, inst, RightConstraint);
+    serialize_atomic(token, inst, FrontConstraint);
+    serialize_atomic(token, inst, BackConstraint);
+    serialize_atomic(int, inst, Color3uint8);
 }

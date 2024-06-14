@@ -17,4 +17,6 @@ typedef struct PVInstance {
 PVInstance *PVInstance_new(const char *className, Instance *parent);
 void PVInstance_Draw(PVInstance *this);
 
+void serialize_PVInstance(PVInstance *pvinstance, SerializeInstance *inst);
+
 #endif

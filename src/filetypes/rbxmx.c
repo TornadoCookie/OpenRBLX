@@ -71,72 +71,6 @@ static void _serialize_atomic(SerializeInstance *inst, Serialization serializati
 
 #define serialize_atomic(type, thing, prop) _serialize_atomic(inst, (Serialization){Serialize_##type, #prop, &thing->prop})
 */
-void serialize_Instance(Instance *instance, SerializeInstance *inst)
-{
-    serialize_atomic(string, instance, Name);
-    serialize_atomic(bool, instance, archivable);
-}
-
-void serialize_PVInstance(PVInstance *pvinstance, SerializeInstance *inst)
-{
-    serialize_Instance(pvinstance, inst);
-
-    serialize_atomic(token, pvinstance, Controller);
-    serialize_atomic(bool, pvinstance, ControllerFlagShown);
-}
-
-void serialize_BasePart(BasePart *basepart, SerializeInstance *inst)
-{
-    serialize_PVInstance(basepart, inst);
-
-    serialize_atomic(bool, basepart, Anchored);
-    serialize_atomic(float, basepart, BackParamA);
-    serialize_atomic(float, basepart, BackParamB);
-    serialize_atomic(token, basepart, BackSurface);
-    serialize_atomic(token, basepart, BackSurfaceInput);
-    serialize_atomic(float, basepart, BottomParamA);
-    serialize_atomic(float, basepart, BottomParamB);
-    serialize_atomic(token, basepart, BottomSurface);
-    serialize_atomic(token, basepart, BottomSurfaceInput);
-    serialize_atomic(int, basepart, BrickColor);
-    serialize_atomic(CoordinateFrame, basepart, CFrame);
-    serialize_atomic(bool, basepart, CanCollide);
-    serialize_atomic(bool, basepart, DraggingV1);
-    serialize_atomic(float, basepart, Elasticity);
-    serialize_atomic(float, basepart, Friction);
-    serialize_atomic(float, basepart, FrontParamA);
-    serialize_atomic(float, basepart, FrontParamB);
-    serialize_atomic(token, basepart, FrontSurface);
-    serialize_atomic(token, basepart, FrontSurfaceInput);
-    serialize_atomic(float, basepart, LeftParamA);
-    serialize_atomic(float, basepart, LeftParamB);
-    serialize_atomic(token, basepart, LeftSurface);
-    serialize_atomic(token, basepart, LeftSurfaceInput);
-    serialize_atomic(bool, basepart, Locked);
-    serialize_atomic(token, basepart, Material);
-    serialize_atomic(float, basepart, Reflectance);
-    serialize_atomic(float, basepart, RightParamA);
-    serialize_atomic(float, basepart, RightParamB);
-    serialize_atomic(token, basepart, RightSurface);
-    serialize_atomic(token, basepart, RightSurfaceInput);
-    serialize_atomic(Vector3, basepart, RotVelocity);
-    serialize_atomic(float, basepart, TopParamA);
-    serialize_atomic(float, basepart, TopParamB);
-    serialize_atomic(token, basepart, TopSurface);
-    serialize_atomic(token, basepart, TopSurfaceInput);
-    serialize_atomic(float, basepart, Transparency);
-    serialize_atomic(Vector3, basepart, Velocity);
-    serialize_atomic(Vector3, basepart, size);
-    serialize_atomic(Color3, basepart, Color);
-
-    serialize_atomic(token, inst, TopConstraint);
-    serialize_atomic(token, inst, BottomConstraint);
-    serialize_atomic(token, inst, LeftConstraint);
-    serialize_atomic(token, inst, RightConstraint);
-    serialize_atomic(token, inst, FrontConstraint);
-    serialize_atomic(token, inst, BackConstraint);
-    serialize_atomic(int, inst, Color3uint8);
-}
 
 void serialize_TrussPart(TrussPart *trusspart, SerializeInstance *inst)
 {
@@ -144,21 +78,6 @@ void serialize_TrussPart(TrussPart *trusspart, SerializeInstance *inst)
 
     serialize_BasePart(trusspart, inst);
     serialize_atomic(token, trusspart, Style);
-}
-
-void serialize_FormFactorPart(FormFactorPart *formfactorpart, SerializeInstance *inst)
-{
-    serialize_BasePart(formfactorpart, inst);
-}
-
-void serialize_Part(Part *part, SerializeInstance *inst)
-{
-    //Part *part = Part_new(NULL);
-
-    printf("serialize_Part\n");
-
-    serialize_FormFactorPart(part, inst);
-    serialize_atomic(token, part, shape);
 }
 
 void serialize_Model(Model_Instance *model, SerializeInstance *inst)

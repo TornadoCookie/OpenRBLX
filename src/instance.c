@@ -279,3 +279,9 @@ void Instance_Serialize(Instance *obj, SerializeInstance *inst)
     }
     serializer(obj, inst);
 }
+
+void serialize_Instance(Instance *instance, SerializeInstance *inst)
+{
+    serialize_atomic(string, instance, Name);
+    serialize_atomic(bool, instance, archivable);
+}

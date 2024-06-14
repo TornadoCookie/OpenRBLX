@@ -7,6 +7,7 @@
 #include "meshcontentprovider.h"
 #include "datamodel.h"
 #include "rlgl.h"
+#include "serialize.h"
 
 DEFAULT_DEBUG_CHANNEL(part)
 
@@ -170,4 +171,14 @@ void Part_SetShape(Part *this, Shape shape)
 {
     MeshContentProvider *mcp = ServiceProvider_GetService(GetDataModel(), "MeshContentProvider");
     this->mesh = MeshContentProvider_GetPartMesh(mcp, this->shape);
+}
+
+void serialize_Part(Part *part, SerializeInstance *inst)
+{
+    //Part *part = Part_new(NULL);
+
+    printf("serialize_Part\n");
+
+    serialize_FormFactorPart(part, inst);
+    serialize_atomic(token, part, shape);
 }

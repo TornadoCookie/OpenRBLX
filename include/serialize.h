@@ -2,6 +2,7 @@
 #define _SERIALIZE_
 
 #include <stdint.h>
+#include <stdlib.h>
 #include "cframe.h"
 #include "instance.h"
 
@@ -40,7 +41,5 @@ static void _serialize_atomic(SerializeInstance *inst, Serialization serializati
 }
 
 #define serialize_atomic(type, thing, prop) _serialize_atomic(inst, (Serialization){Serialize_##type, #prop, &thing->prop})
-
-void Instance_Serialize(Instance *obj, SerializeInstance *inst);
 
 #endif

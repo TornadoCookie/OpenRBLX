@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include "rbxscriptsignal.h"
+#include "serialize.h"
 
 typedef struct Instance Instance;
 
@@ -51,6 +52,9 @@ void Instance_SetName(Instance *this, const char *name);
 void Instance_SetParent(Instance *this, Instance *parent);
 
 Instance *Instance_dynNew(const char *className, Instance *parent);
+
+void serialize_Instance(Instance *instance, SerializeInstance *inst);
+void Instance_Serialize(Instance *obj, SerializeInstance *inst);
 
 typedef struct EventArg_Instance_AncestryChanged {
     Instance *child;
