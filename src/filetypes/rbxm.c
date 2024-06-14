@@ -186,7 +186,7 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
             puts("");
 
             chunk.instances = malloc(chunk.Length * sizeof(Instance *));
-            chunk.serializeInstances = malloc(chunk.Length * sizeof(SerializeInstance));
+            chunk.serializeInstances = calloc(chunk.Length, sizeof(SerializeInstance));
 
             for (int i = 0; i < chunk.Length; i++)
             {
@@ -216,12 +216,20 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
             chunk.ValueType = *(uint8_t*)chunkData;
             chunkData += sizeof(uint8_t);
 
+            printf("Property Info:\n");
+            printf("ClassID: %d\n", chunk.ClassID);
+            printf("Name: ");
+            fwrite(chunk.Name, 1, nameLength, stdout);
+            puts("");
+            printf("Value type: %#x\n", chunk.ValueType);
+
             InstanceChunk instChunk;
 
             for (int i = 0; i < instChunkCount; i++)
             {
                 if (chunk.ClassID == instChunks[i].ClassID)
                 {
+                    printf("Has corresponding INST chunk\n");
                     instChunk = instChunks[i];
                 }
             }
@@ -232,7 +240,7 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
                 for (int j = 0; j < sInst->serializationCount; j++)
                 {
                     Serialization s = sInst->serializations[j];
-                    if (!strcmp(s.name, chunk.Name))
+                    if (!strncmp(s.name, chunk.Name, nameLength))
                     {
                         switch (chunk.ValueType)
                         {
@@ -250,12 +258,6 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
                 }
             }
 
-            printf("Property Info:\n");
-            printf("ClassID: %d\n", chunk.ClassID);
-            printf("Name: ");
-            fwrite(chunk.Name, 1, nameLength, stdout);
-            puts("");
-            printf("Value type: %#x\n", chunk.ValueType);
         }
         else
         {
