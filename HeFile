@@ -8,6 +8,7 @@ ExtraCFlag -Wno-incompatible-pointer-types
 ExtraCFlag -rdynamic
 
 Dependency xml
+Dependency lz4
 
 Program test_rbxmx
 Source ../tests/test_rbxmx.c
@@ -101,3 +102,4 @@ Source meshcontentprovider.c
 Source cacheablecontentprovider.c
 Source physicalcharacter.c
 Source lighting.c
+Source ../lib/lz4/src/lz4.c

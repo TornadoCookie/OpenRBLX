@@ -49,6 +49,9 @@ $(DISTDIR):
 CFLAGS+=-Isrc
 CFLAGS+=-Iinclude
 CFLAGS+=-Ilib/xml/src
+CFLAGS+=-Ilib/xml/include
+CFLAGS+=-Ilib/lz4/src
+CFLAGS+=-Ilib/lz4/include
 CFLAGS+=-D PLATFORM=\"$(PLATFORM)\"
 CFLAGS+=-Iinclude
 CFLAGS+=-Ilib/xml/include
@@ -159,6 +162,7 @@ test_rbxm_SOURCES+=src/meshcontentprovider.c
 test_rbxm_SOURCES+=src/cacheablecontentprovider.c
 test_rbxm_SOURCES+=src/physicalcharacter.c
 test_rbxm_SOURCES+=src/lighting.c
+test_rbxm_SOURCES+=src/../lib/lz4/src/lz4.c
 
 $(DISTDIR)/test_rbxm$(EXEC_EXTENSION): $(test_rbxm_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)

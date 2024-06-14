@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <raylib.h>
+#include "lz4.h"
+#include "serialize.h"
 
 #include "debug.h"
 
@@ -32,13 +35,50 @@ typedef struct InstanceChunk {
     uint8_t HasService;
     uint32_t Length;
     int32_t *IDs;
-    bool *IsService;
+    Instance **instances;
+    SerializeInstance *serializeInstances;
 } InstanceChunk;
 
 typedef struct PropertiesChunk {
     int32_t ClassID;
     char *Name;
+    uint8_t ValueType;
+    void *Values;
 } PropertiesChunk;
+
+static void DecodeDifferenceInPlace(unsigned char *bytes, int length)
+{
+    for (int i = 1; i < length; i++)
+    {
+        bytes[i] += bytes[i-1];
+    }
+}
+
+static int32_t RotateInt32(int32_t value)
+{
+    return (int32_t)((uint32_t)value >> 1) ^ (-(value & 1));
+}
+
+static void ReadInterleavedInt32(unsigned char *data, int count, int32_t (*transform)(int32_t), int32_t *values)
+{
+    int blobSize = count * sizeof(int32_t);
+
+    union {
+        unsigned char bytes[4];
+        int32_t val;
+    } work;
+
+    for (int offset = 0; offset < count; offset++)
+    {
+        for (int i = 0; i < sizeof(int32_t); i++)
+        {
+            int index = (i * count) + offset;
+            work.bytes[sizeof(int32_t) - i - 1] = data[index];
+        }
+
+        values[offset] = transform(work.val);
+    }
+}
 
 Instance **LoadModelRBXM(const char *file, int *mdlCount)
 {
@@ -53,6 +93,9 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
 
     Instance **ret = NULL;
     *mdlCount = 0;
+
+    InstanceChunk *instChunks = NULL;
+    int instChunkCount = 0;
 
     fseek(f, 0, SEEK_END);
     long size = ftell(f);
@@ -83,40 +126,81 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
     while (1)
     {
         Chunk *chunk = data;
+        unsigned char *chunkDataCompressed = chunk->Payload;
         printf("\nChunk Info:\n");
         printf("Chunk signature: %.4s\n", chunk->Signature);
         printf("CompressedLength: %d\n", chunk->CompressedLength);
         printf("UncompressedLength: %d\n", chunk->UncompressedLength);
+        unsigned char *chunkData = chunkDataCompressed;
+        if (chunk->CompressedLength)
+        {
+            if (chunkDataCompressed[0] == 0x78 || chunkDataCompressed[0] == 0x58)
+            {
+                int dataSize;
+                chunkData = DecompressData(chunkDataCompressed, chunk->CompressedLength, &dataSize);
+                if (dataSize != chunk->UncompressedLength)
+                {
+                    printf("Error: mismatched compressed and uncompressed data sizes.\n");
+                }
+            }
+            else if (!memcmp(chunkDataCompressed, (unsigned char [3]){0xB5, 0x2F, 0xFD}, 3))
+            {
+                printf("Unsupported compression type zstd.\n");
+            }
+            else
+            {
+                chunkData = malloc(chunk->UncompressedLength);
+                LZ4_decompress_safe(chunkDataCompressed, chunkData, chunk->CompressedLength, chunk->UncompressedLength);
+            }
+        }
         if (!strncmp(chunk->Signature, "END\0", 4))
         {
             break;
         }
         else if (!strncmp(chunk->Signature, "INST", 4))
         {
-            unsigned char *chunkData = data + 17;
             InstanceChunk chunk = { 0 };
-            chunk.ClassID = *(uint32_t*)chunkData;
+            chunk.ClassID = *(int32_t*)chunkData;
             chunkData += sizeof(uint32_t);
             uint32_t classNameLength = *(uint32_t*)chunkData;
-            printf("class name length: %d\n", classNameLength);
             chunkData += sizeof(uint32_t);
             chunk.ClassName = chunkData;
             chunkData += classNameLength;
             chunk.HasService = *chunkData;
-            chunkData++;
+            chunkData += sizeof(uint8_t);
             chunk.Length = *(uint32_t*)chunkData;
             chunkData += sizeof(uint32_t);
-            unsigned char *IDs = chunkData;
+            chunk.IDs = malloc(sizeof(int32_t) * chunk.Length);
+            ReadInterleavedInt32(chunkData, chunk.Length, RotateInt32, chunk.IDs);
 
             printf("Instance Info:\n");
             printf("ClassID: %d\n", chunk.ClassID);
             printf("ClassName: %s\n", chunk.ClassName);
             printf("HasService: %d\n", chunk.HasService);
             printf("Length: %d\n", chunk.Length);
+            printf("IDs: ");
+            for (int i = 0; i < chunk.Length; i++)
+            {
+                printf("%d ", chunk.IDs[i]);
+            }
+            puts("");
+
+            chunk.instances = malloc(chunk.Length * sizeof(Instance *));
+            chunk.serializeInstances = malloc(chunk.Length * sizeof(SerializeInstance));
+
+            for (int i = 0; i < chunk.Length; i++)
+            {
+                Instance *inst = Instance_dynNew(chunk.ClassName, NULL);
+                chunk.instances[i] = inst;
+                Instance_Serialize(inst, &chunk.serializeInstances[i]);
+            }
+
+            instChunkCount++;
+            instChunks = realloc(instChunks, instChunkCount * sizeof(InstanceChunk));
+            instChunks[instChunkCount - 1] = chunk;
         }
         else if (!strncmp(chunk->Signature, "PROP", 4))
         {
-            unsigned char *chunkData = data + 18;
             PropertiesChunk chunk = { 0 };
 
             chunk.ClassID = *(uint32_t*)chunkData;
@@ -126,15 +210,52 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
             {
                 break;
             }
-            printf("name length: %d\n", nameLength);
             chunkData += sizeof(uint32_t);
             chunk.Name = chunkData;
+            chunkData += nameLength;
+            chunk.ValueType = *(uint8_t*)chunkData;
+            chunkData += sizeof(uint8_t);
+
+            InstanceChunk instChunk;
+
+            for (int i = 0; i < instChunkCount; i++)
+            {
+                if (chunk.ClassID == instChunks[i].ClassID)
+                {
+                    instChunk = instChunks[i];
+                }
+            }
+
+            for (int i = 0; i < instChunk.Length; i++)
+            {
+                SerializeInstance *sInst = &(instChunk.serializeInstances[i]);
+                for (int j = 0; j < sInst->serializationCount; j++)
+                {
+                    Serialization s = sInst->serializations[j];
+                    if (!strcmp(s.name, chunk.Name))
+                    {
+                        switch (chunk.ValueType)
+                        {
+                            case 0x02:
+                            {
+                                bool *val = s.val;
+                                *val = ((uint8_t*)chunkData)[i];
+                            } break;
+                            default:
+                            {
+                                printf("Error: unknown value type %#lx.\n", chunk.ValueType);
+                            } break;
+                        }
+                    }
+                }
+            }
 
             printf("Property Info:\n");
             printf("ClassID: %d\n", chunk.ClassID);
             printf("Name: ");
             fwrite(chunk.Name, 1, nameLength, stdout);
             puts("");
+            printf("Value type: %#x\n", chunk.ValueType);
         }
         else
         {
