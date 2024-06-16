@@ -1,4 +1,6 @@
 #include "runservice.h"
+#include "serverscriptservice.h"
+#include "datamodel.h"
 
 #include "debug.h"
 
@@ -15,11 +17,16 @@ RunService *RunService_new(const char *className, Instance *parent)
     newInst->Heartbeat = RBXScriptSignal_new();
     newInst->Stepped = RBXScriptSignal_new();
 
+    if (parent) Instance_SetParent(newInst, parent);
+
     return newInst;
 }
 
 void RunService_Run(RunService *this)
 {
+    ServerScriptService *sss = ServiceProvider_GetService(GetDataModel(), "ServerScriptService");
+    ServerScriptService_RunScripts(sss);
+
     this->running = true;
 }
 
