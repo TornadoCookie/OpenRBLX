@@ -9,6 +9,7 @@
 #include "rlgl.h"
 #include "lighting.h"
 #include "datamodelmesh.h"
+#include "runservice.h"
 
 DEFAULT_DEBUG_CHANNEL(datamodel)
 
@@ -40,6 +41,7 @@ DataModel *DataModel_new(void)
 
     MeshContentProvider_new(NULL, newInst);
     Lighting_new(NULL, newInst);
+    RunService_new(NULL, newInst);
 
     rt = LoadRenderTexture(128, 128);
 
@@ -110,6 +112,12 @@ static void draw_recursive(Instance *inst)
 void DataModel_Draw(DataModel *this)
 {
     Camera_Instance *cam = this->Workspace->CurrentCamera;
+    RunService *rs = ServiceProvider_GetService(this, "RunService");
+
+    if (IsKeyPressed(KEY_F5))
+    {
+        RunService_Run(rs);
+    }
 
     ClearBackground(SKYBLUE);
 
@@ -204,6 +212,12 @@ void DataModel_Draw(DataModel *this)
 
     DrawFPS(0, 20);
     Camera_Process(cam);
+
+    if (rs->running)
+    {
+        RBXScriptSignal_Fire(rs->Stepped, NULL);
+        RBXScriptSignal_Fire(rs->Heartbeat, NULL);
+    }
 }
 
 DataModel *GetDataModel(void)
