@@ -257,6 +257,11 @@ Instance *Instance_dynNew(const char *className, Instance *parent)
     constructor = dlsym(ourselves, constructorName);
     dlclose(ourselves);
 
+    if (!constructor)
+    {
+        return NULL;
+    }
+
     return constructor(className, parent);
 }
 

@@ -4,7 +4,7 @@
 
 DEFAULT_DEBUG_CHANNEL(camera)
 
-Camera_Instance *Camera_new(Instance *parent)
+Camera_Instance *Camera_new(const char *className, Instance *parent)
 {
     Camera_Instance *newInst = Instance_new("Camera", parent);
 

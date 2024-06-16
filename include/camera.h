@@ -26,7 +26,7 @@ typedef struct Camera_Instance {
     Camera camera;
 } Camera_Instance;
 
-Camera_Instance *Camera_new(Instance *parent);
+Camera_Instance *Camera_new(const char *className, Instance *parent);
 
 void Camera_PanUnits(Camera_Instance *this, int units);
 void Camera_TiltUnits(Camera_Instance *this, int units);

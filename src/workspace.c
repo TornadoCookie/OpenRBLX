@@ -18,7 +18,7 @@ Workspace *Workspace_new(Instance *parent)
     newInst->rootinstance.model.pvinstance.instance.DataCost = sizeof(Workspace);
     newInst = realloc(newInst, sizeof(Workspace));
 
-    Camera_Instance *camera = Camera_new(newInst);
+    Camera_Instance *camera = Camera_new(NULL, newInst);
     newInst->CurrentCamera = camera;
 
     newInst->rootinstance.model.pvinstance.drawFunc = workspace_draw;

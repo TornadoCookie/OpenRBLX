@@ -26,6 +26,10 @@ int main(int argc, char **argv)
 
     for (int i = 0; i < mdlCount; i++)
     {
+        if (!mdls[i]) continue;
+        printf("\nParenting instance to datamodel:\n");
+        printf("Pointer %p.\n", mdls[i]);
+        printf("Classname %s.\n", mdls[i]->ClassName);
         Instance_SetParent(mdls[i], datamodel->Workspace);
     }
     free(mdls);

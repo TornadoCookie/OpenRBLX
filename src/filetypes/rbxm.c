@@ -38,6 +38,7 @@ typedef struct InstanceChunk {
     int32_t *IDs;
     Instance **instances;
     SerializeInstance *serializeInstances;
+    bool invalid;
 } InstanceChunk;
 
 typedef struct PropertiesChunk {
@@ -48,11 +49,18 @@ typedef struct PropertiesChunk {
     void *Values;
 } PropertiesChunk;
 
-static void DecodeDifferenceInPlace(unsigned char *bytes, int length)
+typedef struct ParentsChunk {
+    uint8_t Reserved;
+    uint32_t Length;
+    int32_t *Children;
+    int32_t *Parents;
+} ParentsChunk;
+
+static void DecodeDifferenceInPlace(int32_t *data, int length)
 {
     for (int i = 1; i < length; i++)
     {
-        bytes[i] += bytes[i-1];
+        data[i] += data[i-1];
     }
 }
 
@@ -105,52 +113,6 @@ defreadinterleavedfunc(uint32_t)
 defreadinterleavedfunc(float)
 defreadinterleavedfunc(uint8_t)
 
-static void binserialize_token(int *val, unsigned char *prop, int instance, int instanceCount)
-{
-    //[]uint32b~4
-    //32-bit unsigned integer dynamic array, big-endian, encoded by interleaving with a byte size of 4.
-
-    uint32_t *values = malloc(sizeof(uint32_t) * instanceCount);
-
-    ReadInterleaveduint32_t(prop, instanceCount, ReturnUInt32, values);
-
-    *val = values[instance];
-
-}
-
-static void binserialize_float(float *val, unsigned char *prop, int instance, int instanceCount)
-{
-    float *values = malloc(sizeof(float) * instanceCount);
-
-    ReadInterleavedfloat(prop, instanceCount, RotateFloat, values);
-
-    *val = values[instance];
-
-    printf("Value: %f\n", *val);
-}
-
-static void binserialize_vector3(Vector3 *val, unsigned char *prop, int instance, int instanceCount)
-{
-    float *values = malloc(sizeof(float) * instanceCount * 3);
-
-    ReadInterleavedfloat(prop, instanceCount * 3, RotateFloat, values);
-
-    int offset = instance * 3;
-
-    val->x = values[0 + offset];
-    val->y = values[1 + offset];
-    val->z = values[2 + offset];
-
-    printf("arr: ");
-    for (int i = 0; i < instanceCount * 3; i++)
-    {
-        printf("%f, ", values[i]);
-    }
-    puts("");
-
-    printf("Value: %s\n", debugstr_vector3(*val));
-}
-
 static float rotationIDList[][9] = {
     [0x02] = {+1, +0, +0, +0, +1, +0, +0, +0, +1},
     [0x03] = {+1, +0, +0, +0, +0, -1, +0, +1, +0},
@@ -178,61 +140,104 @@ static float rotationIDList[][9] = {
     [0x23] = {+0, +0, -1, +0, -1, -0, -1, +0, -0},
 };
 
-static void binserialize_cframe(CFrame *val, unsigned char *prop, int instance, int instanceCount)
-{
-    for (int i = 0; i < instanceCount; i++)
-    {
-        uint8_t rotId = *(uint8_t*)prop;
-        float *rots;
-        prop += sizeof(uint8_t);
-        if (!rotId)
-        {
-            rots = (float*)prop;
-            prop += sizeof(float) * 9;
-        }
-        else
-        {
-            rots = rotationIDList[rotId];
-        }
-
-        if (i == instance)
-        {
-            val->R00 = rots[0];
-            val->R01 = rots[1];
-            val->R02 = rots[2];
-            val->R10 = rots[3];
-            val->R11 = rots[4];
-            val->R12 = rots[5];
-            val->R20 = rots[6];
-            val->R21 = rots[7];
-            val->R22 = rots[8];
-        }
-    }
-
-    Vector3 pos = {0};
-
-    binserialize_vector3(&pos, prop, instance, instanceCount);
-
-    val->X = pos.x;
-    val->Y = pos.y;
-    val->Z = pos.z;
-}
-
-static void binserialize_color3uint8(Color3 *val, unsigned char *prop, int instance, int instanceCount)
-{
-    uint8_t *values = malloc(sizeof(uint8_t) * instanceCount * 
-    3);
-
-    ReadInterleaveduint8_t(prop, instanceCount * 3, ReturnUInt8, values);
-
-    val->R = (float)values[instance*3] / 255;
-    val->G = (float)values[instance*3+1] / 255;
-    val->B = (float)values[instance*3+2] / 255;
-}
-
 static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChunk instChunk, unsigned char *chunkData)
 {
-    int valSize;
+    void *values;
+    int valueSize;
+
+    switch (chunk.ValueType)
+    {
+        case 0x02: // Boolean value
+        {
+            values = chunkData;
+            valueSize = sizeof(uint8_t);
+        } break;
+        case 0x04: // float value
+        {
+            values = malloc(sizeof(uint32_t) * instChunk.Length);
+            ReadInterleavedfloat(chunkData, instChunk.Length, RotateFloat, values);
+            valueSize = sizeof(float);
+        } break;
+        case 0x0E:
+        {
+            values = malloc(sizeof(Vector3) * instChunk.Length);
+            valueSize = sizeof(Vector3);
+            float *floatValues = malloc(sizeof(float) * instChunk.Length * 3);
+            ReadInterleavedfloat(chunkData, instChunk.Length * 3, RotateFloat, floatValues);
+            for (int i = 0; i < instChunk.Length; i++)
+            {
+                ((Vector3*)values)[i] = (Vector3){floatValues[i*3], floatValues[i*3+1], floatValues[i*3+2]};
+            }
+            free(floatValues);
+        } break;
+        case 0x10: // CFrame value
+        {
+            values = malloc(sizeof(CFrame) * instChunk.Length);
+            valueSize = sizeof(CFrame);
+            float (**rotations) = malloc(sizeof(float[9]) * instChunk.Length);
+            for (int i = 0; i < instChunk.Length; i++)
+            {
+                uint8_t rotId = *(uint8_t*)chunkData;
+                chunkData += sizeof(uint8_t);
+                if (!rotId)
+                {
+                    rotations[i] = chunkData;
+                    chunkData += sizeof(float[9]);
+                }
+                else
+                {
+                    rotations[i] = rotationIDList[rotId];
+                }
+                ((CFrame*)values)[i].R00 = rotations[i][0];
+                ((CFrame*)values)[i].R01 = rotations[i][1];
+                ((CFrame*)values)[i].R02 = rotations[i][2];
+                ((CFrame*)values)[i].R10 = rotations[i][3];
+                ((CFrame*)values)[i].R11 = rotations[i][4];
+                ((CFrame*)values)[i].R12 = rotations[i][5];
+                ((CFrame*)values)[i].R20 = rotations[i][6];
+                ((CFrame*)values)[i].R21 = rotations[i][7];
+                ((CFrame*)values)[i].R22 = rotations[i][8];
+            }
+            float *positions = malloc(sizeof(float) * instChunk.Length * 3);
+            ReadInterleavedfloat(chunkData, instChunk.Length * 3, RotateFloat, positions);
+            for (int i = 0; i < instChunk.Length; i++)
+            {
+                ((CFrame*)values)[i].X = positions[i*3];
+                ((CFrame*)values)[i].Y = positions[i*3+1];
+                ((CFrame*)values)[i].Z = positions[i*3+2];
+            }
+            free(rotations);
+            free(positions);
+        } break;
+        case 0x12: // Token value
+        {
+            valueSize = sizeof(int);
+            values = malloc(sizeof(int) * instChunk.Length);
+            ReadInterleaveduint32_t(chunkData, instChunk.Length, ReturnUInt32, values);
+            
+        } break;
+        case 0x1A: // Color3uint8 value
+        {
+            valueSize = sizeof(Color3);
+            values = malloc(sizeof(Color3) * instChunk.Length);
+            uint8_t *uint8Values = malloc(3 * instChunk.Length);
+            ReadInterleaveduint8_t(chunkData, instChunk.Length * 3, ReturnUInt8, uint8Values);
+            for (int i = 0; i < instChunk.Length; i++)
+            {
+                ((Color3*)values)[i] = (Color3){
+                    (float)uint8Values[i*3] / 255,
+                    (float)uint8Values[i*3+1] / 255,
+                    (float)uint8Values[i*3+2] / 255,
+                };
+            }
+            free(uint8Values);
+        } break;
+        default:
+        {
+            printf("Error: unknown value type %#lx.\n", chunk.ValueType);
+            return;
+        } break;
+    }
 
     for (int i = 0; i < instChunk.Length; i++)
     {
@@ -244,53 +249,22 @@ static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChu
             if (!strncmp(s.name, chunk.Name, chunk.nameLength) ||
                 (!strcmp(s.name, "Color") && !strncmp(chunk.Name, "Color3uint8", chunk.nameLength)))
             {
-                switch (chunk.ValueType)
+                memcpy(s.val, values + valueSize * i, valueSize);
+                if (Instance_IsA(inst, "BasePart") && !strncmp(chunk.Name, "Position", chunk.nameLength))
                 {
-                    case 0x02: // Boolean value
-                    {
-                        bool *val = s.val;
-                        *val = ((uint8_t*)chunkData)[i];
-                    } break;
-                    case 0x04: // float value
-                    {
-                        binserialize_float(s.val, chunkData, i, instChunk.Length);
-                    } break;
-                    case 0x0E:
-                    {
-                        binserialize_vector3(s.val, chunkData, i, instChunk.Length);
-                        if (Instance_IsA(inst, "BasePart") && !strncmp(chunk.Name, "Position", chunk.nameLength))
-                        {
-                            BasePart_SetPosition(inst, ((BasePart*)inst)->Position);
-                        }
-                    } break;
-                    case 0x10: // CFrame value
-                    {
-                        binserialize_cframe(s.val, chunkData, i, instChunk.Length);
-                        if (Instance_IsA(inst, "BasePart") && !strncmp(chunk.Name, "CFrame", chunk.nameLength))
-                        {
-                            BasePart_SetCFrame(inst, ((BasePart*)inst)->CFrame);
-                        }
-                    } break;
-                    case 0x12: // Token value
-                    {
-                        binserialize_token(s.val, chunkData, i, instChunk.Length);
-                        if (Instance_IsA(inst, "Part") && !strncmp(chunk.Name, "shape", chunk.nameLength))
-                        {
-                            Part_SetShape(inst, ((Part*)inst)->shape);
-                        }
-                    } break;
-                    case 0x1A: // Color3uint8 value
-                    {
-                        binserialize_color3uint8(s.val, chunkData, i, instChunk.Length);
-                        if (Instance_IsA(inst, "BasePart") && !strcmp(s.name, "Color"))
-                        {
-                            BasePart_SetColor(inst, ((BasePart*)inst)->Color);
-                        }
-                    } break;
-                    default:
-                    {
-                        printf("Error: unknown value type %#lx.\n", chunk.ValueType);
-                    } break;
+                    BasePart_SetPosition(inst, ((BasePart*)inst)->Position);
+                }
+                else if (Instance_IsA(inst, "BasePart") && !strncmp(chunk.Name, "CFrame", chunk.nameLength))
+                {
+                    BasePart_SetCFrame(inst, ((BasePart*)inst)->CFrame);
+                }
+                else if (Instance_IsA(inst, "Part") && !strncmp(chunk.Name, "shape", chunk.nameLength))
+                {
+                    Part_SetShape(inst, ((Part*)inst)->shape);
+                }
+                else if (Instance_IsA(inst, "BasePart") && !strcmp(s.name, "Color"))
+                {
+                    BasePart_SetColor(inst, ((BasePart*)inst)->Color);
                 }
             }
         }
@@ -389,6 +363,7 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
             chunkData += sizeof(uint32_t);
             chunk.IDs = malloc(sizeof(int32_t) * chunk.Length);
             ReadInterleavedint32_t(chunkData, chunk.Length, RotateInt32, chunk.IDs);
+            DecodeDifferenceInPlace(chunk.IDs, chunk.Length);
 
             printf("Instance Info:\n");
             printf("ClassID: %d\n", chunk.ClassID);
@@ -408,7 +383,13 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
             for (int i = 0; i < chunk.Length; i++)
             {
                 Instance *inst = Instance_dynNew(chunk.ClassName, NULL);
+                if (!inst)
+                {
+                    printf("Unknown ClassName %s.\n", chunk.ClassName);
+                    chunk.invalid = true;
+                }
                 chunk.instances[i] = inst;
+                if (chunk.invalid) continue;
                 Instance_Serialize(inst, &chunk.serializeInstances[i]);
             }
 
@@ -450,6 +431,17 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
             apply_property_chunk_to_instances(chunk, instChunk, chunkData);
 
         }
+        else if (!strncmp(chunk->Signature, "PRNT", 4))
+        {
+            ParentsChunk chunk = { 0 };
+
+            chunkData += sizeof(uint8_t);
+            chunk.Length = *(uint32_t*)chunkData;
+            chunkData += sizeof(uint32_t);
+
+            printf("Parents info:\n");
+            printf("Length: %d.\n", chunk.Length);
+        }
         else
         {
             printf("error: Unknown signature.\n");
@@ -459,6 +451,7 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
 
     for (int i = 0; i < instChunkCount; i++)
     {
+        if (instChunks[i].invalid) continue;
         for (int j = 0; j < instChunks[i].Length; j++)
         {
             (*mdlCount)++;
