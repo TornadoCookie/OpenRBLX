@@ -86,6 +86,8 @@ test_rbxmx_SOURCES+=src/meshcontentprovider.c
 test_rbxmx_SOURCES+=src/cacheablecontentprovider.c
 test_rbxmx_SOURCES+=src/physicalcharacter.c
 test_rbxmx_SOURCES+=src/lighting.c
+test_rbxmx_SOURCES+=src/runservice.c
+test_rbxmx_SOURCES+=src/serverscriptservice.c
 
 $(DISTDIR)/test_rbxmx$(EXEC_EXTENSION): $(test_rbxmx_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
@@ -112,6 +114,8 @@ test_rbxlx_SOURCES+=src/meshcontentprovider.c
 test_rbxlx_SOURCES+=src/cacheablecontentprovider.c
 test_rbxlx_SOURCES+=src/physicalcharacter.c
 test_rbxlx_SOURCES+=src/lighting.c
+test_rbxlx_SOURCES+=src/runservice.c
+test_rbxlx_SOURCES+=src/serverscriptservice.c
 
 $(DISTDIR)/test_rbxlx$(EXEC_EXTENSION): $(test_rbxlx_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
@@ -138,6 +142,8 @@ studio_SOURCES+=src/meshcontentprovider.c
 studio_SOURCES+=src/cacheablecontentprovider.c
 studio_SOURCES+=src/physicalcharacter.c
 studio_SOURCES+=src/lighting.c
+studio_SOURCES+=src/runservice.c
+studio_SOURCES+=src/serverscriptservice.c
 
 $(DISTDIR)/studio$(EXEC_EXTENSION): $(studio_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
@@ -169,6 +175,8 @@ test_rbxm_SOURCES+=src/vector3value.c
 test_rbxm_SOURCES+=src/cylindermesh.c
 test_rbxm_SOURCES+=src/bevelmesh.c
 test_rbxm_SOURCES+=src/datamodelmesh.c
+test_rbxm_SOURCES+=src/runservice.c
+test_rbxm_SOURCES+=src/serverscriptservice.c
 
 $(DISTDIR)/test_rbxm$(EXEC_EXTENSION): $(test_rbxm_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
@@ -200,6 +208,11 @@ test_rbxl_SOURCES+=src/vector3value.c
 test_rbxl_SOURCES+=src/cylindermesh.c
 test_rbxl_SOURCES+=src/bevelmesh.c
 test_rbxl_SOURCES+=src/datamodelmesh.c
+test_rbxl_SOURCES+=src/runservice.c
+test_rbxl_SOURCES+=src/serverscriptservice.c
+test_rbxl_SOURCES+=src/luasourcecontainer.c
+test_rbxl_SOURCES+=src/basescript.c
+test_rbxl_SOURCES+=src/script.c
 
 $(DISTDIR)/test_rbxl$(EXEC_EXTENSION): $(test_rbxl_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)

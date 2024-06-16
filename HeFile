@@ -32,6 +32,8 @@ Source meshcontentprovider.c
 Source cacheablecontentprovider.c
 Source physicalcharacter.c
 Source lighting.c
+Source runservice.c
+Source serverscriptservice.c
 
 Program test_rbxlx
 Source ../tests/test_rbxlx.c
@@ -56,6 +58,8 @@ Source meshcontentprovider.c
 Source cacheablecontentprovider.c
 Source physicalcharacter.c
 Source lighting.c
+Source runservice.c
+Source serverscriptservice.c
 
 Program studio
 Source ../studio/studio.c
@@ -80,6 +84,8 @@ Source meshcontentprovider.c
 Source cacheablecontentprovider.c
 Source physicalcharacter.c
 Source lighting.c
+Source runservice.c
+Source serverscriptservice.c
 
 Program test_rbxm
 Source ../tests/test_rbxm.c
@@ -109,6 +115,8 @@ Source vector3value.c
 Source cylindermesh.c
 Source bevelmesh.c
 Source datamodelmesh.c
+Source runservice.c
+Source serverscriptservice.c
 
 Program test_rbxl
 Source ../tests/test_rbxl.c
@@ -138,3 +146,8 @@ Source vector3value.c
 Source cylindermesh.c
 Source bevelmesh.c
 Source datamodelmesh.c
+Source runservice.c
+Source serverscriptservice.c
+Source luasourcecontainer.c
+Source basescript.c
+Source script.c
