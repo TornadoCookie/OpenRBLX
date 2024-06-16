@@ -3,8 +3,14 @@
 #include <stdlib.h>
 #include "debug.h"
 #include <rlgl.h>
+#include <string.h>
 
 DEFAULT_DEBUG_CHANNEL(meshcontentprovider)
+
+static Mesh GenMeshWedge()
+{
+    return LoadModel("staticdata/wedge.obj").meshes[0];
+}
 
 MeshContentProvider *MeshContentProvider_new(const char *className, Instance *parent)
 {
@@ -17,6 +23,7 @@ MeshContentProvider *MeshContentProvider_new(const char *className, Instance *pa
     newInst->ballMesh = GenMeshSphere(0.5f, 12, 24);
     newInst->blockMesh = GenMeshCube(1.0f, 1.0f, 1.0f);
     newInst->cylinderMesh = GenMeshCylinder(0.5f, 1.0f, 24);
+    newInst->wedgeMesh = GenMeshWedge();
 
     newInst->studs = LoadTexture("staticdata/studs.png");
 

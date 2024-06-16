@@ -163,6 +163,7 @@ test_rbxm_SOURCES+=src/cacheablecontentprovider.c
 test_rbxm_SOURCES+=src/physicalcharacter.c
 test_rbxm_SOURCES+=src/lighting.c
 test_rbxm_SOURCES+=src/../lib/lz4/src/lz4.c
+test_rbxm_SOURCES+=src/wedgepart.c
 
 $(DISTDIR)/test_rbxm$(EXEC_EXTENSION): $(test_rbxm_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)

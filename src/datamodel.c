@@ -22,6 +22,12 @@ DataModel *DataModel_new(void)
 
     newInst->serviceprovider.instance.DataCost = sizeof(DataModel);
     newInst = realloc(newInst, sizeof(DataModel));
+    
+    if (game)
+    {
+        TraceLog(LOG_FATAL, "more than one instance of DataModel\n");
+    }
+    game = newInst;
 
     newInst->AllowedGearTypeChanged = RBXScriptSignal_new();
     newInst->GraphicsQualityChangeRequest = RBXScriptSignal_new();
@@ -29,13 +35,7 @@ DataModel *DataModel_new(void)
 
     newInst->JobId = "OpenRBLX";
 
-    newInst->Workspace = Workspace_new(newInst);
-
-    if (game)
-    {
-        TraceLog(LOG_FATAL, "more than one instance of DataModel\n");
-    }
-    game = newInst;
+    newInst->Workspace = Workspace_new("Workspace", newInst);
 
     MeshContentProvider_new(NULL, newInst);
     Lighting_new(newInst);

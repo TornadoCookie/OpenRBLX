@@ -11,7 +11,7 @@ const BrickColor brickColors[] = {
     {"Bright yellow", (Color3){0.961, 0.804, 0.189}, 24},
     {"Black", (Color3){0.106, 0.165, 0.208}, 26},
     {"Dark green", (Color3){0.157, 0.499, 0.279}, 28},
-    {"Medium green", (Color3){9,632, 0.769, 0.550}, 29},
+    {"Medium green", (Color3){0.632, 0.769, 0.550}, 29},
     {"Bright green", (Color3){0.295, 0.593, 0.295}, 37},
     {"Dark orange", (Color3){0.628, 0.373, 0.208}, 38},
     {"Light blue", (Color3){0.706, 0.824, 0.895}, 45},

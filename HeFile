@@ -103,3 +103,4 @@ Source cacheablecontentprovider.c
 Source physicalcharacter.c
 Source lighting.c
 Source ../lib/lz4/src/lz4.c
+Source wedgepart.c

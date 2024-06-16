@@ -11,6 +11,7 @@ typedef struct MeshContentProvider {
     Mesh ballMesh;
     Mesh cylinderMesh;
     Mesh blockMesh;
+    Mesh wedgeMesh;
     Texture2D studs;
 } MeshContentProvider;
 

@@ -11,7 +11,7 @@ typedef struct Workspace {
     Camera_Instance *CurrentCamera;
 } Workspace;
 
-Workspace *Workspace_new(Instance *parent);
+Workspace *Workspace_new(const char *className, Instance *parent);
 
 void Workspace_BreakJoints(Workspace *this, Instance **instances, int instanceCount);
 void Workspace_MakeJoints(Workspace *this, Instance **instances, int instanceCount);
