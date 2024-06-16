@@ -94,37 +94,6 @@ void serialize_PhysicalCharacter(PhysicalCharacter *physicalcharacter, Serialize
     serialize_atomic(Ref, physicalcharacter, RightArm);
 }
 
-void serialize_RootInstance(RootInstance *rootinstance, SerializeInstance *inst)
-{
-    serialize_Model(rootinstance, inst);
-}
-
-void serialize_Workspace(Workspace *workspace, SerializeInstance *inst)
-{
-    workspace = GetDataModel()->Workspace;
-    serialize_Instance(workspace, inst);
-
-    workspace->rootinstance.model.pvinstance.instance.ClassName = "Workspace";
-
-    serialize_atomic(double, workspace, DistributedGameTime);
-    serialize_atomic(Ref, workspace, CurrentCamera);
-}
-
-void serialize_Camera(Camera_Instance *camera, SerializeInstance *inst)
-{
-    DataModel *datamodel = GetDataModel();
-    camera = datamodel->Workspace->CurrentCamera;
-
-    serialize_Instance(camera, inst);
-
-    camera->instance.ClassName = "Camera";
-
-    serialize_atomic(Ref, camera, CameraSubject);
-    serialize_atomic(token, camera, CameraType);
-    serialize_atomic(CoordinateFrame, camera, CoordinateFrame);
-    serialize_atomic(CoordinateFrame, camera, Focus);
-}
-
 static void xmlserialize_coordinateframe(CoordinateFrame *cf, struct xml_node *node)
 {
     for (int i = 0; i < xml_node_children(node); i++)
@@ -234,7 +203,7 @@ static void xmlserialize_token(int *val, char *prop, char *propName)
         *val = asNumber;
     }
 
-    printf("serialize_token: prop %s, propName %s, asNumber %d.\n", prop, propName, asNumber);
+    printf("serialize_token: prop %s, propName %s, asNumber %ld.\n", prop, propName, asNumber);
 
     if (strstr(propName, "SurfaceInput"))
     {

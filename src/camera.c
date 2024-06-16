@@ -1,6 +1,7 @@
 #include "camera.h"
 #include "debug.h"
 #include <stdlib.h>
+#include "datamodel.h"
 
 DEFAULT_DEBUG_CHANNEL(camera)
 
@@ -43,4 +44,19 @@ void Camera_Process(Camera_Instance *this)
 {
     FIXME("this %p stub!\n", this);
     UpdateCamera(&this->camera, CAMERA_FREE);
+}
+
+void serialize_Camera(Camera_Instance *camera, SerializeInstance *inst)
+{
+    DataModel *datamodel = GetDataModel();
+    camera = datamodel->Workspace->CurrentCamera;
+
+    serialize_Instance(camera, inst);
+
+    camera->instance.ClassName = "Camera";
+
+    serialize_atomic(Ref, camera, CameraSubject);
+    serialize_atomic(token, camera, CameraType);
+    serialize_atomic(CoordinateFrame, camera, CoordinateFrame);
+    serialize_atomic(CoordinateFrame, camera, Focus);
 }

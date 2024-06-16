@@ -8,3 +8,8 @@ RootInstance *RootInstance_new(const char *className, Instance *parent)
 
     return newInst;
 }
+
+void serialize_RootInstance(RootInstance *rootinstance, SerializeInstance *inst)
+{
+    serialize_Model(rootinstance, inst);
+}

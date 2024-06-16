@@ -419,7 +419,9 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
             chunkData += sizeof(uint32_t);
             uint32_t classNameLength = *(uint32_t*)chunkData;
             chunkData += sizeof(uint32_t);
-            chunk.ClassName = chunkData;
+            chunk.ClassName = malloc(classNameLength+1);
+            memcpy(chunk.ClassName, chunkData, classNameLength);
+            chunk.ClassName[classNameLength] = 0;
             chunkData += classNameLength;
             chunk.HasService = *chunkData;
             chunkData += sizeof(uint8_t);

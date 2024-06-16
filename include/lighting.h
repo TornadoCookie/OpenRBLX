@@ -18,7 +18,7 @@ typedef struct Lighting {
     RBXScriptSignal *LightingChanged;
 } Lighting;
 
-Lighting *Lighting_new(Instance *parent);
+Lighting *Lighting_new(const char *className, Instance *parent);
 
 double Lighting_GetMinutesAfterMidnight(Lighting *this);
 Vector3 Lighting_GetMoonDirection(Lighting *this);

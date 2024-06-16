@@ -255,6 +255,10 @@ Instance *Instance_dynNew(const char *className, Instance *parent)
     Instance *(*constructor)(const char *, Instance *);
     const char *constructorName = TextFormat("%s_new", className);
     constructor = dlsym(ourselves, constructorName);
+    if (!constructor)
+    {
+        printf("dlerror: %s\n", dlerror());
+    }
     dlclose(ourselves);
 
     if (!constructor)

@@ -5,7 +5,7 @@
 
 DEFAULT_DEBUG_CHANNEL(lighting)
 
-Lighting *Lighting_new(Instance *parent)
+Lighting *Lighting_new(const char *className, Instance *parent)
 {
     Lighting *newInst = Instance_new("Lighting", parent);
 

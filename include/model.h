@@ -27,4 +27,6 @@ void Model_MakeJoints(Model_Instance *this);
 void Model_MoveTo(Model_Instance *this, Vector3 position);
 void Model_TranslateBy(Model_Instance *this, Vector3 delta);
 
+void serialize_Model(Model_Instance *model, SerializeInstance *inst);
+
 #endif

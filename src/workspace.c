@@ -55,3 +55,14 @@ void Workspace_ZoomToExtents(Workspace *this)
 {
     FIXME("this %p stub!\n", this);
 }
+
+void serialize_Workspace(Workspace *workspace, SerializeInstance *inst)
+{
+    workspace = GetDataModel()->Workspace;
+    serialize_Instance(workspace, inst);
+
+    workspace->rootinstance.model.pvinstance.instance.ClassName = "Workspace";
+
+    serialize_atomic(double, workspace, DistributedGameTime);
+    serialize_atomic(Ref, workspace, CurrentCamera);
+}
