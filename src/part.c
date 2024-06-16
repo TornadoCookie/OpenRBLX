@@ -132,7 +132,7 @@ static void draw_ball(Part *this)
 
 void part_draw(Part *this)
 {
-    printf("drawing part %p, position %s, size %s.\n", this, debugstr_vector3(this->formfactorpart.basepart.Position), debugstr_vector3(this->formfactorpart.basepart.size));
+    //printf("drawing part %p, position %s, size %s.\n", this, debugstr_vector3(this->formfactorpart.basepart.Position), debugstr_vector3(this->formfactorpart.basepart.size));
     this->material.maps[MATERIAL_MAP_DIFFUSE].color = rl_from_color3(this->formfactorpart.basepart.Color, this->formfactorpart.basepart.Transparency);
 
     //printf("color %s.\n", debugstr_color3(this->formfactorpart.basepart.Color));
