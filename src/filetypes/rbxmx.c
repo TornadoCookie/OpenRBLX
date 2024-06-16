@@ -80,13 +80,6 @@ void serialize_TrussPart(TrussPart *trusspart, SerializeInstance *inst)
     serialize_atomic(token, trusspart, Style);
 }
 
-void serialize_Model(Model_Instance *model, SerializeInstance *inst)
-{
-    serialize_PVInstance(model, inst);
-
-    _serialize_atomic(inst, (Serialization){Serialize_CoordinateFrame, "CoordinateFrame", &inst->modelOffset});
-}
-
 void serialize_PhysicalCharacter(PhysicalCharacter *physicalcharacter, SerializeInstance *inst)
 {
     serialize_Model(physicalcharacter, inst);

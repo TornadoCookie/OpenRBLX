@@ -140,7 +140,7 @@ static float rotationIDList[][9] = {
     [0x23] = {+0, +0, -1, +0, -1, -0, -1, +0, -0},
 };
 
-static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChunk instChunk, unsigned char *chunkData)
+static void *parse_values(PropertiesChunk chunk, InstanceChunk instChunk, unsigned char *chunkData, int *vsize)
 {
     void *values;
     int valueSize;
@@ -234,10 +234,21 @@ static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChu
         } break;
         default:
         {
-            printf("Error: unknown value type %#lx.\n", chunk.ValueType);
-            return;
+            printf("Error: unknown value type %#x.\n", chunk.ValueType);
+            return NULL;
         } break;
     }
+
+    *vsize = valueSize;
+    return values;
+}
+
+static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChunk instChunk, unsigned char *chunkData)
+{
+    int valueSize;
+    void *values = parse_values(chunk, instChunk, chunkData, &valueSize);
+
+    if (!values) return;
 
     for (int i = 0; i < instChunk.Length; i++)
     {
@@ -456,7 +467,7 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
         {
             (*mdlCount)++;
             ret = realloc(ret, sizeof(Instance *) * *mdlCount);
-            ret[*mdlCount - 1] = instChunks->instances[j];
+            ret[*mdlCount - 1] = instChunks[i].instances[j];
         }
     }
 

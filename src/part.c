@@ -55,7 +55,7 @@ static void draw_bump_surface(Part *this, Vector3 unit)
         {
             for (int z = start.z; z < end.z; z++)
             {
-                printf("draw {%f, %f, %f}\n", x, unit.y, z);
+                printf("draw {%d, %f, %d}\n", x, unit.y, z);
                 rlPushMatrix();
                 Vector3 axis;
                 float angle;
@@ -132,10 +132,10 @@ static void draw_ball(Part *this)
 
 void part_draw(Part *this)
 {
-    printf("drawing part %p, position %s.\n", this, debugstr_vector3(this->formfactorpart.basepart.Position));
+    //printf("drawing part %p, position %s.\n", this, debugstr_vector3(this->formfactorpart.basepart.Position));
     this->material.maps[MATERIAL_MAP_DIFFUSE].color = rl_from_color3(this->formfactorpart.basepart.Color, this->formfactorpart.basepart.Transparency);
 
-    printf("color %s.\n", debugstr_color3(this->formfactorpart.basepart.Color));
+    //printf("color %s.\n", debugstr_color3(this->formfactorpart.basepart.Color));
 
     switch (this->shape)
     {

@@ -104,7 +104,7 @@ ModelBoundingBox Model_GetBoundingBox(Model_Instance *this)
 
     ret.size = Vector3Subtract(box.max, box.min);
     Vector3 position = Vector3Lerp(box.min, box.max, 0.5f);
-    printf("max = %s, min = %s.\n", debugstr_vector3(box.max), debugstr_vector3(box.min));
+    //printf("max = %s, min = %s.\n", debugstr_vector3(box.max), debugstr_vector3(box.min));
 
     ret.orientation.X = position.x;
     ret.orientation.Y = position.y;
@@ -139,4 +139,11 @@ void Model_TranslateBy(Model_Instance *this, Vector3 delta)
         Model_TranslateBy(children[i], delta);
     }
 
+}
+
+void serialize_Model(Model_Instance *model, SerializeInstance *inst)
+{
+    serialize_PVInstance(model, inst);
+
+    _serialize_atomic(inst, (Serialization){Serialize_CoordinateFrame, "CoordinateFrame", &inst->modelOffset});
 }

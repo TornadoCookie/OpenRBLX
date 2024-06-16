@@ -97,7 +97,7 @@ static void draw_recursive(Instance *inst)
     if (!inst) return;
     if (Instance_IsA(inst, "PVInstance"))
     {
-        printf("draw %s.\n", inst->ClassName);
+        //printf("draw %s.\n", inst->ClassName);
         PVInstance_Draw(inst);
     }
     for (int i = 0; i < inst->childCount; i++)
