@@ -10,10 +10,10 @@ int main(int argc, char **argv)
 {
     if (argc < 2)
     {
-        printf("usage: test_rbxm <mdl.rbxm>\n");
+        printf("usage: test_rbxl <mdl.rbxl>\n");
         return 0;
     }
-    InitWindow(640, 480, "rbxm test");
+    InitWindow(640, 480, "rbxl test");
     DataModel *datamodel = DataModel_new();
     int mdlCount;
     Instance **mdls = LoadModelRBXM(argv[1], &mdlCount);
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
         printf("\nParenting instance to datamodel:\n");
         printf("Pointer %p.\n", mdls[i]);
         printf("Classname %s.\n", mdls[i]->ClassName);
-        Instance_SetParent(mdls[i], datamodel->Workspace);
+        Instance_SetParent(mdls[i], datamodel);
     }
     free(mdls);
 
