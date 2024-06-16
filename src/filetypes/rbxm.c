@@ -163,6 +163,28 @@ static void *parse_values(PropertiesChunk chunk, InstanceChunk instChunk, unsign
             ReadInterleavedfloat(chunkData, instChunk.Length, RotateFloat, values);
             valueSize = sizeof(float);
         } break;
+        case 0x0B: // BrickColor value
+        {
+            values = malloc(sizeof(uint32_t) * instChunk.Length);
+            valueSize = sizeof(uint32_t);
+            ReadInterleaveduint32_t(chunkData, instChunk.Length, ReturnUInt32, values);
+        } break;
+        case 0x0C: // Color3 value
+        {
+            values = malloc(sizeof(Color3) * instChunk.Length);
+            valueSize = sizeof(Color3);
+            float *floatValues = malloc(sizeof(float) * instChunk.Length * 3);
+            ReadInterleavedfloat(chunkData, instChunk.Length, RotateFloat, floatValues);
+            ReadInterleavedfloat(chunkData + instChunk.Length*sizeof(float), instChunk.Length, RotateFloat, floatValues + instChunk.Length);
+            ReadInterleavedfloat(chunkData + instChunk.Length*2*sizeof(float), instChunk.Length, RotateFloat, floatValues + instChunk.Length*2);
+            for (int i = 0; i < instChunk.Length; i++)
+            {
+                ((Color3*)values)[i].R = floatValues[i];
+                ((Color3*)values)[i].G = floatValues[i+instChunk.Length];
+                ((Color3*)values)[i].B = floatValues[i+instChunk.Length*2];
+            }
+            free(floatValues);
+        } break;
         case 0x0E: // Vector3 value
         {
             values = malloc(sizeof(Vector3) * instChunk.Length);
@@ -295,6 +317,10 @@ static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChu
                 else if (Instance_IsA(inst, "BasePart") && !strcmp(s.name, "Color"))
                 {
                     BasePart_SetColor(inst, ((BasePart*)inst)->Color);
+                }
+                else if (Instance_IsA(inst, "BasePart") && !strcmp(s.name, "BrickColor"))
+                {
+                    BasePart_SetBrickColor(inst, ((BasePart*)inst)->BrickColor);
                 }
             }
         }
@@ -485,7 +511,7 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
             {
                 Instance *child = NULL;
                 Instance *parent = NULL;
-                printf("%d is parented to %d.\n", chunk.Children[i], chunk.Parents[i]);
+                //printf("%d is parented to %d.\n", chunk.Children[i], chunk.Parents[i]);
 
                 for (int j = 0; j < instChunkCount; j++)
                 {
