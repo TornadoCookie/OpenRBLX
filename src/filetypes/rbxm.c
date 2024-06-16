@@ -81,6 +81,11 @@ static float RotateFloat(float value)
     return *(float*)&i;
 }
 
+static float ReturnFloat(float value)
+{
+    return value;
+}
+
 static uint8_t ReturnUInt8(uint8_t value)
 {
     return value;
@@ -158,17 +163,27 @@ static void *parse_values(PropertiesChunk chunk, InstanceChunk instChunk, unsign
             ReadInterleavedfloat(chunkData, instChunk.Length, RotateFloat, values);
             valueSize = sizeof(float);
         } break;
-        case 0x0E:
+        case 0x0E: // Vector3 value
         {
             values = malloc(sizeof(Vector3) * instChunk.Length);
             valueSize = sizeof(Vector3);
-            float *floatValues = malloc(sizeof(float) * instChunk.Length * 3);
-            ReadInterleavedfloat(chunkData, instChunk.Length * 3, RotateFloat, floatValues);
+            float *xValues = malloc(sizeof(float) * instChunk.Length);
+            float *yValues = malloc(sizeof(float) * instChunk.Length);
+            float *zValues = malloc(sizeof(float) * instChunk.Length);
+            ReadInterleavedfloat(chunkData, instChunk.Length, RotateFloat, xValues);
+            ReadInterleavedfloat(chunkData + instChunk.Length*sizeof(float), instChunk.Length, RotateFloat, yValues);
+            ReadInterleavedfloat(chunkData + instChunk.Length*2*sizeof(float), instChunk.Length, RotateFloat, zValues);
             for (int i = 0; i < instChunk.Length; i++)
             {
-                ((Vector3*)values)[i] = (Vector3){floatValues[i*3], floatValues[i*3+1], floatValues[i*3+2]};
+                ((Vector3*)values)[i] = (Vector3){
+                    xValues[i],
+                    yValues[i],
+                    zValues[i]
+                };
             }
-            free(floatValues);
+            free(xValues);
+            free(yValues);
+            free(zValues);
         } break;
         case 0x10: // CFrame value
         {
@@ -199,12 +214,14 @@ static void *parse_values(PropertiesChunk chunk, InstanceChunk instChunk, unsign
                 ((CFrame*)values)[i].R22 = rotations[i][8];
             }
             float *positions = malloc(sizeof(float) * instChunk.Length * 3);
-            ReadInterleavedfloat(chunkData, instChunk.Length * 3, RotateFloat, positions);
+            ReadInterleavedfloat(chunkData, instChunk.Length, RotateFloat, positions);
+            ReadInterleavedfloat(chunkData + instChunk.Length*sizeof(float), instChunk.Length, RotateFloat, positions + instChunk.Length);
+            ReadInterleavedfloat(chunkData + instChunk.Length*2*sizeof(float), instChunk.Length, RotateFloat, positions + instChunk.Length*2);
             for (int i = 0; i < instChunk.Length; i++)
             {
-                ((CFrame*)values)[i].X = positions[i*3];
-                ((CFrame*)values)[i].Y = positions[i*3+1];
-                ((CFrame*)values)[i].Z = positions[i*3+2];
+                ((CFrame*)values)[i].X = positions[i];
+                ((CFrame*)values)[i].Y = positions[i+instChunk.Length];
+                ((CFrame*)values)[i].Z = positions[i+instChunk.Length*2];
             }
             free(rotations);
             free(positions);
@@ -221,13 +238,15 @@ static void *parse_values(PropertiesChunk chunk, InstanceChunk instChunk, unsign
             valueSize = sizeof(Color3);
             values = malloc(sizeof(Color3) * instChunk.Length);
             uint8_t *uint8Values = malloc(3 * instChunk.Length);
-            ReadInterleaveduint8_t(chunkData, instChunk.Length * 3, ReturnUInt8, uint8Values);
+            ReadInterleaveduint8_t(chunkData, instChunk.Length, ReturnUInt8, uint8Values);
+            ReadInterleaveduint8_t(chunkData + instChunk.Length, instChunk.Length, ReturnUInt8, uint8Values + instChunk.Length);
+            ReadInterleaveduint8_t(chunkData + instChunk.Length*2, instChunk.Length, ReturnUInt8, uint8Values + instChunk.Length*2);
             for (int i = 0; i < instChunk.Length; i++)
             {
                 ((Color3*)values)[i] = (Color3){
-                    (float)uint8Values[i*3] / 255,
-                    (float)uint8Values[i*3+1] / 255,
-                    (float)uint8Values[i*3+2] / 255,
+                    (float)uint8Values[i] / 255,
+                    (float)uint8Values[i+instChunk.Length] / 255,
+                    (float)uint8Values[i+instChunk.Length*2] / 255,
                 };
             }
             free(uint8Values);
@@ -280,6 +299,14 @@ static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChu
             }
         }
     }
+}
+
+static int32_t *LoadReferences(int length, unsigned char *data)
+{
+    int32_t *references = malloc(sizeof(int32_t) * length);
+    ReadInterleavedint32_t(data, length, RotateInt32, references);
+    DecodeDifferenceInPlace(references, length);
+    return references;
 }
 
 Instance **LoadModelRBXM(const char *file, int *mdlCount)
@@ -372,9 +399,7 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
             chunkData += sizeof(uint8_t);
             chunk.Length = *(uint32_t*)chunkData;
             chunkData += sizeof(uint32_t);
-            chunk.IDs = malloc(sizeof(int32_t) * chunk.Length);
-            ReadInterleavedint32_t(chunkData, chunk.Length, RotateInt32, chunk.IDs);
-            DecodeDifferenceInPlace(chunk.IDs, chunk.Length);
+            chunk.IDs = LoadReferences(chunk.Length, chunkData);
 
             printf("Instance Info:\n");
             printf("ClassID: %d\n", chunk.ClassID);
@@ -450,25 +475,54 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
             chunk.Length = *(uint32_t*)chunkData;
             chunkData += sizeof(uint32_t);
 
+            chunk.Children = LoadReferences(chunk.Length, chunkData);
+            chunkData += sizeof(int32_t) * chunk.Length;
+            chunk.Parents = LoadReferences(chunk.Length, chunkData);
+
             printf("Parents info:\n");
             printf("Length: %d.\n", chunk.Length);
+            for (int i = 0; i < chunk.Length; i++)
+            {
+                Instance *child = NULL;
+                Instance *parent = NULL;
+                printf("%d is parented to %d.\n", chunk.Children[i], chunk.Parents[i]);
+
+                for (int j = 0; j < instChunkCount; j++)
+                {
+                    InstanceChunk instChunk = instChunks[i];
+                    if (instChunk.invalid) continue;
+                    for (int k = 0; k < instChunk.Length; k++)
+                    {
+                        if (instChunk.IDs[k] == chunk.Children[i]) child = instChunk.instances[k];
+                        if (instChunk.IDs[k] == chunk.Parents[i]) parent = instChunk.instances[k];
+                    }
+                }
+
+                if (!child) continue;
+
+                if (chunk.Parents[i] != -1 && (!child || !parent))
+                {
+                    printf("Unable to find instance. Instance will be parented to datamodel.\n");
+                }
+
+                if (chunk.Parents[i] == -1 || !parent)
+                {
+                    printf("Adding the thing.\n");
+                    (*mdlCount)++;
+                    ret = realloc(ret, sizeof(Instance *) * *mdlCount);
+                    ret[*mdlCount - 1] = child;
+                }
+                else
+                {
+                    Instance_SetParent(child, parent);
+                }
+            }
         }
         else
         {
             printf("error: Unknown signature.\n");
         }
         data += sizeof(Chunk) + chunk->CompressedLength;
-    }
-
-    for (int i = 0; i < instChunkCount; i++)
-    {
-        if (instChunks[i].invalid) continue;
-        for (int j = 0; j < instChunks[i].Length; j++)
-        {
-            (*mdlCount)++;
-            ret = realloc(ret, sizeof(Instance *) * *mdlCount);
-            ret[*mdlCount - 1] = instChunks[i].instances[j];
-        }
     }
 
     return ret;

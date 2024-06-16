@@ -335,7 +335,7 @@ static void serialize(SerializeInstance *inst, char *prop, char *propName, struc
                 case Serialize_CoordinateFrame:
                 {
                     xmlserialize_coordinateframe(val, child);
-                    if (Instance_IsA(ret, "BasePart") && !strcmp(propName, "CoordinateFrame"))
+                    if (Instance_IsA(ret, "BasePart") && !strcmp(propName, "CFrame"))
                     {
                         BasePart_SetCFrame(ret, ((BasePart*)ret)->CFrame);
                     }

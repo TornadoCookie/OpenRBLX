@@ -111,7 +111,6 @@ void DataModel_Draw(DataModel *this)
     Camera_Instance *cam = this->Workspace->CurrentCamera;
 
     ClearBackground(SKYBLUE);
-    DrawFPS(0, 20);
 
     BeginMode3D(cam->camera);
     Lighting *lighting = Instance_FindFirstChildOfClass(this, "Lighting");
@@ -201,6 +200,8 @@ void DataModel_Draw(DataModel *this)
     //DrawCube((Vector3){1, 0, -1}, 1, 2, 2, MAGENTA);
 
     EndMode3D();
+
+    DrawFPS(0, 20);
     Camera_Process(cam);
 }
 
