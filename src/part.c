@@ -135,6 +135,8 @@ void part_draw(Part *this)
     printf("drawing part %p, position %s.\n", this, debugstr_vector3(this->formfactorpart.basepart.Position));
     this->material.maps[MATERIAL_MAP_DIFFUSE].color = rl_from_color3(this->formfactorpart.basepart.Color, this->formfactorpart.basepart.Transparency);
 
+    printf("color %s.\n", debugstr_color3(this->formfactorpart.basepart.Color));
+
     switch (this->shape)
     {
         case Shape_Block: draw_block(this); break;

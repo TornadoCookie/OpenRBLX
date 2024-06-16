@@ -8,7 +8,7 @@
 
 int main(int argc, char **argv)
 {
-    if (argc != 2)
+    if (argc < 2)
     {
         printf("usage: test_rbxm <mdl.rbxm>\n");
         return 0;
@@ -29,6 +29,8 @@ int main(int argc, char **argv)
         Instance_SetParent(mdls[i], datamodel->Workspace);
     }
     free(mdls);
+
+    if (argc > 2 && !strcmp(argv[2], "-q")) return 0;
 
     SetTargetFPS(60);
     DisableCursor();

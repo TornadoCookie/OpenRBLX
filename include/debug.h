@@ -27,6 +27,11 @@ const char *debugstr_matrix(Matrix m)
     return buf;
 }
 
+const char *debugstr_color3(Color3 c)
+{
+    return debugstr_vector3((Vector3){c.R, c.G, c.B});
+}
+
 void dbg_printf(const char *type, const char *channel, const char *func, const char *restrict format, ...)
 {
     static char buf[1024];
@@ -45,10 +50,12 @@ void dbg_printf(const char *type, const char *channel, const char *func, const c
 
 #include <raymath.h>
 #include "cframe.h"
+#include "color3.h"
 
 const char *debugstr_vector3(Vector3 v);
 const char *debugstr_cframe(CFrame cf);
 const char *debugstr_matrix(Matrix m);
+const char *debugstr_color3(Color3 c);
 void dbg_printf(const char *type, const char *channel, const char *func, const char *restrict format, ...);
 
 #define FIXME(fmt, ...) dbg_printf("FIXME", __dbg_channel, __func__, fmt, __VA_ARGS__)
