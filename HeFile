@@ -104,3 +104,5 @@ Source physicalcharacter.c
 Source lighting.c
 Source ../lib/lz4/src/lz4.c
 Source wedgepart.c
+Source valuebase.c
+Source vector3value.c
