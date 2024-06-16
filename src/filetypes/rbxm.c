@@ -489,7 +489,7 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
 
                 for (int j = 0; j < instChunkCount; j++)
                 {
-                    InstanceChunk instChunk = instChunks[i];
+                    InstanceChunk instChunk = instChunks[j];
                     if (instChunk.invalid) continue;
                     for (int k = 0; k < instChunk.Length; k++)
                     {
@@ -507,7 +507,6 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
 
                 if (chunk.Parents[i] == -1 || !parent)
                 {
-                    printf("Adding the thing.\n");
                     (*mdlCount)++;
                     ret = realloc(ret, sizeof(Instance *) * *mdlCount);
                     ret[*mdlCount - 1] = child;
