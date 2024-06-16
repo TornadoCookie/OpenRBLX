@@ -5,9 +5,10 @@ Features:
 - rbxlx parsing.
 - parsing models from the 2005 era with original colour and form.
 - parsing modern models as well.
+- binary formats (rbxm, rbxl) parsing
 
 TODO:
-- matrices aren't converted from CFrames correctly necessarily yet. we need to test more.
+- 2005 matrices aren't converted from CFrames correctly necessarily yet. we need to test more.
 - surfaces
 - physics
 - 2005 controllers impl (might not have to implement)
@@ -19,10 +20,8 @@ TODO:
 - skybox
 - celestial bodies
 - studio-like editor
-- binary formats (rbxm, rbxl) parsing
 - rccservice + server software
 - netcode, httpservice, replication
 
 Testing:
-- test_rbxmx: add the .rbxmx file to the datamodel and render it.
-- part cframe alignment tests + results in datamodel.c.
+- test_*: test that file format. takes the file as an argument.
