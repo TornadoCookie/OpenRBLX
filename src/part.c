@@ -8,6 +8,8 @@
 #include "datamodel.h"
 #include "rlgl.h"
 #include "serialize.h"
+#include <string.h>
+#include "datamodelmesh.h"
 
 DEFAULT_DEBUG_CHANNEL(part)
 
@@ -143,6 +145,25 @@ void part_draw(Part *this)
         case Shape_Cylinder: draw_cylinder(this); break;
         case Shape_Ball: draw_ball(this); break;
         default: FIXME("not implemented: %d.\n", this->shape); break;
+    }
+
+    int childCount;
+    Instance **children = Instance_GetChildren(this, &childCount);
+
+    for (int i = 0; i < childCount; i++)
+    {
+        Instance *child = children[i];
+        if (!strcmp(child->ClassName, "CylinderMesh"))
+        {
+            DataModelMesh *dmmesh = child;
+            Color3 vertexColor = (Color3){dmmesh->VertexColor.x, dmmesh->VertexColor.y, dmmesh->VertexColor.z};
+            DrawCylinder(
+                Vector3Add(this->formfactorpart.basepart.Position, dmmesh->Offset),
+                this->formfactorpart.basepart.size.x + dmmesh->Scale.x,
+                this->formfactorpart.basepart.size.x + dmmesh->Scale.x,
+                this->formfactorpart.basepart.size.y + dmmesh->Scale.y,
+                12, rl_from_color3(vertexColor, 0.0f));
+        }
     }
 }
 

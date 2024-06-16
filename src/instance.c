@@ -129,6 +129,8 @@ bool Instance_IsAncestorOf(Instance *this, Instance *descendant)
         if (this->children[i] == descendant) return true;
         if (Instance_IsAncestorOf(this->children[i], descendant)) return true;
     }
+
+    return false;
 }
 
 bool Instance_IsDescendantOf(Instance *this, Instance *ancestor)
@@ -278,7 +280,7 @@ void Instance_Serialize(Instance *obj, SerializeInstance *inst)
     void (*serializer)(Instance*, SerializeInstance*);
     const char *serializerName = TextFormat("serialize_%s", obj->ClassName);
     serializer = dlsym(ourselves, serializerName);
-    printf("dlerror: %s\n", dlerror());
+    if (!serializer) printf("dlerror: %s\n", dlerror());
     dlclose(ourselves);
 
     if (!serializer)

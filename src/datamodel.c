@@ -8,6 +8,7 @@
 #include "meshcontentprovider.h"
 #include "rlgl.h"
 #include "lighting.h"
+#include "datamodelmesh.h"
 
 DEFAULT_DEBUG_CHANNEL(datamodel)
 

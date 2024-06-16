@@ -106,3 +106,6 @@ Source ../lib/lz4/src/lz4.c
 Source wedgepart.c
 Source valuebase.c
 Source vector3value.c
+Source cylindermesh.c
+Source bevelmesh.c
+Source datamodelmesh.c

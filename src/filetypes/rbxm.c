@@ -513,7 +513,7 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
             {
                 Instance *child = NULL;
                 Instance *parent = NULL;
-                //printf("%d is parented to %d.\n", chunk.Children[i], chunk.Parents[i]);
+                printf("%d is parented to %d.\n", chunk.Children[i], chunk.Parents[i]);
 
                 for (int j = 0; j < instChunkCount; j++)
                 {
@@ -527,6 +527,11 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
                 }
 
                 if (!child) continue;
+                if (Instance_IsAncestorOf(child, parent) || Instance_IsDescendantOf(parent, child))
+                {
+                    printf("This will cause an infinite loop. Parenting to datamodel.\n");
+                    parent = NULL;
+                }
 
                 if (chunk.Parents[i] != -1 && (!child || !parent))
                 {

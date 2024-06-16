@@ -30,7 +30,7 @@ int main(int argc, char **argv)
         printf("\nParenting instance to datamodel:\n");
         printf("Pointer %p.\n", mdls[i]);
         printf("Classname %s.\n", mdls[i]->ClassName);
-        Instance_SetParent(mdls[i], datamodel->Workspace);
+        Instance_SetParent(mdls[i], datamodel);
     }
     free(mdls);
 
