@@ -52,6 +52,8 @@ CFLAGS+=-Ilib/xml/src
 CFLAGS+=-Ilib/xml/include
 CFLAGS+=-Ilib/lz4/src
 CFLAGS+=-Ilib/lz4/include
+CFLAGS+=-Ilib/minilua/src
+CFLAGS+=-Ilib/minilua/include
 CFLAGS+=-D PLATFORM=\"$(PLATFORM)\"
 CFLAGS+=-Iinclude
 CFLAGS+=-Ilib/xml/include

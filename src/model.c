@@ -10,8 +10,8 @@ DEFAULT_DEBUG_CHANNEL(model)
 
 void model_draw(Model_Instance *mdl)
 {
-    CFrame cf = Model_GetModelCFrame(mdl);
-    DrawCube((Vector3){cf.X, cf.Y, cf.Z}, 1, 1, 1, WHITE);
+    //CFrame cf = Model_GetModelCFrame(mdl);
+    //DrawCube((Vector3){cf.X, cf.Y, cf.Z}, 1, 1, 1, WHITE);
 }
 
 Model_Instance *Model_new(const char *className, Instance *parent)

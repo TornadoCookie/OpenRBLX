@@ -9,6 +9,7 @@ ExtraCFlag -rdynamic
 
 Dependency xml
 Dependency lz4
+Dependency minilua
 
 Program test_rbxmx
 Source ../tests/test_rbxmx.c

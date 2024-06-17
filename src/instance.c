@@ -114,6 +114,9 @@ bool ClassName_IsA(const char *className1, const char *className)
     else if (!strcmp(className, "Model")) return ClassName_IsA(className1, "WorldRoot");
     else if (!strcmp(className, "WorldRoot")) return ClassName_IsA(className1, "Workspace");
 
+    else if (!strcmp(className, "LuaSourceContainer")) return ClassName_IsA(className1, "BaseScript");
+    else if (!strcmp(className, "BaseScript")) return ClassName_IsA(className1, "Script");
+
     return false;
 }
 

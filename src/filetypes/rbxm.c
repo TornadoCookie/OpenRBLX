@@ -7,6 +7,7 @@
 #include "lz4.h"
 #include "serialize.h"
 #include "part.h"
+#include "script.h"
 
 #include "debug.h"
 
@@ -152,6 +153,19 @@ static void *parse_values(PropertiesChunk chunk, InstanceChunk instChunk, unsign
 
     switch (chunk.ValueType)
     {
+        case 0x01: // String value
+        {
+            values = malloc(sizeof(void*) * instChunk.Length);
+            valueSize = sizeof(void*);
+
+            for (int i = 0; i < instChunk.Length; i++)
+            {
+                ((unsigned char **)values)[i] = chunkData;
+                uint32_t length = *(uint32_t*)chunkData;
+                chunkData += sizeof(uint32_t);
+                chunkData += length;
+            }
+        } break;
         case 0x02: // Boolean value
         {
             values = chunkData;
@@ -301,7 +315,24 @@ static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChu
             if (!strncmp(s.name, chunk.Name, chunk.nameLength) ||
                 (!strcmp(s.name, "Color") && !strncmp(chunk.Name, "Color3uint8", chunk.nameLength)))
             {
-                memcpy(s.val, values + valueSize * i, valueSize);
+                if (chunk.ValueType == 0x01)
+                {
+                    char **val = s.val;
+                    unsigned char *strData = ((unsigned char **)values)[i];
+                    uint32_t length = *(uint32_t*)strData;
+                    strData += length;
+                    *val = malloc(length + 1);
+                    memcpy(*val, strData, length);
+                    (*val)[length] = 0;
+                    if (Instance_IsA(inst, "Script") && !strcmp(s.name, "Source"))
+                    {
+                        ((Script*)inst)->sourceLength = length;
+                    }
+                }
+                else
+                {
+                    memcpy(s.val, values + valueSize * i, valueSize);
+                }
                 if (Instance_IsA(inst, "BasePart") && !strncmp(chunk.Name, "Position", chunk.nameLength))
                 {
                     BasePart_SetPosition(inst, ((BasePart*)inst)->Position);

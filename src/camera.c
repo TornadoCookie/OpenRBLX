@@ -42,7 +42,7 @@ bool Camera_Zoom(Camera_Instance *this, float distance)
 
 void Camera_Process(Camera_Instance *this)
 {
-    FIXME("this %p stub!\n", this);
+    FIXME("this %p stub!, %f\n", this, this->camera.position.y);
     UpdateCamera(&this->camera, CAMERA_FREE);
 }
 

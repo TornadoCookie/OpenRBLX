@@ -7,6 +7,7 @@ typedef struct Script {
     BaseScript basescript;
 
     const char *Source;
+    int sourceLength;
 } Script;
 
 Script *Script_new(const char *className, Instance *parent);
