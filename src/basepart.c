@@ -10,11 +10,6 @@
 
 DEFAULT_DEBUG_CHANNEL(basepart)
 
-static Color rl_from_color3(Color3 col, float transparency)
-{
-    return (Color){col.R * 255, col.G * 255, col.B * 255, (1.0f-transparency) * 255};
-}
-
 BasePart *BasePart_new(const char *className, Instance *parent)
 {
     BasePart *newInst = PVInstance_new(className, parent);
@@ -86,16 +81,9 @@ void BasePart_Draw(BasePart *this)
     for (int i = 0; i < childCount; i++)
     {
         Instance *child = children[i];
-        if (!strcmp(child->ClassName, "CylinderMesh"))
+        if (Instance_IsA(child, "DataModelMesh"))
         {
-            DataModelMesh *dmmesh = child;
-            Color3 vertexColor = this->Color;
-            DrawCylinder(
-                Vector3Add(this->Position, dmmesh->Offset),
-                this->size.x + dmmesh->Scale.x,
-                this->size.x + dmmesh->Scale.x,
-                this->size.y + dmmesh->Scale.y,
-                12, rl_from_color3(vertexColor, 0.0f));
+            DataModelMesh_Draw(child, this);
         }
     }
 }

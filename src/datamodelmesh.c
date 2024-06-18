@@ -1,13 +1,29 @@
 #include "datamodelmesh.h"
+#include "basepart.h"
+
+#include "debug.h"
+DEFAULT_DEBUG_CHANNEL(datamodelmesh)
+
+void datamodelmesh_draw(DataModelMesh *this, BasePart *parent)
+{
+    FIXME("classname %s has no draw func.\n", this->instance.ClassName);
+}
 
 DataModelMesh *DataModelMesh_new(const char *className, Instance *parent)
 {
-    Instance *newInst = Instance_new(className, parent);
+    DataModelMesh *newInst = Instance_new(className, parent);
 
-    newInst->DataCost = sizeof(DataModelMesh);
+    newInst->instance.DataCost = sizeof(DataModelMesh);
     newInst = realloc(newInst, sizeof(DataModelMesh));
+    
+    newInst->drawFunc = datamodelmesh_draw;
 
     return newInst;
+}
+
+void DataModelMesh_Draw(DataModelMesh *this, BasePart *parent)
+{
+    this->drawFunc(this, parent);
 }
 
 void serialize_DataModelMesh(DataModelMesh *datamodelmesh, SerializeInstance *inst)
