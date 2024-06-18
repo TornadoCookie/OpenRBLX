@@ -67,154 +67,75 @@ LDFLAGS+=-lm
 LDFLAGS+=-Llib/$(RAYLIB_NAME)/lib
 LDFLAGS+=$(RAYLIB_DLL)
 
+instance_SOURCES+=src/datamodel.c
+instance_SOURCES+=src/instance.c
+instance_SOURCES+=src/rbxscriptsignal.c
+instance_SOURCES+=src/workspace.c
+instance_SOURCES+=src/serviceprovider.c
+instance_SOURCES+=src/rootinstance.c
+instance_SOURCES+=src/model.c
+instance_SOURCES+=src/pvinstance.c
+instance_SOURCES+=src/trusspart.c
+instance_SOURCES+=src/basepart.c
+instance_SOURCES+=src/part.c
+instance_SOURCES+=src/formfactorpart.c
+instance_SOURCES+=src/camera.c
+instance_SOURCES+=src/brickcolor.c
+instance_SOURCES+=src/meshcontentprovider.c
+instance_SOURCES+=src/cacheablecontentprovider.c
+instance_SOURCES+=src/physicalcharacter.c
+instance_SOURCES+=src/lighting.c
+instance_SOURCES+=src/wedgepart.c
+instance_SOURCES+=src/valuebase.c
+instance_SOURCES+=src/vector3value.c
+instance_SOURCES+=src/cylindermesh.c
+instance_SOURCES+=src/bevelmesh.c
+instance_SOURCES+=src/datamodelmesh.c
+instance_SOURCES+=src/runservice.c
+instance_SOURCES+=src/serverscriptservice.c
+instance_SOURCES+=src/luasourcecontainer.c
+instance_SOURCES+=src/basescript.c
+instance_SOURCES+=src/script.c
+
+rbxmx_SOURCES+=src/filetypes/rbxlx.c
+rbxmx_SOURCES+=src/filetypes/rbxmx.c
+rbxmx_SOURCES+=src/../lib/xml/src/xml.c
+
+rbxm_SOURCES+=src/filetypes/rbxm.c
+rbxm_SOURCES+=src/../lib/lz4/src/lz4.c
+
 test_rbxmx_SOURCES+=src/../tests/test_rbxmx.c
-test_rbxmx_SOURCES+=src/filetypes/rbxmx.c
-test_rbxmx_SOURCES+=src/datamodel.c
-test_rbxmx_SOURCES+=src/instance.c
-test_rbxmx_SOURCES+=src/../lib/xml/src/xml.c
-test_rbxmx_SOURCES+=src/rbxscriptsignal.c
-test_rbxmx_SOURCES+=src/workspace.c
-test_rbxmx_SOURCES+=src/serviceprovider.c
-test_rbxmx_SOURCES+=src/rootinstance.c
-test_rbxmx_SOURCES+=src/model.c
-test_rbxmx_SOURCES+=src/pvinstance.c
-test_rbxmx_SOURCES+=src/trusspart.c
-test_rbxmx_SOURCES+=src/basepart.c
-test_rbxmx_SOURCES+=src/part.c
-test_rbxmx_SOURCES+=src/formfactorpart.c
-test_rbxmx_SOURCES+=src/camera.c
-test_rbxmx_SOURCES+=src/brickcolor.c
-test_rbxmx_SOURCES+=src/meshcontentprovider.c
-test_rbxmx_SOURCES+=src/cacheablecontentprovider.c
-test_rbxmx_SOURCES+=src/physicalcharacter.c
-test_rbxmx_SOURCES+=src/lighting.c
-test_rbxmx_SOURCES+=src/runservice.c
-test_rbxmx_SOURCES+=src/serverscriptservice.c
+test_rbxmx_SOURCES+=$(instance_SOURCES)
+test_rbxmx_SOURCES+=$(rbxmx_SOURCES)
 
 $(DISTDIR)/test_rbxmx$(EXEC_EXTENSION): $(test_rbxmx_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
 test_rbxlx_SOURCES+=src/../tests/test_rbxlx.c
-test_rbxlx_SOURCES+=src/filetypes/rbxlx.c
-test_rbxlx_SOURCES+=src/filetypes/rbxmx.c
-test_rbxlx_SOURCES+=src/datamodel.c
-test_rbxlx_SOURCES+=src/instance.c
-test_rbxlx_SOURCES+=src/../lib/xml/src/xml.c
-test_rbxlx_SOURCES+=src/rbxscriptsignal.c
-test_rbxlx_SOURCES+=src/workspace.c
-test_rbxlx_SOURCES+=src/serviceprovider.c
-test_rbxlx_SOURCES+=src/rootinstance.c
-test_rbxlx_SOURCES+=src/model.c
-test_rbxlx_SOURCES+=src/pvinstance.c
-test_rbxlx_SOURCES+=src/trusspart.c
-test_rbxlx_SOURCES+=src/basepart.c
-test_rbxlx_SOURCES+=src/part.c
-test_rbxlx_SOURCES+=src/formfactorpart.c
-test_rbxlx_SOURCES+=src/camera.c
-test_rbxlx_SOURCES+=src/brickcolor.c
-test_rbxlx_SOURCES+=src/meshcontentprovider.c
-test_rbxlx_SOURCES+=src/cacheablecontentprovider.c
-test_rbxlx_SOURCES+=src/physicalcharacter.c
-test_rbxlx_SOURCES+=src/lighting.c
-test_rbxlx_SOURCES+=src/runservice.c
-test_rbxlx_SOURCES+=src/serverscriptservice.c
+test_rbxlx_SOURCES+=$(instance_SOURCES)
+test_rbxlx_SOURCES+=$(rbxmx_SOURCES)
 
 $(DISTDIR)/test_rbxlx$(EXEC_EXTENSION): $(test_rbxlx_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
 studio_SOURCES+=src/../studio/studio.c
-studio_SOURCES+=src/filetypes/rbxlx.c
-studio_SOURCES+=src/filetypes/rbxmx.c
-studio_SOURCES+=src/datamodel.c
-studio_SOURCES+=src/instance.c
-studio_SOURCES+=src/../lib/xml/src/xml.c
-studio_SOURCES+=src/rbxscriptsignal.c
-studio_SOURCES+=src/workspace.c
-studio_SOURCES+=src/serviceprovider.c
-studio_SOURCES+=src/rootinstance.c
-studio_SOURCES+=src/model.c
-studio_SOURCES+=src/pvinstance.c
-studio_SOURCES+=src/trusspart.c
-studio_SOURCES+=src/basepart.c
-studio_SOURCES+=src/part.c
-studio_SOURCES+=src/formfactorpart.c
-studio_SOURCES+=src/camera.c
-studio_SOURCES+=src/brickcolor.c
-studio_SOURCES+=src/meshcontentprovider.c
-studio_SOURCES+=src/cacheablecontentprovider.c
-studio_SOURCES+=src/physicalcharacter.c
-studio_SOURCES+=src/lighting.c
-studio_SOURCES+=src/runservice.c
-studio_SOURCES+=src/serverscriptservice.c
+studio_SOURCES+=$(instance_SOURCES)
+studio_SOURCES+=$(rbxmx_SOURCES)
+studio_SOURCES+=$(rbxm_SOURCES)
 
 $(DISTDIR)/studio$(EXEC_EXTENSION): $(studio_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
 test_rbxm_SOURCES+=src/../tests/test_rbxm.c
-test_rbxm_SOURCES+=src/filetypes/rbxm.c
-test_rbxm_SOURCES+=src/datamodel.c
-test_rbxm_SOURCES+=src/instance.c
-test_rbxm_SOURCES+=src/rbxscriptsignal.c
-test_rbxm_SOURCES+=src/workspace.c
-test_rbxm_SOURCES+=src/serviceprovider.c
-test_rbxm_SOURCES+=src/rootinstance.c
-test_rbxm_SOURCES+=src/model.c
-test_rbxm_SOURCES+=src/pvinstance.c
-test_rbxm_SOURCES+=src/trusspart.c
-test_rbxm_SOURCES+=src/basepart.c
-test_rbxm_SOURCES+=src/part.c
-test_rbxm_SOURCES+=src/formfactorpart.c
-test_rbxm_SOURCES+=src/camera.c
-test_rbxm_SOURCES+=src/brickcolor.c
-test_rbxm_SOURCES+=src/meshcontentprovider.c
-test_rbxm_SOURCES+=src/cacheablecontentprovider.c
-test_rbxm_SOURCES+=src/physicalcharacter.c
-test_rbxm_SOURCES+=src/lighting.c
-test_rbxm_SOURCES+=src/../lib/lz4/src/lz4.c
-test_rbxm_SOURCES+=src/wedgepart.c
-test_rbxm_SOURCES+=src/valuebase.c
-test_rbxm_SOURCES+=src/vector3value.c
-test_rbxm_SOURCES+=src/cylindermesh.c
-test_rbxm_SOURCES+=src/bevelmesh.c
-test_rbxm_SOURCES+=src/datamodelmesh.c
-test_rbxm_SOURCES+=src/runservice.c
-test_rbxm_SOURCES+=src/serverscriptservice.c
+test_rbxm_SOURCES+=$(instance_SOURCES)
+test_rbxm_SOURCES+=$(rbxm_SOURCES)
 
 $(DISTDIR)/test_rbxm$(EXEC_EXTENSION): $(test_rbxm_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
 test_rbxl_SOURCES+=src/../tests/test_rbxl.c
-test_rbxl_SOURCES+=src/filetypes/rbxm.c
-test_rbxl_SOURCES+=src/datamodel.c
-test_rbxl_SOURCES+=src/instance.c
-test_rbxl_SOURCES+=src/rbxscriptsignal.c
-test_rbxl_SOURCES+=src/workspace.c
-test_rbxl_SOURCES+=src/serviceprovider.c
-test_rbxl_SOURCES+=src/rootinstance.c
-test_rbxl_SOURCES+=src/model.c
-test_rbxl_SOURCES+=src/pvinstance.c
-test_rbxl_SOURCES+=src/trusspart.c
-test_rbxl_SOURCES+=src/basepart.c
-test_rbxl_SOURCES+=src/part.c
-test_rbxl_SOURCES+=src/formfactorpart.c
-test_rbxl_SOURCES+=src/camera.c
-test_rbxl_SOURCES+=src/brickcolor.c
-test_rbxl_SOURCES+=src/meshcontentprovider.c
-test_rbxl_SOURCES+=src/cacheablecontentprovider.c
-test_rbxl_SOURCES+=src/physicalcharacter.c
-test_rbxl_SOURCES+=src/lighting.c
-test_rbxl_SOURCES+=src/../lib/lz4/src/lz4.c
-test_rbxl_SOURCES+=src/wedgepart.c
-test_rbxl_SOURCES+=src/valuebase.c
-test_rbxl_SOURCES+=src/vector3value.c
-test_rbxl_SOURCES+=src/cylindermesh.c
-test_rbxl_SOURCES+=src/bevelmesh.c
-test_rbxl_SOURCES+=src/datamodelmesh.c
-test_rbxl_SOURCES+=src/runservice.c
-test_rbxl_SOURCES+=src/serverscriptservice.c
-test_rbxl_SOURCES+=src/luasourcecontainer.c
-test_rbxl_SOURCES+=src/basescript.c
-test_rbxl_SOURCES+=src/script.c
+test_rbxl_SOURCES+=$(instance_SOURCES)
+test_rbxl_SOURCES+=$(rbxm_SOURCES)
 
 $(DISTDIR)/test_rbxl$(EXEC_EXTENSION): $(test_rbxl_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
