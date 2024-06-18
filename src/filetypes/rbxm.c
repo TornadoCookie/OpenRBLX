@@ -333,25 +333,28 @@ static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChu
                 {
                     memcpy(s.val, values + valueSize * i, valueSize);
                 }
-                if (Instance_IsA(inst, "BasePart") && !strncmp(chunk.Name, "Position", chunk.nameLength))
+                if (Instance_IsA(inst,"BasePart"))
                 {
-                    BasePart_SetPosition(inst, ((BasePart*)inst)->Position);
+                    if (!strcmp(s.name, "Position"))
+                    {
+                        BasePart_SetPosition(inst, ((BasePart*)inst)->Position);
+                    }
+                    else if (!strcmp(s.name, "CFrame"))
+                    {
+                        BasePart_SetCFrame(inst, ((BasePart*)inst)->CFrame);
+                    }
+                    else if (!strcmp(s.name, "Color"))
+                    {
+                        BasePart_SetColor(inst, ((BasePart*)inst)->Color);
+                    }
+                    else if (!strcmp(s.name, "BrickColor"))
+                    {
+                        BasePart_SetBrickColor(inst, ((BasePart*)inst)->BrickColor);
+                    }
                 }
-                else if (Instance_IsA(inst, "BasePart") && !strncmp(chunk.Name, "CFrame", chunk.nameLength))
-                {
-                    BasePart_SetCFrame(inst, ((BasePart*)inst)->CFrame);
-                }
-                else if (Instance_IsA(inst, "Part") && !strncmp(chunk.Name, "shape", chunk.nameLength))
+                if (Instance_IsA(inst, "Part") && !strncmp(chunk.Name, "shape", chunk.nameLength))
                 {
                     Part_SetShape(inst, ((Part*)inst)->shape);
-                }
-                else if (Instance_IsA(inst, "BasePart") && !strcmp(s.name, "Color"))
-                {
-                    BasePart_SetColor(inst, ((BasePart*)inst)->Color);
-                }
-                else if (Instance_IsA(inst, "BasePart") && !strcmp(s.name, "BrickColor"))
-                {
-                    BasePart_SetBrickColor(inst, ((BasePart*)inst)->BrickColor);
                 }
             }
         }
