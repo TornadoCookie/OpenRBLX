@@ -155,16 +155,7 @@ static void *parse_values(PropertiesChunk chunk, InstanceChunk instChunk, unsign
     {
         case 0x01: // String value
         {
-            values = malloc(sizeof(void*) * instChunk.Length);
-            valueSize = sizeof(void*);
-
-            for (int i = 0; i < instChunk.Length; i++)
-            {
-                ((unsigned char **)values)[i] = chunkData;
-                uint32_t length = *(uint32_t*)chunkData;
-                chunkData += sizeof(uint32_t);
-                chunkData += length;
-            }
+            return (void*)-1;
         } break;
         case 0x02: // Boolean value
         {
@@ -318,9 +309,20 @@ static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChu
                 if (chunk.ValueType == 0x01)
                 {
                     char **val = s.val;
-                    unsigned char *strData = ((unsigned char **)values)[i];
-                    uint32_t length = *(uint32_t*)strData;
-                    strData += length;
+                    unsigned char *strData;
+                    unsigned char *cDataCopy = chunkData;
+                    uint32_t length;
+                    for (int j = 0; j < instChunk.Length; j++)
+                    {
+                        length = *(uint32_t*)cDataCopy;
+                        cDataCopy += sizeof(uint32_t);
+                        if (j == i)
+                        {
+                            strData = cDataCopy;
+                            break;
+                        }
+                        cDataCopy += length;
+                    }
                     *val = malloc(length + 1);
                     memcpy(*val, strData, length);
                     (*val)[length] = 0;
