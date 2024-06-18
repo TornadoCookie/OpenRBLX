@@ -35,6 +35,13 @@ const char *debugstr_color3(Color3 c)
 void dbg_printf(const char *type, const char *channel, const char *func, const char *restrict format, ...)
 {
     static char buf[1024];
+
+    char *env = getenv("OPENRBLXDEBUG");
+    if (env && strcmp(channel, env))
+    {
+        return;
+    }
+
     snprintf(buf, 1024, "%s:%s:%s %s", type, channel, func, format);
     
     va_list args;
