@@ -4,8 +4,16 @@
 #include <stdlib.h>
 #include "brickcolor.h"
 #include "serialize.h"
+#include <raylib.h>
+#include "datamodelmesh.h"
+#include <string.h>
 
 DEFAULT_DEBUG_CHANNEL(basepart)
+
+static Color rl_from_color3(Color3 col, float transparency)
+{
+    return (Color){col.R * 255, col.G * 255, col.B * 255, (1.0f-transparency) * 255};
+}
 
 BasePart *BasePart_new(const char *className, Instance *parent)
 {
@@ -16,6 +24,8 @@ BasePart *BasePart_new(const char *className, Instance *parent)
 
     newInst->Touched = RBXScriptSignal_new();
     newInst->TouchEnded = RBXScriptSignal_new();
+
+    newInst->pvinstance.drawFunc = BasePart_Draw;
 
     return newInst;
 }
@@ -66,6 +76,28 @@ void BasePart_SetPosition(BasePart *this, Vector3 pos)
     this->CFrame.Y = pos.y;
     this->CFrame.Z = pos.z;
     this->Position = pos;
+}
+
+void BasePart_Draw(BasePart *this)
+{
+    int childCount;
+    Instance **children = Instance_GetChildren(this, &childCount);
+
+    for (int i = 0; i < childCount; i++)
+    {
+        Instance *child = children[i];
+        if (!strcmp(child->ClassName, "CylinderMesh"))
+        {
+            DataModelMesh *dmmesh = child;
+            Color3 vertexColor = this->Color;
+            DrawCylinder(
+                Vector3Add(this->Position, dmmesh->Offset),
+                this->size.x + dmmesh->Scale.x,
+                this->size.x + dmmesh->Scale.x,
+                this->size.y + dmmesh->Scale.y,
+                12, rl_from_color3(vertexColor, 0.0f));
+        }
+    }
 }
 
 void serialize_BasePart(BasePart *basepart, SerializeInstance *inst)

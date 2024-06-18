@@ -137,6 +137,22 @@ void part_draw(Part *this)
     //printf("drawing part %p, position %s, size %s.\n", this, debugstr_vector3(this->formfactorpart.basepart.Position), debugstr_vector3(this->formfactorpart.basepart.size));
     this->material.maps[MATERIAL_MAP_DIFFUSE].color = rl_from_color3(this->formfactorpart.basepart.Color, this->formfactorpart.basepart.Transparency);
 
+    int childCount;
+    Instance **children = Instance_GetChildren(this, &childCount);
+    bool meshOverridden = false;
+
+    for (int i = 0; i < childCount; i++)
+    {
+        if (Instance_IsA(children[i], "DataModelMesh"))
+        {
+            meshOverridden = true;
+        }
+    }
+
+    BasePart_Draw(this);
+
+    if (meshOverridden) return;
+
     //printf("color %s.\n", debugstr_color3(this->formfactorpart.basepart.Color));
 
     switch (this->shape)
@@ -147,24 +163,6 @@ void part_draw(Part *this)
         default: FIXME("not implemented: %d.\n", this->shape); break;
     }
 
-    int childCount;
-    Instance **children = Instance_GetChildren(this, &childCount);
-
-    for (int i = 0; i < childCount; i++)
-    {
-        Instance *child = children[i];
-        if (!strcmp(child->ClassName, "CylinderMesh"))
-        {
-            DataModelMesh *dmmesh = child;
-            Color3 vertexColor = (Color3){dmmesh->VertexColor.x, dmmesh->VertexColor.y, dmmesh->VertexColor.z};
-            DrawCylinder(
-                Vector3Add(this->formfactorpart.basepart.Position, dmmesh->Offset),
-                this->formfactorpart.basepart.size.x + dmmesh->Scale.x,
-                this->formfactorpart.basepart.size.x + dmmesh->Scale.x,
-                this->formfactorpart.basepart.size.y + dmmesh->Scale.y,
-                12, rl_from_color3(vertexColor, 0.0f));
-        }
-    }
 }
 
 Part *Part_new(const char *className, Instance *parent)

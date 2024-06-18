@@ -117,6 +117,10 @@ bool ClassName_IsA(const char *className1, const char *className)
     else if (!strcmp(className, "LuaSourceContainer")) return ClassName_IsA(className1, "BaseScript");
     else if (!strcmp(className, "BaseScript")) return ClassName_IsA(className1, "Script");
 
+    else if (!strcmp(className, "DataModelMesh")) return ClassName_IsA(className1, "FileMesh") || ClassName_IsA(className1, "BevelMesh");
+    else if (!strcmp(className, "FileMesh")) return ClassName_IsA(className1, "SpecialMesh");
+    else if (!strcmp(className, "BevelMesh")) return ClassName_IsA(className1, "BlockMesh") || ClassName_IsA(className1, "CylinderMesh");
+
     return false;
 }
 
