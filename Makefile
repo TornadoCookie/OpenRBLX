@@ -96,6 +96,8 @@ instance_SOURCES+=src/serverscriptservice.c
 instance_SOURCES+=src/luasourcecontainer.c
 instance_SOURCES+=src/basescript.c
 instance_SOURCES+=src/script.c
+instance_SOURCES+=src/specialmesh.c
+instance_SOURCES+=src/filemesh.c
 
 rbxmx_SOURCES+=src/filetypes/rbxlx.c
 rbxmx_SOURCES+=src/filetypes/rbxmx.c

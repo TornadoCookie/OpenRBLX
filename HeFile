@@ -41,6 +41,8 @@ Source serverscriptservice.c
 Source luasourcecontainer.c
 Source basescript.c
 Source script.c
+Source specialmesh.c
+Source filemesh.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c

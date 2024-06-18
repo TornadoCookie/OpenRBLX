@@ -6,7 +6,16 @@
 typedef enum {
     MeshType_Head,
     MeshType_Torso,
-    MeshType_Wedge
+    MeshType_Wedge,
+    MeshType_Sphere,
+    MeshType_Cylinder,
+    MeshType_FileMesh,
+    MeshType_Brick,
+    MeshType_Prism,
+    MeshType_Pyramid,
+    MeshType_ParallelRamp,
+    MeshType_RightAngleRamp,
+    MeshType_CornerWedge,
 } MeshType;
 
 typedef struct SpecialMesh {
