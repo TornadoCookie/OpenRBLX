@@ -47,10 +47,58 @@ static int luau_wait(lua_State *L)
 
 static int luau_Instance_FindFirstChild(lua_State *L);
 static void luau_pushinstance(lua_State *L, Instance *inst);
+static void luau_pushvector3(lua_State *L, Vector3 v);
+
+static Vector3 luau_tovector3(lua_State *L, int idx)
+{
+    Vector3 ret = { 0 };
+
+    lua_pushstring(L, "X");
+    lua_gettable(L, idx);
+    ret.x = lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    lua_pushstring(L, "Y");
+    lua_gettable(L, idx);
+    ret.y = lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    lua_pushstring(L, "Z");
+    lua_gettable(L, idx);
+    ret.z = lua_tonumber(L, -1);
+    
+    lua_pop(L, 1);
+
+    return ret;
+}
+
+static int luau_vector3__mul(lua_State *L)
+{
+    lua_Number factor = lua_tonumber(L, 2);
+    Vector3 vec = luau_tovector3(L, 1);
+
+    Vector3 ret = (Vector3){
+        vec.x * factor,
+        vec.y * factor,
+        vec.z * factor
+    };
+
+    luau_pushvector3(L, ret);
+
+    return 1;
+}
 
 static void luau_pushvector3(lua_State *L, Vector3 v)
 {
     lua_newtable(L);
+
+    lua_newtable(L);
+
+    lua_pushstring(L, "__mul");
+    lua_pushcfunction(L, luau_vector3__mul);
+    lua_settable(L, -3);
+
+    lua_setmetatable(L, -2);
 
     lua_pushstring(L, "X");
     lua_pushnumber(L, v.x);
