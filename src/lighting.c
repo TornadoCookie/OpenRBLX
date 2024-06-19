@@ -53,3 +53,15 @@ void Lighting_draw(Lighting *this)
 {
     
 }
+
+void serialize_Lighting(Lighting *lighting, SerializeInstance *inst)
+{
+    serialize_Instance(lighting, inst);
+
+    serialize_atomic(Color3, lighting, Ambient);
+    serialize_atomic(float, lighting, Brightness);
+    serialize_atomic(Color3, lighting, ColorShift_Bottom);
+    serialize_atomic(Color3, lighting, ColorShift_Top);
+    serialize_atomic(float, lighting, GeographicLatitude);
+    serialize_atomic(string, lighting, TimeOfDay);
+}
