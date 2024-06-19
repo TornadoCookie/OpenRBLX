@@ -18,4 +18,5 @@ void serialize_Decal(Decal *decal, SerializeInstance *inst)
     serialize_atomic(string, decal, Texture);
     serialize_atomic(float, decal, Shiny);
     serialize_atomic(float, decal, Specular);
+    serialize_atomic(Color3, decal, Color3);
 }

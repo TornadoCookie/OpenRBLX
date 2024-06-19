@@ -6,12 +6,21 @@
 
 typedef struct DataModelMesh DataModelMesh;
 
+typedef enum {
+    LevelOfDetailSetting_Low,
+    LevelOfDetailSetting_Medium,
+    LevelOfDetailSetting_High,
+} LevelOfDetailSetting;
+
 typedef struct DataModelMesh {
     Instance instance;
 
     Vector3 Offset;
     Vector3 Scale;
     Vector3 VertexColor;
+
+    LevelOfDetailSetting LODX;
+    LevelOfDetailSetting LODY;
 
     void (*drawFunc) (DataModelMesh*, BasePart*);
 } DataModelMesh;

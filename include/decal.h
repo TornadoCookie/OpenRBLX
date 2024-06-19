@@ -10,6 +10,7 @@ typedef struct Decal {
     const char *Texture;
     float Shiny;
     float Specular;
+    Color3 Color3;
 } Decal;
 
 Decal *Decal_new(const char *className, Instance *parent);

@@ -5,6 +5,10 @@
 
 typedef struct BevelMesh {
     DataModelMesh datamodelmesh;
+
+    float Bevel;
+    float BevelRoundness;
+    float Bulge;
 } BevelMesh;
 
 BevelMesh *BevelMesh_new(const char *className, Instance *parent);

@@ -300,12 +300,15 @@ static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChu
     {
         SerializeInstance *sInst = &(instChunk.serializeInstances[i]);
         Instance *inst = instChunk.instances[i];
+        if (!inst) continue;
+        bool serialized = false;
         for (int j = 0; j < sInst->serializationCount; j++)
         {
             Serialization s = sInst->serializations[j];
             if (!strncmp(s.name, chunk.Name, chunk.nameLength) ||
                 (!strcmp(s.name, "Color") && !strncmp(chunk.Name, "Color3uint8", chunk.nameLength)))
             {
+                serialized = true;
                 if (chunk.ValueType == 0x01)
                 {
                     char **val = s.val;
@@ -359,6 +362,10 @@ static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChu
                     Part_SetShape(inst, ((Part*)inst)->shape);
                 }
             }
+        }
+        if (!serialized)
+        {
+            FIXME("Not serialized: ClassName %s, Property %s.\n", inst->ClassName, chunk.Name);
         }
     }
 }

@@ -33,4 +33,6 @@ void serialize_DataModelMesh(DataModelMesh *datamodelmesh, SerializeInstance *in
     serialize_atomic(Vector3, datamodelmesh, Offset);
     serialize_atomic(Vector3, datamodelmesh, Scale);
     serialize_atomic(Vector3, datamodelmesh, VertexColor);
+    serialize_atomic(token, datamodelmesh, LODX);
+    serialize_atomic(token, datamodelmesh, LODY);
 }

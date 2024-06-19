@@ -98,6 +98,8 @@ instance_SOURCES+=src/basescript.c
 instance_SOURCES+=src/script.c
 instance_SOURCES+=src/specialmesh.c
 instance_SOURCES+=src/filemesh.c
+instance_SOURCES+=src/decal.c
+instance_SOURCES+=src/faceinstance.c
 
 rbxmx_SOURCES+=src/filetypes/rbxlx.c
 rbxmx_SOURCES+=src/filetypes/rbxmx.c

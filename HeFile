@@ -5,7 +5,7 @@ UseRaylib True
 ExtraCFlag -Iinclude
 ExtraCFlag -Ilib/xml/include
 ExtraCFlag -Wno-incompatible-pointer-types
-ExtraCFlag -Wl,-rdynamic
+ExtraCFlag -rdynamic
 
 Dependency xml
 Dependency lz4
@@ -43,6 +43,8 @@ Source basescript.c
 Source script.c
 Source specialmesh.c
 Source filemesh.c
+Source decal.c
+Source faceinstance.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c
