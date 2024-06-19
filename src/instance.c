@@ -121,6 +121,8 @@ bool ClassName_IsA(const char *className1, const char *className)
     else if (!strcmp(className, "FileMesh")) return ClassName_IsA(className1, "SpecialMesh");
     else if (!strcmp(className, "BevelMesh")) return ClassName_IsA(className1, "BlockMesh") || ClassName_IsA(className1, "CylinderMesh");
 
+    else if (!strcmp(className, "FaceInstance")) return ClassName_IsA(className1, "Decal");
+
     return false;
 }
 
@@ -257,7 +259,7 @@ void Instance_SetParent(Instance *this, Instance *parent)
 
 Instance *Instance_dynNew(const char *className, Instance *parent)
 {
-    printf("Instance_dynNew(%s, %p)\n", className, parent);
+    //printf("Instance_dynNew(%s, %p)\n", className, parent);
 
     void *ourselves = dlopen(NULL, RTLD_LAZY);
 
@@ -280,7 +282,7 @@ Instance *Instance_dynNew(const char *className, Instance *parent)
 
 void Instance_Serialize(Instance *obj, SerializeInstance *inst)
 {
-    printf("Instance_Serialize(%p, %p)\n", obj, inst);
+    //printf("Instance_Serialize(%p, %p)\n", obj, inst);
 
     void *ourselves = dlopen(NULL, RTLD_LAZY);
 

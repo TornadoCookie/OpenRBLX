@@ -10,6 +10,7 @@
 #include "serialize.h"
 #include <string.h>
 #include "datamodelmesh.h"
+#include "decal.h"
 
 DEFAULT_DEBUG_CHANNEL(part)
 
@@ -146,6 +147,10 @@ void part_draw(Part *this)
         if (Instance_IsA(children[i], "DataModelMesh"))
         {
             meshOverridden = true;
+        }
+        if (Instance_IsA(children[i], "Decal"))
+        {
+            Decal *decal = children[i];
         }
     }
 
