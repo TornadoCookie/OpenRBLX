@@ -46,6 +46,7 @@ static int luau_wait(lua_State *L)
 }
 
 static int luau_Instance_FindFirstChild(lua_State *L);
+static void luau_pushinstance(lua_State *L, Instance *inst);
 
 static int luau_Instance__index(lua_State *L)
 {
@@ -55,34 +56,26 @@ static int luau_Instance__index(lua_State *L)
     lua_pop(L, 1);
 
     const char *name = lua_tostring(L, 2);
-    printf("Find child with name %s.\n", name);
     Instance *child = Instance_FindFirstChild(inst, name, false);
 
     if (child)
     {
-        lua_newtable(L);
-
-        lua_newtable(L);
-    
-        lua_pushstring(L, "__index");
-        lua_pushcfunction(L, luau_Instance__index);
-        lua_settable(L, -3);
-    
-        lua_setmetatable(L, -2);
-    
-        lua_pushstring(L, "FindFirstChild");
-        lua_pushcfunction(L, luau_Instance_FindFirstChild);
-        lua_settable(L, -3);
-        
-        lua_pushstring(L, "__inst_ptr");
-        lua_pushlightuserdata(L, child);
-        lua_settable(L, -3);
+        luau_pushinstance(L, child);
 
         return 1;
     }
 
     lua_rawget(L, 1);
+    if (!lua_isnil(L, -1))
+        return 1;
 
+    if (!strcmp(name, "Parent"))
+    {
+        luau_pushinstance(L, inst->Parent);
+        return 1;
+    }
+
+    lua_pushnil(L);
     return 1;
 }
 
@@ -114,13 +107,33 @@ static int luau_Instance_FindFirstChild(lua_State *L)
     return 1;
 }
 
-static void init_lua_state(lua_State *L)
+static int luau_Instance_GetChildren(lua_State *L)
 {
-    luaL_openlibs(L);
+    if (lua_gettop(L) != 1)
+    {
+        lua_pushstring(L, "Expected 1 argument.\n");
+        lua_error(L);
+    }
 
-    lua_pushcfunction(L, luau_wait);
-    lua_setglobal(L, "wait");
+    lua_pushstring(L, "__inst_ptr");
+    lua_rawget(L, 1);
 
+    Instance *inst = lua_touserdata(L, -1);
+
+    lua_newtable(L);
+
+    for (int i = 0; i < inst->childCount; i++)
+    {
+        lua_pushstring(L, inst->children[i]->Name);
+        luau_pushinstance(L, inst->children[i]);
+        lua_settable(L, -3);
+    }
+
+    return 1;
+}
+
+static void luau_pushinstance(lua_State *L, Instance *inst)
+{
     lua_newtable(L);
 
     lua_newtable(L);
@@ -134,30 +147,49 @@ static void init_lua_state(lua_State *L)
     lua_pushstring(L, "FindFirstChild");
     lua_pushcfunction(L, luau_Instance_FindFirstChild);
     lua_settable(L, -3);
+
+    lua_pushstring(L, "GetChildren");
+    lua_pushcfunction(L, luau_Instance_GetChildren);
+    lua_settable(L, -3);
     
     lua_pushstring(L, "__inst_ptr");
-    lua_pushlightuserdata(L, GetDataModel()->Workspace);
+    lua_pushlightuserdata(L, inst);
     lua_settable(L, -3);
+}
 
+static void init_lua_state(lua_State *L, Script *script)
+{
+    luaL_openlibs(L);
+
+    lua_pushcfunction(L, luau_wait);
+    lua_setglobal(L, "wait");
+
+    luau_pushinstance(L, GetDataModel()->Workspace);
     lua_setglobal(L, "Workspace");
+
+    luau_pushinstance(L, script);
+    lua_setglobal(L, "script");
+
+    luau_pushinstance(L, GetDataModel());
+    lua_setglobal(L, "game");
 }
 
 static void *run_script(Script *script)
 {
     lua_State *L = luaL_newstate();
 
-    init_lua_state(L);
+    init_lua_state(L, script);
 
     printf("Running script source: \"%s\"\n", script->Source);
 
-    if (luaL_loadbuffer(L, script->Source, script->sourceLength, Instance_GetFullName(script)))
+    if (luaL_loadbuffer(L, script->Source, script->sourceLength, script->basescript.luasourcecontainer.instance.Name))
     {
-        printf("Error: %s: %s\n", script->basescript.luasourcecontainer.instance.Name, lua_tostring(L, -1));
+        printf("Error: %s\n", lua_tostring(L, -1));
         goto end;
     }
     if (lua_pcall(L, 0, 0, 0))
     {
-        printf("Error: %s: %s\n", script->basescript.luasourcecontainer.instance.Name, lua_tostring(L, -1));
+        printf("Error: %s\n", lua_tostring(L, -1));
         goto end;
     }
     
@@ -183,5 +215,5 @@ static void run_scripts(Instance *inst)
 
 void ServerScriptService_RunScripts(ServerScriptService *this)
 {
-    run_scripts(this);
+    run_scripts(GetDataModel());
 }
