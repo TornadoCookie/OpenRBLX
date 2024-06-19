@@ -48,6 +48,56 @@ static int luau_wait(lua_State *L)
 static int luau_Instance_FindFirstChild(lua_State *L);
 static void luau_pushinstance(lua_State *L, Instance *inst);
 
+static void luau_pushvector3(lua_State *L, Vector3 v)
+{
+    lua_newtable(L);
+
+    lua_pushstring(L, "X");
+    lua_pushnumber(L, v.x);
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "Y");
+    lua_pushnumber(L, v.y);
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "Z");
+    lua_pushnumber(L, v.z);
+    lua_settable(L, -3);
+}
+
+static void luau_pushcframe(lua_State *L, CFrame cf)
+{
+    lua_newtable(L);
+
+    lua_pushstring(L, "X");
+    lua_pushnumber(L, cf.X);
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "Y");
+    lua_pushnumber(L, cf.Y);
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "Z");
+    lua_pushnumber(L, cf.Z);
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "LookVector");
+    luau_pushvector3(L, (Vector3){-cf.R02, -cf.R12, -cf.R22});
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "lookVector");
+    luau_pushvector3(L, (Vector3){-cf.R02, -cf.R12, -cf.R22});
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "RightVector");
+    luau_pushvector3(L, (Vector3){cf.R00, cf.R10, cf.R20});
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "UpVector");
+    luau_pushvector3(L, (Vector3){cf.R01, cf.R11, cf.R21});
+    lua_settable(L, -3);
+}
+
 static int luau_Instance__index(lua_State *L)
 {
     lua_pushstring(L, "__inst_ptr");
@@ -73,6 +123,16 @@ static int luau_Instance__index(lua_State *L)
     {
         luau_pushinstance(L, inst->Parent);
         return 1;
+    }
+
+    if (Instance_IsA(inst, "BasePart"))
+    {
+        BasePart *basepart = inst;
+        if (!strcmp(name, "CFrame"))
+        {
+            luau_pushcframe(L, basepart->CFrame);
+            return 1;
+        }
     }
 
     lua_pushnil(L);
@@ -132,8 +192,29 @@ static int luau_Instance_GetChildren(lua_State *L)
     return 1;
 }
 
+static int luau_ServiceProvider_GetService(lua_State *L)
+{
+    lua_pushstring(L, "__inst_ptr");
+    lua_gettable(L, 1);
+
+    ServiceProvider *serviceprovider = lua_touserdata(L, -1);
+    const char *serviceName = lua_tostring(L, 2);
+
+    Instance *service = ServiceProvider_GetService(serviceprovider, serviceName);
+
+    luau_pushinstance(L, service);
+
+    return 1;
+}
+
 static void luau_pushinstance(lua_State *L, Instance *inst)
 {
+    if (!inst)
+    {
+        lua_pushnil(L);
+        return;
+    }
+
     lua_newtable(L);
 
     lua_newtable(L);
@@ -155,6 +236,13 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
     lua_pushstring(L, "__inst_ptr");
     lua_pushlightuserdata(L, inst);
     lua_settable(L, -3);
+
+    if (Instance_IsA(inst, "ServiceProvider"))
+    {
+        lua_pushstring(L, "GetService");
+        lua_pushcfunction(L, luau_ServiceProvider_GetService);
+        lua_settable(L, -3);
+    }
 }
 
 static void init_lua_state(lua_State *L, Script *script)
@@ -172,6 +260,9 @@ static void init_lua_state(lua_State *L, Script *script)
 
     luau_pushinstance(L, GetDataModel());
     lua_setglobal(L, "game");
+
+    lua_newtable(L);
+    lua_setglobal(L, "Vector3");
 }
 
 static void *run_script(Script *script)
@@ -180,7 +271,7 @@ static void *run_script(Script *script)
 
     init_lua_state(L, script);
 
-    printf("Running script source: \"%s\"\n", script->Source);
+    printf("Running script source [%s]: \"%s\"\n", script->basescript.luasourcecontainer.instance.Name, script->Source);
 
     if (luaL_loadbuffer(L, script->Source, script->sourceLength, script->basescript.luasourcecontainer.instance.Name))
     {
