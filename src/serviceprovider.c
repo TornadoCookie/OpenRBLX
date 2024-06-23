@@ -19,5 +19,12 @@ ServiceProvider *ServiceProvider_new(const char *className, Instance *parent)
 
 Instance *ServiceProvider_GetService(ServiceProvider *this, const char *className)
 {
-    return Instance_FindFirstChildOfClass(this, className);
+    Instance *ret = Instance_FindFirstChildOfClass(this, className);
+
+    if (!ret)
+    {
+        ret = Instance_dynNew(className, this);
+    }
+
+    return ret;
 }
