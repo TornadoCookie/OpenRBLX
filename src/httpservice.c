@@ -1,4 +1,5 @@
 #include "httpservice.h"
+#include <string.h>
 
 #include "debug.h"
 DEFAULT_DEBUG_CHANNEL(httpservice)
@@ -51,7 +52,7 @@ const char *HttpService_GetAsync(HttpService *this, const char *url)
 
     curl_easy_setopt(this->curl, CURLOPT_URL, url);
     curl_easy_setopt(this->curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
-    curl_east_setopt(this->curl, CURLOPT_WRITEDATA, &chunk);
+    curl_easy_setopt(this->curl, CURLOPT_WRITEDATA, &chunk);
 
     CURLcode res = curl_easy_perform(this->curl);
 

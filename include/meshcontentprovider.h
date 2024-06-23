@@ -18,5 +18,6 @@ typedef struct MeshContentProvider {
 MeshContentProvider *MeshContentProvider_new(const char *className, Instance *parent);
 
 Mesh MeshContentProvider_GetPartMesh(MeshContentProvider *this, Shape shape);
+Mesh MeshContentProvider_GetFileMesh(MeshContentProvider *this, const char *content);
 
 #endif
