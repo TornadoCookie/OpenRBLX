@@ -105,6 +105,7 @@ instance_SOURCES+=src/decal.c
 instance_SOURCES+=src/faceinstance.c
 instance_SOURCES+=src/../lib/cJSON/src/cJSON.c
 instance_SOURCES+=src/httpservice.c
+instance_SOURCES+=src/numbervalue.c
 
 rbxmx_SOURCES+=src/filetypes/rbxlx.c
 rbxmx_SOURCES+=src/filetypes/rbxmx.c

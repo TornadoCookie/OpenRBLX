@@ -49,6 +49,7 @@ Source decal.c
 Source faceinstance.c
 Source ../lib/cJSON/src/cJSON.c
 Source httpservice.c
+Source numbervalue.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c
