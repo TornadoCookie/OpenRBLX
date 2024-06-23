@@ -54,11 +54,14 @@ CFLAGS+=-Ilib/lz4/src
 CFLAGS+=-Ilib/lz4/include
 CFLAGS+=-Ilib/minilua/src
 CFLAGS+=-Ilib/minilua/include
+CFLAGS+=-Ilib/cJSON/src
+CFLAGS+=-Ilib/cJSON/include
 CFLAGS+=-D PLATFORM=\"$(PLATFORM)\"
 CFLAGS+=-Iinclude
 CFLAGS+=-Ilib/xml/include
 CFLAGS+=-Wno-incompatible-pointer-types
 CFLAGS+=-rdynamic
+CFLAGS+=-lcurl
 
 CFLAGS+=-Ilib/$(RAYLIB_NAME)/include
 CFLAGS+=-Wl,-rpath,lib/$(RAYLIB_NAME)/lib
@@ -100,6 +103,8 @@ instance_SOURCES+=src/specialmesh.c
 instance_SOURCES+=src/filemesh.c
 instance_SOURCES+=src/decal.c
 instance_SOURCES+=src/faceinstance.c
+instance_SOURCES+=src/../lib/cJSON/src/cJSON.c
+instance_SOURCES+=src/httpservice.c
 
 rbxmx_SOURCES+=src/filetypes/rbxlx.c
 rbxmx_SOURCES+=src/filetypes/rbxmx.c

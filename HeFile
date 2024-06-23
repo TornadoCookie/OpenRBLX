@@ -6,10 +6,12 @@ ExtraCFlag -Iinclude
 ExtraCFlag -Ilib/xml/include
 ExtraCFlag -Wno-incompatible-pointer-types
 ExtraCFlag -rdynamic
+ExtraCFlag -lcurl
 
 Dependency xml
 Dependency lz4
 Dependency minilua
+Dependency cJSON
 
 SourceGroup instance
 Source datamodel.c
@@ -45,6 +47,8 @@ Source specialmesh.c
 Source filemesh.c
 Source decal.c
 Source faceinstance.c
+Source ../lib/cJSON/src/cJSON.c
+Source httpservice.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c
@@ -54,7 +58,6 @@ Source ../lib/xml/src/xml.c
 SourceGroup rbxm
 Source filetypes/rbxm.c
 Source ../lib/lz4/src/lz4.c
-
 
 Program test_rbxmx
 Source ../tests/test_rbxmx.c
