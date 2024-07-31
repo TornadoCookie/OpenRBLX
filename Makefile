@@ -1,3 +1,5 @@
+# Generated using Helium v1.3.2 (https://github.com/tornadocookie/he)
+
 PLATFORM?=linux64-debug
 DISTDIR?=.
 
@@ -41,7 +43,15 @@ endif
 PROGRAMS=test_rbxmx test_rbxlx studio test_rbxm test_rbxl
 LIBRARIES=
 
-all: $(DISTDIR) $(foreach prog, $(PROGRAMS), $(DISTDIR)/$(prog)$(EXEC_EXTENSION)) $(foreach lib, $(LIBRARIES), $(DISTDIR)/$(lib)$(LIB_EXTENSION))
+all: $(DISTDIR) $(foreach prog, $(PROGRAMS), $(DISTDIR)/$(prog)$(EXEC_EXTENSION)) $(foreach lib, $(LIBRARIES), $(DISTDIR)/$(lib)$(LIB_EXTENSION)) deps
+
+ifneq ($(DISTDIR), .)
+deps:
+	mkdir -p $(DISTDIR)/lib
+	if [ -d lib/$(RAYLIB_NAME) ]; then cp -r lib/$(RAYLIB_NAME) $(DISTDIR)/lib/$(RAYLIB_NAME); fi
+else
+deps:
+endif
 
 $(DISTDIR):
 	mkdir -p $@
@@ -106,6 +116,7 @@ instance_SOURCES+=src/faceinstance.c
 instance_SOURCES+=src/../lib/cJSON/src/cJSON.c
 instance_SOURCES+=src/httpservice.c
 instance_SOURCES+=src/numbervalue.c
+instance_SOURCES+=src/folder.c
 
 rbxmx_SOURCES+=src/filetypes/rbxlx.c
 rbxmx_SOURCES+=src/filetypes/rbxmx.c
@@ -156,3 +167,8 @@ clean:
 	rm -f $(DISTDIR)/studio$(EXEC_EXTENSION)
 	rm -f $(DISTDIR)/test_rbxm$(EXEC_EXTENSION)
 	rm -f $(DISTDIR)/test_rbxl$(EXEC_EXTENSION)
+
+all_dist:
+	DISTDIR=$(DISTDIR)/dist/linux64 PLATFORM=linux64 $(MAKE)
+	DISTDIR=$(DISTDIR)/dist/linux64-debug PLATFORM=linux64-debug $(MAKE)
+	DISTDIR=$(DISTDIR)/dist/win64 PLATFORM=win64 $(MAKE)

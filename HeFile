@@ -50,6 +50,7 @@ Source faceinstance.c
 Source ../lib/cJSON/src/cJSON.c
 Source httpservice.c
 Source numbervalue.c
+Source folder.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c
