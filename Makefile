@@ -40,7 +40,7 @@ CFLAGS+=-D EXEC_EXTENSION=\".exe\"
 CFLAGS+=-D LIB_EXTENSION=\".dll\"
 endif
 
-PROGRAMS=test_rbxmx test_rbxlx studio test_rbxm test_rbxl
+PROGRAMS=test_rbxmx test_rbxlx studio test_rbxm test_rbxl test_rbxmesh
 LIBRARIES=
 
 all: $(DISTDIR) $(foreach prog, $(PROGRAMS), $(DISTDIR)/$(prog)$(EXEC_EXTENSION)) $(foreach lib, $(LIBRARIES), $(DISTDIR)/$(lib)$(LIB_EXTENSION)) deps
@@ -48,7 +48,7 @@ all: $(DISTDIR) $(foreach prog, $(PROGRAMS), $(DISTDIR)/$(prog)$(EXEC_EXTENSION)
 ifneq ($(DISTDIR), .)
 deps:
 	mkdir -p $(DISTDIR)/lib
-	if [ -d lib/$(RAYLIB_NAME) ]; then cp -r lib/$(RAYLIB_NAME) $(DISTDIR)/lib/$(RAYLIB_NAME); fi
+	if [ -d lib/$(RAYLIB_NAME) ]; then cp -r lib/$(RAYLIB_NAME) $(DISTDIR)/lib; fi
 else
 deps:
 endif
@@ -117,6 +117,8 @@ instance_SOURCES+=src/../lib/cJSON/src/cJSON.c
 instance_SOURCES+=src/httpservice.c
 instance_SOURCES+=src/numbervalue.c
 instance_SOURCES+=src/folder.c
+instance_SOURCES+=src/trianglemeshpart.c
+instance_SOURCES+=src/meshpart.c
 
 rbxmx_SOURCES+=src/filetypes/rbxlx.c
 rbxmx_SOURCES+=src/filetypes/rbxmx.c
@@ -161,12 +163,19 @@ test_rbxl_SOURCES+=$(rbxm_SOURCES)
 $(DISTDIR)/test_rbxl$(EXEC_EXTENSION): $(test_rbxl_SOURCES)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
+test_rbxmesh_SOURCES+=src/../tests/test_rbxmesh.c
+test_rbxmesh_SOURCES+=$(instance_SOURCES)
+
+$(DISTDIR)/test_rbxmesh$(EXEC_EXTENSION): $(test_rbxmesh_SOURCES)
+	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+
 clean:
 	rm -f $(DISTDIR)/test_rbxmx$(EXEC_EXTENSION)
 	rm -f $(DISTDIR)/test_rbxlx$(EXEC_EXTENSION)
 	rm -f $(DISTDIR)/studio$(EXEC_EXTENSION)
 	rm -f $(DISTDIR)/test_rbxm$(EXEC_EXTENSION)
 	rm -f $(DISTDIR)/test_rbxl$(EXEC_EXTENSION)
+	rm -f $(DISTDIR)/test_rbxmesh$(EXEC_EXTENSION)
 
 all_dist:
 	DISTDIR=$(DISTDIR)/dist/linux64 PLATFORM=linux64 $(MAKE)

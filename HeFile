@@ -51,6 +51,8 @@ Source ../lib/cJSON/src/cJSON.c
 Source httpservice.c
 Source numbervalue.c
 Source folder.c
+Source trianglemeshpart.c
+Source meshpart.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c
@@ -87,3 +89,6 @@ Source ../tests/test_rbxl.c
 UseSourceGroup instance
 UseSourceGroup rbxm
 
+Program test_rbxmesh
+Source ../tests/test_rbxmesh.c
+UseSourceGroup instance
