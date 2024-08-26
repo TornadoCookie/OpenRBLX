@@ -1,7 +1,7 @@
-# Generated using Helium v1.3.2 (https://github.com/tornadocookie/he)
+# Generated using Helium v2.0.0 (https://github.com/tornadocookie/he)
 
 PLATFORM?=linux64-debug
-DISTDIR?=.
+DISTDIR?=build
 
 .PHONY: all
 
@@ -11,6 +11,7 @@ ifeq ($(PLATFORM), linux64)
 EXEC_EXTENSION=
 LIB_EXTENSION=.so
 CC=gcc
+CXX=g++
 RAYLIB_DLL=-lraylib
 CFLAGS+=-O2
 CFLAGS+=-D RELEASE
@@ -22,6 +23,7 @@ ifeq ($(PLATFORM), linux64-debug)
 EXEC_EXTENSION=-debug
 LIB_EXTENSION=-debug.so
 CC=gcc
+CXX=g++
 RAYLIB_DLL=-lraylib
 CFLAGS+=-g
 CFLAGS+=-D DEBUG
@@ -33,6 +35,7 @@ ifeq ($(PLATFORM), win64)
 EXEC_EXTENSION=.exe
 LIB_EXTENSION=.dll
 CC=x86_64-w64-mingw32-gcc
+CXX=x86_64-w64-mingw32-g++
 RAYLIB_DLL=-lraylibdll
 CFLAGS+=-O2
 CFLAGS+=-D RELEASE
@@ -43,7 +46,7 @@ endif
 PROGRAMS=test_rbxmx test_rbxlx studio test_rbxm test_rbxl test_rbxmesh
 LIBRARIES=
 
-all: $(DISTDIR) $(foreach prog, $(PROGRAMS), $(DISTDIR)/$(prog)$(EXEC_EXTENSION)) $(foreach lib, $(LIBRARIES), $(DISTDIR)/$(lib)$(LIB_EXTENSION)) deps
+all: $(DISTDIR) $(DISTDIR)/src $(DISTDIR)/src/../lib/cJSON/src $(DISTDIR)/src/filetypes $(DISTDIR)/src/../lib/xml/src $(DISTDIR)/src/../lib/lz4/src $(DISTDIR)/src/../tests $(DISTDIR)/src/../studio $(foreach prog, $(PROGRAMS), $(DISTDIR)/$(prog)$(EXEC_EXTENSION)) $(foreach lib, $(LIBRARIES), $(DISTDIR)/$(lib)$(LIB_EXTENSION)) deps
 
 ifneq ($(DISTDIR), .)
 deps:
@@ -52,6 +55,27 @@ deps:
 else
 deps:
 endif
+
+$(DISTDIR)/src:
+	mkdir -p $@
+
+$(DISTDIR)/src/../lib/cJSON/src:
+	mkdir -p $@
+
+$(DISTDIR)/src/filetypes:
+	mkdir -p $@
+
+$(DISTDIR)/src/../lib/xml/src:
+	mkdir -p $@
+
+$(DISTDIR)/src/../lib/lz4/src:
+	mkdir -p $@
+
+$(DISTDIR)/src/../tests:
+	mkdir -p $@
+
+$(DISTDIR)/src/../studio:
+	mkdir -p $@
 
 $(DISTDIR):
 	mkdir -p $@
@@ -66,115 +90,171 @@ CFLAGS+=-Ilib/minilua/src
 CFLAGS+=-Ilib/minilua/include
 CFLAGS+=-Ilib/cJSON/src
 CFLAGS+=-Ilib/cJSON/include
+CFLAGS+=-Ilib/mini_gzip/src
+CFLAGS+=-Ilib/mini_gzip/include
 CFLAGS+=-D PLATFORM=\"$(PLATFORM)\"
 CFLAGS+=-Iinclude
 CFLAGS+=-Ilib/xml/include
 CFLAGS+=-Wno-incompatible-pointer-types
-CFLAGS+=-rdynamic
-CFLAGS+=-lcurl
+
+LDFLAGS+=-rdynamic
+LDFLAGS+=-lcurl
 
 CFLAGS+=-Ilib/$(RAYLIB_NAME)/include
-CFLAGS+=-Wl,-rpath,lib/$(RAYLIB_NAME)/lib
 
 LDFLAGS+=-lm
 LDFLAGS+=-Llib/$(RAYLIB_NAME)/lib
 LDFLAGS+=$(RAYLIB_DLL)
+LDFLAGS+=-Wl,-rpath,lib/$(RAYLIB_NAME)/lib
 
-instance_SOURCES+=src/datamodel.c
-instance_SOURCES+=src/instance.c
-instance_SOURCES+=src/rbxscriptsignal.c
-instance_SOURCES+=src/workspace.c
-instance_SOURCES+=src/serviceprovider.c
-instance_SOURCES+=src/rootinstance.c
-instance_SOURCES+=src/model.c
-instance_SOURCES+=src/pvinstance.c
-instance_SOURCES+=src/trusspart.c
-instance_SOURCES+=src/basepart.c
-instance_SOURCES+=src/part.c
-instance_SOURCES+=src/formfactorpart.c
-instance_SOURCES+=src/camera.c
-instance_SOURCES+=src/brickcolor.c
-instance_SOURCES+=src/meshcontentprovider.c
-instance_SOURCES+=src/cacheablecontentprovider.c
-instance_SOURCES+=src/physicalcharacter.c
-instance_SOURCES+=src/lighting.c
-instance_SOURCES+=src/wedgepart.c
-instance_SOURCES+=src/valuebase.c
-instance_SOURCES+=src/vector3value.c
-instance_SOURCES+=src/cylindermesh.c
-instance_SOURCES+=src/bevelmesh.c
-instance_SOURCES+=src/datamodelmesh.c
-instance_SOURCES+=src/runservice.c
-instance_SOURCES+=src/serverscriptservice.c
-instance_SOURCES+=src/luasourcecontainer.c
-instance_SOURCES+=src/basescript.c
-instance_SOURCES+=src/script.c
-instance_SOURCES+=src/specialmesh.c
-instance_SOURCES+=src/filemesh.c
-instance_SOURCES+=src/decal.c
-instance_SOURCES+=src/faceinstance.c
-instance_SOURCES+=src/../lib/cJSON/src/cJSON.c
-instance_SOURCES+=src/httpservice.c
-instance_SOURCES+=src/numbervalue.c
-instance_SOURCES+=src/folder.c
-instance_SOURCES+=src/trianglemeshpart.c
-instance_SOURCES+=src/meshpart.c
+instance_SOURCES+=$(DISTDIR)/src/datamodel.o
+instance_SOURCES+=$(DISTDIR)/src/instance.o
+instance_SOURCES+=$(DISTDIR)/src/rbxscriptsignal.o
+instance_SOURCES+=$(DISTDIR)/src/workspace.o
+instance_SOURCES+=$(DISTDIR)/src/serviceprovider.o
+instance_SOURCES+=$(DISTDIR)/src/rootinstance.o
+instance_SOURCES+=$(DISTDIR)/src/model.o
+instance_SOURCES+=$(DISTDIR)/src/pvinstance.o
+instance_SOURCES+=$(DISTDIR)/src/trusspart.o
+instance_SOURCES+=$(DISTDIR)/src/basepart.o
+instance_SOURCES+=$(DISTDIR)/src/part.o
+instance_SOURCES+=$(DISTDIR)/src/formfactorpart.o
+instance_SOURCES+=$(DISTDIR)/src/camera.o
+instance_SOURCES+=$(DISTDIR)/src/brickcolor.o
+instance_SOURCES+=$(DISTDIR)/src/meshcontentprovider.o
+instance_SOURCES+=$(DISTDIR)/src/cacheablecontentprovider.o
+instance_SOURCES+=$(DISTDIR)/src/physicalcharacter.o
+instance_SOURCES+=$(DISTDIR)/src/lighting.o
+instance_SOURCES+=$(DISTDIR)/src/wedgepart.o
+instance_SOURCES+=$(DISTDIR)/src/valuebase.o
+instance_SOURCES+=$(DISTDIR)/src/vector3value.o
+instance_SOURCES+=$(DISTDIR)/src/cylindermesh.o
+instance_SOURCES+=$(DISTDIR)/src/bevelmesh.o
+instance_SOURCES+=$(DISTDIR)/src/datamodelmesh.o
+instance_SOURCES+=$(DISTDIR)/src/runservice.o
+instance_SOURCES+=$(DISTDIR)/src/serverscriptservice.o
+instance_SOURCES+=$(DISTDIR)/src/luasourcecontainer.o
+instance_SOURCES+=$(DISTDIR)/src/basescript.o
+instance_SOURCES+=$(DISTDIR)/src/script.o
+instance_SOURCES+=$(DISTDIR)/src/specialmesh.o
+instance_SOURCES+=$(DISTDIR)/src/filemesh.o
+instance_SOURCES+=$(DISTDIR)/src/decal.o
+instance_SOURCES+=$(DISTDIR)/src/faceinstance.o
+instance_SOURCES+=$(DISTDIR)/src/../lib/cJSON/src/cJSON.o
+instance_SOURCES+=$(DISTDIR)/src/httpservice.o
+instance_SOURCES+=$(DISTDIR)/src/numbervalue.o
+instance_SOURCES+=$(DISTDIR)/src/folder.o
+instance_SOURCES+=$(DISTDIR)/src/trianglemeshpart.o
+instance_SOURCES+=$(DISTDIR)/src/meshpart.o
 
-rbxmx_SOURCES+=src/filetypes/rbxlx.c
-rbxmx_SOURCES+=src/filetypes/rbxmx.c
-rbxmx_SOURCES+=src/../lib/xml/src/xml.c
+rbxmx_SOURCES+=$(DISTDIR)/src/filetypes/rbxlx.o
+rbxmx_SOURCES+=$(DISTDIR)/src/filetypes/rbxmx.o
+rbxmx_SOURCES+=$(DISTDIR)/src/../lib/xml/src/xml.o
 
-rbxm_SOURCES+=src/filetypes/rbxm.c
-rbxm_SOURCES+=src/../lib/lz4/src/lz4.c
+rbxm_SOURCES+=$(DISTDIR)/src/filetypes/rbxm.o
+rbxm_SOURCES+=$(DISTDIR)/src/../lib/lz4/src/lz4.o
 
-test_rbxmx_SOURCES+=src/../tests/test_rbxmx.c
+test_rbxmx_SOURCES+=$(DISTDIR)/src/../tests/test_rbxmx.o
 test_rbxmx_SOURCES+=$(instance_SOURCES)
 test_rbxmx_SOURCES+=$(rbxmx_SOURCES)
 
 $(DISTDIR)/test_rbxmx$(EXEC_EXTENSION): $(test_rbxmx_SOURCES)
-	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+	$(CC) -o $@ $^ $(LDFLAGS)
 
-test_rbxlx_SOURCES+=src/../tests/test_rbxlx.c
+test_rbxlx_SOURCES+=$(DISTDIR)/src/../tests/test_rbxlx.o
 test_rbxlx_SOURCES+=$(instance_SOURCES)
 test_rbxlx_SOURCES+=$(rbxmx_SOURCES)
 
 $(DISTDIR)/test_rbxlx$(EXEC_EXTENSION): $(test_rbxlx_SOURCES)
-	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+	$(CC) -o $@ $^ $(LDFLAGS)
 
-studio_SOURCES+=src/../studio/studio.c
+studio_SOURCES+=$(DISTDIR)/src/../studio/studio.o
 studio_SOURCES+=$(instance_SOURCES)
 studio_SOURCES+=$(rbxmx_SOURCES)
 studio_SOURCES+=$(rbxm_SOURCES)
 
 $(DISTDIR)/studio$(EXEC_EXTENSION): $(studio_SOURCES)
-	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+	$(CC) -o $@ $^ $(LDFLAGS)
 
-test_rbxm_SOURCES+=src/../tests/test_rbxm.c
+test_rbxm_SOURCES+=$(DISTDIR)/src/../tests/test_rbxm.o
 test_rbxm_SOURCES+=$(instance_SOURCES)
 test_rbxm_SOURCES+=$(rbxm_SOURCES)
 
 $(DISTDIR)/test_rbxm$(EXEC_EXTENSION): $(test_rbxm_SOURCES)
-	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+	$(CC) -o $@ $^ $(LDFLAGS)
 
-test_rbxl_SOURCES+=src/../tests/test_rbxl.c
+test_rbxl_SOURCES+=$(DISTDIR)/src/../tests/test_rbxl.o
 test_rbxl_SOURCES+=$(instance_SOURCES)
 test_rbxl_SOURCES+=$(rbxm_SOURCES)
 
 $(DISTDIR)/test_rbxl$(EXEC_EXTENSION): $(test_rbxl_SOURCES)
-	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+	$(CC) -o $@ $^ $(LDFLAGS)
 
-test_rbxmesh_SOURCES+=src/../tests/test_rbxmesh.c
+test_rbxmesh_SOURCES+=$(DISTDIR)/src/../tests/test_rbxmesh.o
 test_rbxmesh_SOURCES+=$(instance_SOURCES)
 
 $(DISTDIR)/test_rbxmesh$(EXEC_EXTENSION): $(test_rbxmesh_SOURCES)
-	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+	$(CC) -o $@ $^ $(LDFLAGS)
+
+$(DISTDIR)/%.o: %.c
+	$(CC) -c $^ $(CFLAGS) -o $@
 
 clean:
+	rm -f $(DISTDIR)/src/datamodel.o
+	rm -f $(DISTDIR)/src/instance.o
+	rm -f $(DISTDIR)/src/rbxscriptsignal.o
+	rm -f $(DISTDIR)/src/workspace.o
+	rm -f $(DISTDIR)/src/serviceprovider.o
+	rm -f $(DISTDIR)/src/rootinstance.o
+	rm -f $(DISTDIR)/src/model.o
+	rm -f $(DISTDIR)/src/pvinstance.o
+	rm -f $(DISTDIR)/src/trusspart.o
+	rm -f $(DISTDIR)/src/basepart.o
+	rm -f $(DISTDIR)/src/part.o
+	rm -f $(DISTDIR)/src/formfactorpart.o
+	rm -f $(DISTDIR)/src/camera.o
+	rm -f $(DISTDIR)/src/brickcolor.o
+	rm -f $(DISTDIR)/src/meshcontentprovider.o
+	rm -f $(DISTDIR)/src/cacheablecontentprovider.o
+	rm -f $(DISTDIR)/src/physicalcharacter.o
+	rm -f $(DISTDIR)/src/lighting.o
+	rm -f $(DISTDIR)/src/wedgepart.o
+	rm -f $(DISTDIR)/src/valuebase.o
+	rm -f $(DISTDIR)/src/vector3value.o
+	rm -f $(DISTDIR)/src/cylindermesh.o
+	rm -f $(DISTDIR)/src/bevelmesh.o
+	rm -f $(DISTDIR)/src/datamodelmesh.o
+	rm -f $(DISTDIR)/src/runservice.o
+	rm -f $(DISTDIR)/src/serverscriptservice.o
+	rm -f $(DISTDIR)/src/luasourcecontainer.o
+	rm -f $(DISTDIR)/src/basescript.o
+	rm -f $(DISTDIR)/src/script.o
+	rm -f $(DISTDIR)/src/specialmesh.o
+	rm -f $(DISTDIR)/src/filemesh.o
+	rm -f $(DISTDIR)/src/decal.o
+	rm -f $(DISTDIR)/src/faceinstance.o
+	rm -f $(DISTDIR)/src/../lib/cJSON/src/cJSON.o
+	rm -f $(DISTDIR)/src/httpservice.o
+	rm -f $(DISTDIR)/src/numbervalue.o
+	rm -f $(DISTDIR)/src/folder.o
+	rm -f $(DISTDIR)/src/trianglemeshpart.o
+	rm -f $(DISTDIR)/src/meshpart.o
+	rm -f $(DISTDIR)/src/filetypes/rbxlx.o
+	rm -f $(DISTDIR)/src/filetypes/rbxmx.o
+	rm -f $(DISTDIR)/src/../lib/xml/src/xml.o
+	rm -f $(DISTDIR)/src/filetypes/rbxm.o
+	rm -f $(DISTDIR)/src/../lib/lz4/src/lz4.o
+	rm -f $(DISTDIR)/src/../tests/test_rbxmx.o
 	rm -f $(DISTDIR)/test_rbxmx$(EXEC_EXTENSION)
+	rm -f $(DISTDIR)/src/../tests/test_rbxlx.o
 	rm -f $(DISTDIR)/test_rbxlx$(EXEC_EXTENSION)
+	rm -f $(DISTDIR)/src/../studio/studio.o
 	rm -f $(DISTDIR)/studio$(EXEC_EXTENSION)
+	rm -f $(DISTDIR)/src/../tests/test_rbxm.o
 	rm -f $(DISTDIR)/test_rbxm$(EXEC_EXTENSION)
+	rm -f $(DISTDIR)/src/../tests/test_rbxl.o
 	rm -f $(DISTDIR)/test_rbxl$(EXEC_EXTENSION)
+	rm -f $(DISTDIR)/src/../tests/test_rbxmesh.o
 	rm -f $(DISTDIR)/test_rbxmesh$(EXEC_EXTENSION)
 
 all_dist:

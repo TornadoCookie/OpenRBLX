@@ -1,17 +1,20 @@
 DefaultPlatform linux64-debug
+DefaultDistDir build
 RaylibVersion 5
 UseRaylib True
 
 ExtraCFlag -Iinclude
 ExtraCFlag -Ilib/xml/include
 ExtraCFlag -Wno-incompatible-pointer-types
-ExtraCFlag -rdynamic
-ExtraCFlag -lcurl
+
+ExtraLDFlag -rdynamic
+ExtraLDFlag -lcurl
 
 Dependency xml
 Dependency lz4
 Dependency minilua
 Dependency cJSON
+Dependency mini_gzip
 
 SourceGroup instance
 Source datamodel.c
