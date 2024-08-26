@@ -365,7 +365,7 @@ static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChu
         }
         if (!serialized)
         {
-            FIXME("Not serialized: ClassName %s, Property %s.\n", inst->ClassName, chunk.Name);
+            FIXME("Not serialized: ClassName %s, Property %.*s", inst->ClassName, chunk.nameLength, chunk.Name);
         }
     }
 }
