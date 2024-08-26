@@ -21,7 +21,7 @@ typedef struct HttpService {
 
 HttpService *HttpService_new(const char *className, Instance *parent);
 
-const char *HttpService_GetAsync(HttpService *this, const char *url);
+const char *HttpService_GetAsync(HttpService *this, const char *url, int *dataSize);
 const char *HttpService_PostAsync(HttpService *this, const char *url, const char *data, HttpContentType contentType);
 
 cJSON *HttpService_JSONDecode(HttpService *this, const char *input);

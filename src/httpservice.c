@@ -1,5 +1,6 @@
 #include "httpservice.h"
 #include <string.h>
+#include <raylib.h>
 
 #include "debug.h"
 DEFAULT_DEBUG_CHANNEL(httpservice)
@@ -44,15 +45,16 @@ WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
   return realsize;
 }
 
-const char *HttpService_GetAsync(HttpService *this, const char *url)
+const char *HttpService_GetAsync(HttpService *this, const char *url, int *dataSize)
 {
-    struct MemoryStruct chunk = { 0 };
+    struct MemoryStruct chunk = { malloc(1), 0 };
 
     this->curl = curl_easy_init();
 
     curl_easy_setopt(this->curl, CURLOPT_URL, url);
     curl_easy_setopt(this->curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
     curl_easy_setopt(this->curl, CURLOPT_WRITEDATA, &chunk);
+    curl_easy_setopt(this->curl, CURLOPT_ACCEPT_ENCODING, "deflate"); // this results in virtually uncompressed data because no server likes deflate
 
     CURLcode res = curl_easy_perform(this->curl);
 
@@ -63,6 +65,8 @@ const char *HttpService_GetAsync(HttpService *this, const char *url)
     }
 
     curl_easy_cleanup(this->curl);
+
+    if (dataSize) *dataSize = chunk.size;
 
     return chunk.memory;
 }
