@@ -16,6 +16,7 @@ MeshPart *MeshPart_new(const char *className, Instance *parent)
     if (parent) Instance_SetParent(newInst, parent);
 
     newInst->meshLoaded = false;
+    newInst->trianglemeshpart.basepart.pvinstance.drawFunc = MeshPart_Draw;
 
     return newInst;
 }

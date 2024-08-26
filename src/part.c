@@ -203,8 +203,6 @@ void serialize_Part(Part *part, SerializeInstance *inst)
 {
     //Part *part = Part_new(NULL);
 
-    printf("serialize_Part\n");
-
     serialize_FormFactorPart(part, inst);
     serialize_atomic(token, part, shape);
 }

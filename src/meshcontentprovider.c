@@ -6,6 +6,7 @@
 #include <string.h>
 #include "httpservice.h"
 #include "datamodel.h"
+#include <mini_gzip.h>
 
 DEFAULT_DEBUG_CHANNEL(meshcontentprovider)
 
@@ -47,12 +48,12 @@ Mesh MeshContentProvider_GetPartMesh(MeshContentProvider *this, Shape shape)
     }
 }
 
-/*
-Mesh LoadMeshFromRobloxFormat(unsigned char *data, int dataSize)
+Mesh LoadMeshFromRobloxFormat(const char *data, int dataSize)
 {
     float version;
-    printf("%s\n", buf);
+    printf("%p: %s\n", data, data);
     sscanf(data, "version %f", &version);
+    data = strchr(data, '\n')+1;
 
     if (version != 1.0f)
     {
@@ -62,8 +63,8 @@ Mesh LoadMeshFromRobloxFormat(unsigned char *data, int dataSize)
 
     Mesh mesh = { 0 };
 
-    fgets(buf, 255, f);
-    sscanf(buf, "%d", &mesh.triangleCount);
+    sscanf(data, "%d", &mesh.triangleCount);
+    data = strchr(data, '\n')+1;
 
     mesh.vertexCount = mesh.triangleCount * 3;
 
@@ -71,30 +72,32 @@ Mesh LoadMeshFromRobloxFormat(unsigned char *data, int dataSize)
     mesh.texcoords = malloc(sizeof(float) * mesh.vertexCount * 2);
     mesh.normals = malloc(sizeof(float) * mesh.vertexCount * 3);
 
-    long offset = ftell(f);
-    fseek(f, 0, SEEK_END);
-    long fsize = ftell(f);
-    fseek(f, offset, SEEK_SET);
+    printf("Version: %f\n", version);
+    printf("Triangle Count: %d\n", mesh.triangleCount);
 
-    char *theRest = malloc(fsize - offset + 1);
-    fgets(theRest, fsize - offset, f);
-    theRest[fsize - offset] = 0;
+    char *theRest = data;
 
     for (int i = 0; i < mesh.vertexCount; i++)
     {
         sscanf(theRest, "[%f,%f,%f]", &(mesh.vertices[i*3]), &(mesh.vertices[i*3+1]), &(mesh.vertices[i*3+2]));
+        printf("Vertex: [%f, %f, %f]\n", mesh.vertices[i*3], mesh.vertices[i*3+1], mesh.vertices[i*3+2]);
         mesh.vertices[i*3] /= 2;
         mesh.vertices[i*3+1] /= 2;
         mesh.vertices[i*3+2] /= 2;
         theRest = strchr(theRest, ']') + 1;
         sscanf(theRest, "[%f,%f,%f]", &(mesh.normals[i*3]), &(mesh.normals[i*3+1]), &(mesh.normals[i*3+2]));
         theRest = strchr(theRest, ']') + 1;
-        sscanf(theRest, "[%f,%f,0]", &(mesh.texcoords[i*2]), &(mesh.texcoords[i*2+1]));
+        float dummyThirdTexCoord;
+        sscanf(theRest, "[%f,%f,%f]", &(mesh.texcoords[i*2]), &(mesh.texcoords[i*2+1]), &dummyThirdTexCoord);
         mesh.texcoords[i*2+1] = 1 - mesh.texcoords[i*2+1];
+        theRest = strchr(theRest, ']') + 1;
     }
 
+
+    UploadMesh(&mesh, false);
+
     return mesh;
-}*/
+}
 
 Mesh MeshContentProvider_GetFileMesh(MeshContentProvider *this, const char *content)
 {
@@ -107,13 +110,35 @@ Mesh MeshContentProvider_GetFileMesh(MeshContentProvider *this, const char *cont
     printf("Our thing is: %s\n", url);
 
     HttpService *httpService = ServiceProvider_GetService(GetDataModel(), "HttpService");
-    const char *data = HttpService_GetAsync(httpService, url);
+    const char *jsonundecoded = HttpService_GetAsync(httpService, url, NULL);
+    cJSON *json = HttpService_JSONDecode(httpService, jsonundecoded);
 
-    //Mesh ret = LoadMeshFromRobloxFormat(data, strlen(data));
+    printf("%s\n", jsonundecoded);
+
+    cJSON *locations = cJSON_GetObjectItem(json, "locations");
+    cJSON *location = cJSON_GetArrayItem(locations, 0);
+    const char *newUrl = cJSON_GetStringValue(cJSON_GetObjectItem(location, "location"));
+    printf("Redirecting to %s.\n", newUrl);
+
+    int dataSize;
+    const char *data = HttpService_GetAsync(httpService, newUrl, &dataSize);
+
+    //struct mini_gzip gz;
+    //mini_gz_start(&gz, dataCompressed, dataCompressedSize);
+
+    //int uncompressSize;
+    //char *data = DecompressData(dataCompressed + 10, dataCompressedSize, &uncompressSize);
+
     
-    printf("Unable to retrieve mesh data.\n");
 
-    //free(data);
+    //printf("%d\n", mini_gz_unpack(&gz, data, gz.data_len));
+    
 
-    return (Mesh){0};
+    Mesh ret = LoadMeshFromRobloxFormat(data, dataSize);
+    
+    //printf("Unable to retrieve mesh data.\n");
+
+    free(data);
+
+    return ret;
 }

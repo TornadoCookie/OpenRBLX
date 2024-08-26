@@ -21,6 +21,7 @@ int main(int argc, char **argv)
     while (!WindowShouldClose())
     {
         BeginDrawing();
+        ClearBackground(SKYBLUE);
         BeginMode3D(game->Workspace->CurrentCamera->camera);
         Camera_Process(game->Workspace->CurrentCamera);
         DrawMesh(mesh, mat, MatrixTranslate(0, 0, 0));
