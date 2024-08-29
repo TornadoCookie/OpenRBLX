@@ -46,6 +46,7 @@ Instance **Instance_GetDescendants(Instance *this, int *childCount);
 Instance *Instance_FindFirstChildOfClass(Instance *this, const char *className);
 
 bool ClassName_IsA(const char *className1, const char *className2);
+int GetInstanceCount(void);
 
 void Instance_SetArchivable(Instance *this, bool archivable);
 void Instance_SetName(Instance *this, const char *name);

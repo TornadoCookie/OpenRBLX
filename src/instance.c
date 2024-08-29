@@ -9,6 +9,8 @@
 
 DEFAULT_DEBUG_CHANNEL(instance)
 
+static int instanceCount;
+
 Instance *Instance_new(const char *className, Instance *parent)
 {
     Instance *newInst = malloc(sizeof(Instance));
@@ -31,7 +33,14 @@ Instance *Instance_new(const char *className, Instance *parent)
 
     newInst->Parent = NULL;
 
+    instanceCount++;
+
     return newInst;
+}
+
+int GetInstanceCount()
+{
+    return instanceCount;
 }
 
 Instance *Instance_Clone(Instance *this)

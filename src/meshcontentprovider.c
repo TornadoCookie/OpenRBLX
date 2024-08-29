@@ -6,7 +6,6 @@
 #include <string.h>
 #include "httpservice.h"
 #include "datamodel.h"
-#include <mini_gzip.h>
 
 DEFAULT_DEBUG_CHANNEL(meshcontentprovider)
 
@@ -51,7 +50,7 @@ Mesh MeshContentProvider_GetPartMesh(MeshContentProvider *this, Shape shape)
 Mesh LoadMeshFromRobloxFormat(const char *data, int dataSize)
 {
     float version;
-    printf("%p: %s\n", data, data);
+    //printf("%p: %s\n", data, data);
     sscanf(data, "version %f", &version);
     data = strchr(data, '\n')+1;
 
@@ -80,7 +79,7 @@ Mesh LoadMeshFromRobloxFormat(const char *data, int dataSize)
     for (int i = 0; i < mesh.vertexCount; i++)
     {
         sscanf(theRest, "[%f,%f,%f]", &(mesh.vertices[i*3]), &(mesh.vertices[i*3+1]), &(mesh.vertices[i*3+2]));
-        printf("Vertex: [%f, %f, %f]\n", mesh.vertices[i*3], mesh.vertices[i*3+1], mesh.vertices[i*3+2]);
+        //printf("Vertex: [%f, %f, %f]\n", mesh.vertices[i*3], mesh.vertices[i*3+1], mesh.vertices[i*3+2]);
         mesh.vertices[i*3] /= 2;
         mesh.vertices[i*3+1] /= 2;
         mesh.vertices[i*3+2] /= 2;

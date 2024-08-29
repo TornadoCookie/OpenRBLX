@@ -10,6 +10,7 @@
 #include "lighting.h"
 #include "datamodelmesh.h"
 #include "runservice.h"
+#include <time.h>
 
 DEFAULT_DEBUG_CHANNEL(datamodel)
 
@@ -114,12 +115,21 @@ void DataModel_Draw(DataModel *this)
     Camera_Instance *cam = this->Workspace->CurrentCamera;
     RunService *rs = ServiceProvider_GetService(this, "RunService");
 
+    static bool showStatsMenu;
+
     if (IsKeyPressed(KEY_F5))
     {
         RunService_Run(rs);
     }
 
+    if (IsKeyDown(KEY_LEFT_SHIFT))
+    {
+        if (IsKeyPressed(KEY_F1)) showStatsMenu = !showStatsMenu;
+    }
+
     ClearBackground(SKYBLUE);
+
+    clock_t render_start_clock = clock();
 
     BeginMode3D(cam->camera);
     Lighting *lighting = Instance_FindFirstChildOfClass(this, "Lighting");
@@ -210,13 +220,26 @@ void DataModel_Draw(DataModel *this)
 
     EndMode3D();
 
-    DrawFPS(0, 20);
+    clock_t render_end_clock = clock();
+
+    //DrawFPS(0, 20);
     Camera_Process(cam);
 
     if (rs->running)
     {
         RBXScriptSignal_Fire(rs->Stepped, NULL);
         RBXScriptSignal_Fire(rs->Heartbeat, NULL);
+    }
+
+    if (showStatsMenu)
+    {
+        float renderTime = (render_end_clock-render_start_clock)/CLOCKS_PER_SEC;
+
+        DrawRectangle(0, 300, 100, 180, (Color){128, 128, 128, 128});
+        DrawText("----- World -----", 0, 300, 10, WHITE);
+        DrawText(TextFormat("Instances: %d", GetInstanceCount()), 0, 310, 10, WHITE);
+        DrawText("----- Timing ------", 0, 320, 10, WHITE);
+        DrawText(TextFormat("Render: %.1f %.1f msec %d%%", 1.0f/GetFrameTime(), renderTime*1000, (int)(renderTime / GetFrameTime())*100), 0, 330, 10, WHITE);
     }
 }
 
