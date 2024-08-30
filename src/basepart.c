@@ -29,6 +29,8 @@ BasePart *BasePart_new(const char *className, Instance *parent)
     newInst->LeftSurface = SurfaceType_Smooth;
     newInst->RightSurface = SurfaceType_Smooth;
 
+    BasePart_SetCFrame(newInst, (CFrame){0, 0, 0, -1, 0, 0, 0, 1, 0, 0, 0, -1});
+
     return newInst;
 }
 

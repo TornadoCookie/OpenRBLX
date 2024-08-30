@@ -11,6 +11,7 @@
 #include "datamodelmesh.h"
 #include "runservice.h"
 #include <time.h>
+#include "players.h"
 
 DEFAULT_DEBUG_CHANNEL(datamodel)
 
@@ -117,9 +118,36 @@ void DataModel_Draw(DataModel *this)
 
     static bool showStatsMenu;
 
-    if (IsKeyPressed(KEY_F5))
+    Players *players = ServiceProvider_GetService(this, "Players");
+
+    if (IsKeyPressed(KEY_F8) || IsKeyPressed(KEY_F5))
     {
         RunService_Run(rs);
+        if (IsKeyPressed(KEY_F5))
+        {
+            Players_CreateLocalPlayer(players);
+            Player_LoadCharacter(players->LocalPlayer);
+        }
+    }
+
+    if (players->LocalPlayer && players->LocalPlayer->Character)
+    {
+        if (IsKeyDown(KEY_W))
+        {
+            Player_Move(players->LocalPlayer, (Vector3){0, 0, 1}, true);
+        }
+        if (IsKeyDown(KEY_S))
+        {
+            Player_Move(players->LocalPlayer, (Vector3){0, 0, -1}, true);
+        }
+        if (IsKeyDown(KEY_A))
+        {
+            Player_Move(players->LocalPlayer, (Vector3){-1, 0, 0}, true);
+        }
+        if (IsKeyDown(KEY_D))
+        {
+            Player_Move(players->LocalPlayer, (Vector3){1, 0, 0}, true);
+        }
     }
 
     if (IsKeyDown(KEY_LEFT_SHIFT))

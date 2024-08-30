@@ -57,6 +57,8 @@ Source folder.c
 Source trianglemeshpart.c
 Source meshpart.c
 Source texturecontentprovider.c
+Source players.c
+Source player.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c

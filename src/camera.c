@@ -2,6 +2,7 @@
 #include "debug.h"
 #include <stdlib.h>
 #include "datamodel.h"
+#include "players.h"
 
 DEFAULT_DEBUG_CHANNEL(camera)
 
@@ -43,7 +44,18 @@ bool Camera_Zoom(Camera_Instance *this, float distance)
 void Camera_Process(Camera_Instance *this)
 {
     FIXME("this %p stub!, %f\n", this, this->camera.position.y);
-    UpdateCamera(&this->camera, CAMERA_FREE);
+    Players *players = ServiceProvider_GetService(GetDataModel(), "Players");
+
+    if (players->LocalPlayer && players->LocalPlayer->Character)
+    {
+        this->camera.target = players->LocalPlayer->Character->PrimaryPart->Position;
+        FIXME("Target on position: %s\n", debugstr_vector3(this->camera.target));
+        UpdateCamera(&this->camera, CAMERA_THIRD_PERSON);
+    }
+    else
+    {
+        UpdateCamera(&this->camera, CAMERA_FREE);
+    }
 }
 
 void serialize_Camera(Camera_Instance *camera, SerializeInstance *inst)
