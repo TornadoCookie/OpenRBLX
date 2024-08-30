@@ -108,8 +108,11 @@ void BeginSurfaceMode(SurfaceType surface, Shader tilingShader, int tilePosition
     bool shouldDraw = surface != SurfaceType_Smooth;
     if (shouldDraw)
     {
+        //printf("Begin Surface Mode %d\n", surface);
         switch (surface)
         {
+            case SurfaceType_Bumps:
+                FIXME("treating bumps as studs (%d)\n", surface);
             case SurfaceType_Studs:
             {
                 texOffset = 0;
@@ -135,10 +138,15 @@ void BeginSurfaceMode(SurfaceType surface, Shader tilingShader, int tilePosition
         float tilePosition[2] = {0.0f, 0.25f*texOffset};
         SetShaderValue(tilingShader, tilePositionLoc, tilePosition, SHADER_UNIFORM_VEC2);
     }
+    else
+    {
+        //printf("no surface.\n");
+    }
 }
 
 void EndSurfaceMode()
 {
+    //printf("End surface.\n");
     rlSetTexture(0);
 }
 
@@ -167,34 +175,34 @@ static void draw_block(Part *this)
 
     BeginShaderMode(tilingShader);
 
-    const int Y_STUD_SCALE = 24;
+    const int Y_STUD_SCALE = 32;
     const int X_STUD_SCALE = 2;
 
     rlPushMatrix();
         // NOTE: Transformation is applied in inverse order (scale -> rotate -> translate)
         rlMultMatrixf(MatrixToFloat(mat));
 
-        DrawLine3D((Vector3){0, 0, 0}, (Vector3){0, 0, 1}, BLUE);
+        //DrawLine3D((Vector3){0, 0, 0}, (Vector3){0, 0, 1}, BLUE);
 
         //printf("Matrix: %s\n", debugstr_matrix(rlGetMatrixTransform()));
         //printf("Origin: %s\n", debugstr_matrix(mat));
 
-        rlBegin(RL_TRIANGLES);
+        rlBegin(RL_QUADS);
             rlColor4ub(color.r, color.g, color.b, color.a);
 
             // Front face
             rlNormal3f(0.0f, 0.0f, 1.0f);
 
+            //printf("FRONT ");
+
+            //rlColor3f(1.0f, 0.0f, 1.0f);
             BeginSurfaceMode(this->formfactorpart.basepart.FrontSurface, tilingShader, tilePositionLoc, studs);
-            
+
             rlTexCoord2f(0.0f, size.y/Y_STUD_SCALE);
             rlVertex3f(x - width/2, y - height/2, z + length/2);  // Bottom Left
 
             rlTexCoord2f(size.x/X_STUD_SCALE, size.y/Y_STUD_SCALE);
             rlVertex3f(x + width/2, y - height/2, z + length/2);  // Bottom Right
-
-            rlTexCoord2f(0.0f, 0.0f);
-            rlVertex3f(x - width/2, y + height/2, z + length/2);  // Top Left
 
             rlTexCoord2f(size.x/X_STUD_SCALE, 0.0f);
             rlVertex3f(x + width/2, y + height/2, z + length/2);  // Top Right
@@ -202,24 +210,19 @@ static void draw_block(Part *this)
             rlTexCoord2f(0.0f, 0.0f);
             rlVertex3f(x - width/2, y + height/2, z + length/2);  // Top Left
 
-            rlTexCoord2f(size.x/X_STUD_SCALE, size.y/Y_STUD_SCALE);
-            rlVertex3f(x + width/2, y - height/2, z + length/2);  // Bottom Right
-
             EndSurfaceMode();
 
             // Back face
             rlNormal3f(0.0f, 0.0f, -1.0f);
 
-            BeginSurfaceMode(this->formfactorpart.basepart.BackSurface, tilingShader, tilePositionLoc, studs);
+            //printf("BACK ");
 
-            rlTexCoord2f(0.0f, size.y/Y_STUD_SCALE);
-            rlVertex3f(x - width/2, y - height/2, z - length/2);  // Bottom Left
+            //rlColor3f(1.0f, 1.0f, 0.0f);
+
+            BeginSurfaceMode(this->formfactorpart.basepart.BackSurface, tilingShader, tilePositionLoc, studs);
 
             rlTexCoord2f(0.0f, 0.0f);
             rlVertex3f(x - width/2, y + height/2, z - length/2);  // Top Left
-
-            rlTexCoord2f(size.x/X_STUD_SCALE, size.y/Y_STUD_SCALE);
-            rlVertex3f(x + width/2, y - height/2, z - length/2);  // Bottom Right
 
             rlTexCoord2f(size.x/X_STUD_SCALE, 0.0f);
             rlVertex3f(x + width/2, y + height/2, z - length/2);  // Top Right
@@ -227,18 +230,19 @@ static void draw_block(Part *this)
             rlTexCoord2f(size.x/X_STUD_SCALE, size.y/Y_STUD_SCALE);
             rlVertex3f(x + width/2, y - height/2, z - length/2);  // Bottom Right
 
-            rlTexCoord2f(0.0f, 0.0f);
-            rlVertex3f(x - width/2, y + height/2, z - length/2);  // Top Left
+            rlTexCoord2f(0.0f, size.y/Y_STUD_SCALE);
+            rlVertex3f(x - width/2, y - height/2, z - length/2);  // Bottom Left
 
             EndSurfaceMode();
 
             // Top face
             rlNormal3f(0.0f, 1.0f, 0.0f);
 
-            BeginSurfaceMode(this->formfactorpart.basepart.TopSurface, tilingShader, tilePositionLoc, studs);
+            //printf("TOP ");
 
-            rlTexCoord2f(0.0f, 0.0f);
-            rlVertex3f(-0.5f, 0.5f, -0.5f);  // Top Left
+            //rlColor3f(0.0f, 1.0f, 1.0f);
+
+            BeginSurfaceMode(this->formfactorpart.basepart.TopSurface, tilingShader, tilePositionLoc, studs);
 
             rlTexCoord2f(0.0f, size.z/Y_STUD_SCALE);
             rlVertex3f(-0.5f, 0.5f, 0.5f);  // Bottom Left
@@ -252,40 +256,42 @@ static void draw_block(Part *this)
             rlTexCoord2f(0.0f, 0.0f);
             rlVertex3f(-0.5f, 0.5f, -0.5f);  // Top Left
 
-            rlTexCoord2f(size.x/X_STUD_SCALE, size.z/Y_STUD_SCALE);
-            rlVertex3f(0.5f, 0.5f, 0.5f);  // Bottom Right
-
             EndSurfaceMode();
 
             // Bottom face
             rlNormal3f(0.0f, -1.0f, 0.0f);
+
+            //printf("BOTTOM ");
+
+            //rlColor3f(1.0f, 1.0f, 1.0f);
 
             BeginSurfaceMode(this->formfactorpart.basepart.BottomSurface, tilingShader, tilePositionLoc, studs);
 
             rlTexCoord2f(0.0f, 0.0f);
             rlVertex3f(x - width/2, y - height/2, z - length/2);  // Top Left
 
-            rlTexCoord2f(size.x/X_STUD_SCALE, size.z/Y_STUD_SCALE);
-            rlVertex3f(x + width/2, y - height/2, z + length/2);  // Bottom Right
-
-            rlTexCoord2f(0.0f, size.z/Y_STUD_SCALE);
-            rlVertex3f(x - width/2, y - height/2, z + length/2);  // Bottom Left
-
             rlTexCoord2f(size.x/X_STUD_SCALE, 0.0f);
             rlVertex3f(x + width/2, y - height/2, z - length/2);  // Top Right
 
             rlTexCoord2f(size.x/X_STUD_SCALE, size.z/Y_STUD_SCALE);
             rlVertex3f(x + width/2, y - height/2, z + length/2);  // Bottom Right
-
-            rlTexCoord2f(0.0f, 0.0f);
-            rlVertex3f(x - width/2, y - height/2, z - length/2);  // Top Left
+            
+            rlTexCoord2f(0.0f, size.z/Y_STUD_SCALE);
+            rlVertex3f(x - width/2, y - height/2, z + length/2);  // Bottom Left
 
             EndSurfaceMode();
 
             // Right face
             rlNormal3f(1.0f, 0.0f, 0.0f);
 
+            //printf("RIGHT ");
+
+            //rlColor3f(1.0f, 0.0f, 0.0f);
+
             BeginSurfaceMode(this->formfactorpart.basepart.RightSurface, tilingShader, tilePositionLoc, studs);
+
+            rlTexCoord2f(0.0f, size.y/Y_STUD_SCALE);
+            rlVertex3f(0.5f, -0.5f, 0.5f);  // Bottom Left
 
             rlTexCoord2f(size.z/X_STUD_SCALE, size.y/Y_STUD_SCALE);
             rlVertex3f(0.5f, -0.5f, -0.5f);  // Bottom Right
@@ -296,24 +302,15 @@ static void draw_block(Part *this)
             rlTexCoord2f(0.0f, 0.0f);
             rlVertex3f(0.5f, 0.5f, 0.5f);  // Top Left
 
-            rlTexCoord2f(0.0f, size.y/Y_STUD_SCALE);
-            rlVertex3f(0.5f, -0.5f, 0.5f);  // Bottom Left
-
-            rlTexCoord2f(size.z/X_STUD_SCALE, size.y/Y_STUD_SCALE);
-            rlVertex3f(0.5f, -0.5f, -0.5f);  // Bottom Right
-
-            rlTexCoord2f(0.0f, 0.0f);
-            rlVertex3f(0.5f, 0.5f, 0.5f);  // Top Left
-
             EndSurfaceMode();
 
             // Left face
             rlNormal3f(-1.0f, 0.0f, 0.0f);
 
-            BeginSurfaceMode(this->formfactorpart.basepart.LeftSurface, tilingShader, tilePositionLoc, studs);
+            //printf("LEFT ");
+            //rlColor3f(0.0f, 0.0f, 1.0f);
 
-            rlTexCoord2f(size.z/X_STUD_SCALE, size.y/Y_STUD_SCALE);
-            rlVertex3f(-0.5f, -0.5f, -0.5f);  // Bottom Right
+            BeginSurfaceMode(this->formfactorpart.basepart.LeftSurface, tilingShader, tilePositionLoc, studs);
 
             rlTexCoord2f(0.0f, 0.0f);
             rlVertex3f(-0.5f, 0.5f, 0.5f);  // Top Left
@@ -321,14 +318,11 @@ static void draw_block(Part *this)
             rlTexCoord2f(size.z/X_STUD_SCALE, 0.0f);
             rlVertex3f(-0.5f, 0.5f, -0.5f);  // Top Right
 
-            rlTexCoord2f(0.0f, size.y/Y_STUD_SCALE);
-            rlVertex3f(-0.5f, -0.5f, 0.5f);  // Bottom Left
-
-            rlTexCoord2f(0.0f, 0.0f);
-            rlVertex3f(-0.5f, 0.5f, 0.5f);  // Top Left
-
             rlTexCoord2f(size.z/X_STUD_SCALE, size.y/Y_STUD_SCALE);
             rlVertex3f(-0.5f, -0.5f, -0.5f);  // Bottom Right
+
+            rlTexCoord2f(0.0f, size.y/Y_STUD_SCALE);
+            rlVertex3f(-0.5f, -0.5f, 0.5f);  // Bottom Left
 
             EndSurfaceMode();
         rlEnd();
@@ -368,6 +362,21 @@ void part_draw(Part *this)
 {
     //printf("drawing part %p, position %s, size %s.\n", this, debugstr_vector3(this->formfactorpart.basepart.Position), debugstr_vector3(this->formfactorpart.basepart.size));
     this->material.maps[MATERIAL_MAP_DIFFUSE].color = rl_from_color3(this->formfactorpart.basepart.Color, this->formfactorpart.basepart.Transparency);
+
+    BoundingBox part = (BoundingBox){
+        Vector3Subtract(this->formfactorpart.basepart.Position, Vector3Divide(this->formfactorpart.basepart.size, (Vector3){2, 2, 2})),
+        Vector3Add(this->formfactorpart.basepart.Position, Vector3Divide(this->formfactorpart.basepart.size, (Vector3){2, 2, 2}))
+    };
+
+    Vector3 camPos = GetDataModel()->Workspace->CurrentCamera->camera.position;
+
+    const int RENDER_DISTANCE = 100;
+    BoundingBox camera = (BoundingBox){
+        Vector3Subtract(camPos, (Vector3){RENDER_DISTANCE, RENDER_DISTANCE, RENDER_DISTANCE}),
+        Vector3Add(camPos, (Vector3){RENDER_DISTANCE, RENDER_DISTANCE, RENDER_DISTANCE})
+    };
+
+    if (!CheckCollisionBoxes(part, camera)) return;
 
     int childCount;
     Instance **children = Instance_GetChildren(this, &childCount);
@@ -411,7 +420,7 @@ Part *Part_new(const char *className, Instance *parent)
     newInst->formfactorpart.basepart.pvinstance.drawFunc = part_draw;
 
     newInst->material = LoadMaterialDefault();
-    newInst->material.maps[MATERIAL_MAP_DIFFUSE].texture = ((TextureContentProvider*)ServiceProvider_GetService(GetDataModel(), "TextureContentProvider"))->studsTexture;
+    //newInst->material.maps[MATERIAL_MAP_DIFFUSE].texture = ((TextureContentProvider*)ServiceProvider_GetService(GetDataModel(), "TextureContentProvider"))->studsTexture;
     newInst->shape = Shape_Block;
 
     Part_SetShape(newInst, newInst->shape);

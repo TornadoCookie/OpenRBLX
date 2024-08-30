@@ -18,6 +18,9 @@ DataModelMesh *DataModelMesh_new(const char *className, Instance *parent)
     
     newInst->drawFunc = datamodelmesh_draw;
 
+    newInst->Offset = (Vector3){0, 0, 0};
+    newInst->Scale = (Vector3){0, 0, 0};
+
     return newInst;
 }
 

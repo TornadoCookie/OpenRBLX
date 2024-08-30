@@ -372,13 +372,13 @@ void draw_specialmesh(SpecialMesh *this, BasePart *part)
         case MeshType_Head:
         {
             Vector3 pos = Vector3Add(this->filemesh.datamodelmesh.Offset, ((BasePart*)(this->filemesh.datamodelmesh.instance.Parent))->Position);
-            Vector3 scale = this->filemesh.datamodelmesh.Scale;
-			Vector3 c = this->filemesh.datamodelmesh.VertexColor;
+            Vector3 scale = Vector3Divide(this->filemesh.datamodelmesh.Scale, (Vector3){2, 2, 2});
+			Color3 c = part->Color;
 
             rlPushMatrix();
                 rlTranslatef(pos.x, pos.y, pos.z);
                 rlScalef(scale.x, scale.y, scale.z);
-				rlColor4ub(c.x, c.y, c.z, 255);
+				rlColor3f(c.R, c.G, c.B);
 
                 draw_head();
             rlPopMatrix();
