@@ -11,6 +11,7 @@
 #include <string.h>
 #include "datamodelmesh.h"
 #include "decal.h"
+#include "texturecontentprovider.h"
 
 DEFAULT_DEBUG_CHANNEL(part)
 
@@ -104,7 +105,151 @@ static void draw_bumps(Part *this)
 static void draw_block(Part *this)
 {
     CFrame cf = this->formfactorpart.basepart.CFrame;
-    DrawMesh(this->mesh, this->material, cf_size_to_matrix(this->formfactorpart.basepart.CFrame, this->formfactorpart.basepart.size));
+
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+
+    float width = 1.0f;
+    float height = 1.0f;
+    float length = 1.0f;
+
+    Matrix mat = cf_size_to_matrix(this->formfactorpart.basepart.CFrame, this->formfactorpart.basepart.size);
+    Color color = rl_from_color3(this->formfactorpart.basepart.Color, this->formfactorpart.basepart.Transparency);
+
+    Texture2D studs = ((TextureContentProvider*)ServiceProvider_GetService(GetDataModel(), "TextureContentProvider"))->studsTexture;
+    Shader tilingShader = ((TextureContentProvider*)ServiceProvider_GetService(GetDataModel(), "TextureContentProvider"))->tilingShader;
+    Vector3 size = this->formfactorpart.basepart.size;
+
+    int tilePositionLoc = GetShaderLocation(tilingShader, "tilePosition");
+    int tileSizeLoc = GetShaderLocation(tilingShader, "tileSize");
+
+    rlPushMatrix();
+        // NOTE: Transformation is applied in inverse order (scale -> rotate -> translate)
+        rlMultMatrixf(MatrixToFloat(mat));
+
+        //printf("Matrix: %s\n", debugstr_matrix(rlGetMatrixTransform()));
+        //printf("Origin: %s\n", debugstr_matrix(mat));
+
+        rlBegin(RL_TRIANGLES);
+            rlColor4ub(color.r, color.g, color.b, color.a);
+
+            // Front face
+            rlNormal3f(0.0f, 0.0f, 1.0f);
+
+            int FronttexOffset = 0;
+            if (this->formfactorpart.basepart.FrontSurface != SurfaceType_Smooth)
+            {
+                switch (this->formfactorpart.basepart.FrontSurface)
+                {
+                    case SurfaceType_Studs:
+                    {
+                        FronttexOffset = 0;
+                    } break;
+                    case SurfaceType_Weld:
+                    {
+                        FronttexOffset = 1;
+                    } break;
+                    case SurfaceType_Inlet:
+                    {
+                        FronttexOffset = 2;
+                    } break;
+                    case SurfaceType_Universal:
+                    {
+                        FronttexOffset = 3;
+                    } break;
+                    default:
+                    {
+                        printf("Unknown SurfaceType %d.\n", this->formfactorpart.basepart.FrontSurface);
+                    } break;
+                }
+                rlSetTexture(studs.id);
+            }
+
+            Vector2 FronttilePosition = (Vector2){0.0f, 0.25f*FronttexOffset};
+            Vector2 FronttileSize = (Vector2){1.0f, 0.25f};
+
+            SetShaderValue(tilingShader, tilePositionLoc, &FronttilePosition, SHADER_UNIFORM_VEC2);
+            SetShaderValue(tilingShader, tileSizeLoc, &FronttileSize, SHADER_UNIFORM_VEC2);
+
+            BeginShaderMode(tilingShader);
+            //rlEnableShader(tilingShader.id);
+            
+            rlTexCoord2f(0.0f, size.y);
+            rlVertex3f(x - width/2, y - height/2, z + length/2);  // Bottom Left
+
+            rlTexCoord2f(size.x, size.y);
+            rlVertex3f(x + width/2, y - height/2, z + length/2);  // Bottom Right
+
+            rlTexCoord2f(0.0f, 0.0f);
+            rlVertex3f(x - width/2, y + height/2, z + length/2);  // Top Left
+
+            rlTexCoord2f(size.x, 0.0f);
+            rlVertex3f(x + width/2, y + height/2, z + length/2);  // Top Right
+
+            rlTexCoord2f(0.0f, 0.0f);
+            rlVertex3f(x - width/2, y + height/2, z + length/2);  // Top Left
+
+            rlTexCoord2f(size.x, size.y);
+            rlVertex3f(x + width/2, y - height/2, z + length/2);  // Bottom Right
+
+            //rlDisableShader();
+            EndShaderMode();
+
+            rlSetTexture(0);
+
+            // Back face
+            rlNormal3f(0.0f, 0.0f, -1.0f);
+            rlVertex3f(x - width/2, y - height/2, z - length/2);  // Bottom Left
+            rlVertex3f(x - width/2, y + height/2, z - length/2);  // Top Left
+            rlVertex3f(x + width/2, y - height/2, z - length/2);  // Bottom Right
+
+            rlVertex3f(x + width/2, y + height/2, z - length/2);  // Top Right
+            rlVertex3f(x + width/2, y - height/2, z - length/2);  // Bottom Right
+            rlVertex3f(x - width/2, y + height/2, z - length/2);  // Top Left
+
+            // Top face
+            rlNormal3f(0.0f, 1.0f, 0.0f);
+            rlVertex3f(x - width/2, y + height/2, z - length/2);  // Top Left
+            rlVertex3f(x - width/2, y + height/2, z + length/2);  // Bottom Left
+            rlVertex3f(x + width/2, y + height/2, z + length/2);  // Bottom Right
+
+            rlVertex3f(x + width/2, y + height/2, z - length/2);  // Top Right
+            rlVertex3f(x - width/2, y + height/2, z - length/2);  // Top Left
+            rlVertex3f(x + width/2, y + height/2, z + length/2);  // Bottom Right
+
+            // Bottom face
+            rlNormal3f(0.0f, -1.0f, 0.0f);
+            rlVertex3f(x - width/2, y - height/2, z - length/2);  // Top Left
+            rlVertex3f(x + width/2, y - height/2, z + length/2);  // Bottom Right
+            rlVertex3f(x - width/2, y - height/2, z + length/2);  // Bottom Left
+
+            rlVertex3f(x + width/2, y - height/2, z - length/2);  // Top Right
+            rlVertex3f(x + width/2, y - height/2, z + length/2);  // Bottom Right
+            rlVertex3f(x - width/2, y - height/2, z - length/2);  // Top Left
+
+            // Right face
+            rlNormal3f(1.0f, 0.0f, 0.0f);
+            rlVertex3f(x + width/2, y - height/2, z - length/2);  // Bottom Right
+            rlVertex3f(x + width/2, y + height/2, z - length/2);  // Top Right
+            rlVertex3f(x + width/2, y + height/2, z + length/2);  // Top Left
+
+            rlVertex3f(x + width/2, y - height/2, z + length/2);  // Bottom Left
+            rlVertex3f(x + width/2, y - height/2, z - length/2);  // Bottom Right
+            rlVertex3f(x + width/2, y + height/2, z + length/2);  // Top Left
+
+            // Left face
+            rlNormal3f(-1.0f, 0.0f, 0.0f);
+            rlVertex3f(x - width/2, y - height/2, z - length/2);  // Bottom Right
+            rlVertex3f(x - width/2, y + height/2, z + length/2);  // Top Left
+            rlVertex3f(x - width/2, y + height/2, z - length/2);  // Top Right
+
+            rlVertex3f(x - width/2, y - height/2, z + length/2);  // Bottom Left
+            rlVertex3f(x - width/2, y + height/2, z + length/2);  // Top Left
+            rlVertex3f(x - width/2, y - height/2, z - length/2);  // Bottom Right
+        rlEnd();
+    rlPopMatrix();
+
     //draw_bumps(this);
 }
 
@@ -180,6 +325,7 @@ Part *Part_new(const char *className, Instance *parent)
     newInst->formfactorpart.basepart.pvinstance.drawFunc = part_draw;
 
     newInst->material = LoadMaterialDefault();
+    newInst->material.maps[MATERIAL_MAP_DIFFUSE].texture = ((TextureContentProvider*)ServiceProvider_GetService(GetDataModel(), "TextureContentProvider"))->studsTexture;
     newInst->shape = Shape_Block;
 
     Part_SetShape(newInst, newInst->shape);

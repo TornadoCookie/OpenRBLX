@@ -233,13 +233,14 @@ void DataModel_Draw(DataModel *this)
 
     if (showStatsMenu)
     {
-        float renderTime = (render_end_clock-render_start_clock)/CLOCKS_PER_SEC;
+        float renderTime = (float)(render_end_clock-render_start_clock)/CLOCKS_PER_SEC;
+        printf("render took %d (%f)\n", render_end_clock-render_start_clock, renderTime);
 
         DrawRectangle(0, 300, 100, 180, (Color){128, 128, 128, 128});
         DrawText("----- World -----", 0, 300, 10, WHITE);
         DrawText(TextFormat("Instances: %d", GetInstanceCount()), 0, 310, 10, WHITE);
         DrawText("----- Timing ------", 0, 320, 10, WHITE);
-        DrawText(TextFormat("Render: %.1f %.1f msec %d%%", 1.0f/GetFrameTime(), renderTime*1000, (int)(renderTime / GetFrameTime())*100), 0, 330, 10, WHITE);
+        DrawText(TextFormat("Render: %.1f %.1f msec %.0f%%", 1.0f/GetFrameTime(), renderTime*1000, (renderTime / GetFrameTime())*100), 0, 330, 10, WHITE);
     }
 }
 

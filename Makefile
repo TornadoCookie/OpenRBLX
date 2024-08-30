@@ -146,6 +146,7 @@ instance_SOURCES+=$(DISTDIR)/src/numbervalue.o
 instance_SOURCES+=$(DISTDIR)/src/folder.o
 instance_SOURCES+=$(DISTDIR)/src/trianglemeshpart.o
 instance_SOURCES+=$(DISTDIR)/src/meshpart.o
+instance_SOURCES+=$(DISTDIR)/src/texturecontentprovider.o
 
 rbxmx_SOURCES+=$(DISTDIR)/src/filetypes/rbxlx.o
 rbxmx_SOURCES+=$(DISTDIR)/src/filetypes/rbxmx.o
@@ -239,6 +240,7 @@ clean:
 	rm -f $(DISTDIR)/src/folder.o
 	rm -f $(DISTDIR)/src/trianglemeshpart.o
 	rm -f $(DISTDIR)/src/meshpart.o
+	rm -f $(DISTDIR)/src/texturecontentprovider.o
 	rm -f $(DISTDIR)/src/filetypes/rbxlx.o
 	rm -f $(DISTDIR)/src/filetypes/rbxmx.o
 	rm -f $(DISTDIR)/src/../lib/xml/src/xml.o
