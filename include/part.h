@@ -3,6 +3,7 @@
 
 #include <raylib.h>
 #include "formfactorpart.h"
+#include "texturecontentprovider.h"
 
 typedef enum {
     Shape_Ball,
@@ -17,6 +18,7 @@ typedef struct Part {
     Shape shape;
     Mesh mesh;
     Material material;
+    TextureContentProvider *texCont; // We cache the value of this as ServiceProvider_GetService is costly per frame
 } Part;
 
 Part *Part_new(const char *className, Instance *parent);

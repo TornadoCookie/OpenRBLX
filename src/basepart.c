@@ -22,6 +22,13 @@ BasePart *BasePart_new(const char *className, Instance *parent)
 
     newInst->pvinstance.drawFunc = BasePart_Draw;
 
+    newInst->FrontSurface = SurfaceType_Smooth;
+    newInst->BackSurface = SurfaceType_Smooth;
+    newInst->TopSurface = SurfaceType_Smooth;
+    newInst->BottomSurface = SurfaceType_Smooth;
+    newInst->LeftSurface = SurfaceType_Smooth;
+    newInst->RightSurface = SurfaceType_Smooth;
+
     return newInst;
 }
 

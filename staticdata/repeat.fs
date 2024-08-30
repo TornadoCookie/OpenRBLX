@@ -15,17 +15,18 @@ out vec4 finalColor;
 
 // Tile uniform values
 uniform vec2 tilePosition;
-uniform vec2 tileSize;
 
 void main()
 {
-    vec2 modded = vec2(mod(fragTexCoord.x, tileSize.x), mod(fragTexCoord.y, tileSize.y));
-    vec2 offset = tilePosition + modded;
+    vec2 tileSize = vec2(1.0, 0.25);
+
+    vec2 modded = tilePosition + mod(fragTexCoord, tileSize);
 
     // Texel color fetching from texture sampler
-    vec4 texelColor = texture(texture0, offset);
+    vec4 texelColor = texture(texture0, modded);
 
     // NOTE: Implement here your fragment shader code
 
-    finalColor = texelColor*colDiffuse;
+    finalColor = fragColor*texelColor;
+    //finalColor = vec4(1.0, 0.0, 1.0, 1.0);
 }
