@@ -2,6 +2,7 @@ valgrind.info
 perf.data
 perf.data.old
 rbxm.log
+cache
 
 /*-debug
 build

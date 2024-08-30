@@ -370,7 +370,7 @@ void part_draw(Part *this)
 
     Vector3 camPos = GetDataModel()->Workspace->CurrentCamera->camera.position;
 
-    const int RENDER_DISTANCE = 100;
+    const int RENDER_DISTANCE = 500;
     BoundingBox camera = (BoundingBox){
         Vector3Subtract(camPos, (Vector3){RENDER_DISTANCE, RENDER_DISTANCE, RENDER_DISTANCE}),
         Vector3Add(camPos, (Vector3){RENDER_DISTANCE, RENDER_DISTANCE, RENDER_DISTANCE})

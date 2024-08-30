@@ -105,6 +105,13 @@ Mesh MeshContentProvider_GetFileMesh(MeshContentProvider *this, const char *cont
     sscanf(content, "http://www.roblox.com/asset/?id=%d", &assetid);
 
     printf("Get AssetId %d\n", assetid);
+
+    if (FileExists(TextFormat("cache/%d.obj", assetid)))
+    {
+        printf("Using cached\n");
+        return LoadModel(TextFormat("cache/%d.obj", assetid)).meshes[0];
+    }
+
     const char *url = TextFormat("https://assetdelivery.roblox.com/v2/assetId/%d", assetid);
     printf("Our thing is: %s\n", url);
 
@@ -134,6 +141,8 @@ Mesh MeshContentProvider_GetFileMesh(MeshContentProvider *this, const char *cont
     
 
     Mesh ret = LoadMeshFromRobloxFormat(data, dataSize);
+
+    ExportMesh(ret, TextFormat("cache/%d.obj", assetid));
     
     //printf("Unable to retrieve mesh data.\n");
 
