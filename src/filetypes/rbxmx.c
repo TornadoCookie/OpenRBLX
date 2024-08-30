@@ -370,6 +370,8 @@ static Instance *load_model_part_xml(struct xml_node *node, XMLRefsInstance *ref
     Instance *ret;
 
     ret = Instance_dynNew(className, NULL);
+    if (!ret) return NULL;
+
     Instance_Serialize(ret, &inst);
 /*
     if (!strcmp(className, "TrussPart"))
