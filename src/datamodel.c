@@ -39,11 +39,7 @@ DataModel *DataModel_new(void)
 
     newInst->JobId = "OpenRBLX";
 
-    newInst->Workspace = Workspace_new("Workspace", newInst);
-
-    MeshContentProvider_new(NULL, newInst);
-    Lighting_new(NULL, newInst);
-    RunService_new(NULL, newInst);
+    newInst->Workspace = ServiceProvider_GetService(newInst, "Workspace");
 
     rt = LoadRenderTexture(128, 128);
 

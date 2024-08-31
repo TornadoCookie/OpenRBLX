@@ -174,6 +174,11 @@ Mesh LoadMeshRBXV2(const char *data, int dataSize)
     return mesh;
 }
 
+typedef struct Envelope4 {
+    uint8_t bones[4];
+    uint8_t weights[4];
+} Envelope4;
+
 typedef struct MeshHeader4 {
     uint16_t size;
     uint16_t lodType;
@@ -207,6 +212,9 @@ Mesh LoadMeshRBXV4(const char *data, int dataSize)
 
     Vertex2 *vertices = data;
     data += sizeof(Vertex2) * header.vertexCount;
+
+    // Skip animation data
+    if (header.boneCount) data += sizeof(Envelope4) * header.vertexCount;
 
     Face2 *faces = data;
     data += sizeof(Face2) * header.faceCount;
