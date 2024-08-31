@@ -155,7 +155,7 @@ void DataModel_Draw(DataModel *this)
 
     clock_t render_start_clock = clock();
 
-    if (IsKeyPressed(KEY_F4))
+    if (IsKeyDown(KEY_F4))
     {
         rlEnableWireMode();
     }

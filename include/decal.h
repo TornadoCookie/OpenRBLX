@@ -2,6 +2,7 @@
 #define _DECAL_
 
 #include "faceinstance.h"
+#include <raylib.h>
 
 typedef struct Decal {
     FaceInstance faceinstance;
@@ -11,6 +12,8 @@ typedef struct Decal {
     float Shiny;
     float Specular;
     Color3 Color3;
+
+    Texture2D texture;
 } Decal;
 
 Decal *Decal_new(const char *className, Instance *parent);

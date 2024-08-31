@@ -1,4 +1,6 @@
 #include "decal.h"
+#include "texturecontentprovider.h"
+#include "datamodel.h"
 
 Decal *Decal_new(const char *className, Instance *parent)
 {
