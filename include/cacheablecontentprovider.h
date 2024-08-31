@@ -9,4 +9,7 @@ typedef struct CacheableContentProvider {
 
 CacheableContentProvider *CacheableContentProvider_new(const char *className, Instance *parent);
 
+const char *CacheableContentProvider_LoadAssetDelivery(CacheableContentProvider *this, long assetId, int *dataSize);
+long CacheableContentProvider_GetAssetIdFromContent(CacheableContentProvider *this, const char *content);
+
 #endif

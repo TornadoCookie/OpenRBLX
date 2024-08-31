@@ -292,23 +292,9 @@ Mesh LoadMeshFromRobloxFormat(const char *data, int dataSize)
 
 Mesh MeshContentProvider_GetFileMesh(MeshContentProvider *this, const char *content)
 {
-    long assetid = 0;
+    long assetid = CacheableContentProvider_GetAssetIdFromContent(this, content);
 
     printf("GetFileMesh %s\n", content);
-    if (!strncmp(content, "http://www.roblox.com/asset", 27))
-    {
-        sscanf(content, "http://www.roblox.com/asset/?id=%ld", &assetid);   
-    }
-    else if (!strncmp(content, "rbxassetid://", 13))
-    {
-        sscanf(content, "rbxassetid://%ld", &assetid);
-    }
-    else
-    {
-        printf("Don't know how to handle this\n");
-        return (Mesh){0};
-    }
-
     printf("Get AssetId %ld\n", assetid);
 
     if (FileExists(TextFormat("cache/%ld.obj", assetid)))
@@ -317,22 +303,8 @@ Mesh MeshContentProvider_GetFileMesh(MeshContentProvider *this, const char *cont
         return LoadModel(TextFormat("cache/%ld.obj", assetid)).meshes[0];
     }
 
-    const char *url = TextFormat("https://assetdelivery.roblox.com/v2/assetId/%ld", assetid);
-    printf("Our thing is: %s\n", url);
-
-    HttpService *httpService = ServiceProvider_GetService(GetDataModel(), "HttpService");
-    const char *jsonundecoded = HttpService_GetAsync(httpService, url, NULL);
-    cJSON *json = HttpService_JSONDecode(httpService, jsonundecoded);
-
-    printf("%s\n", jsonundecoded);
-
-    cJSON *locations = cJSON_GetObjectItem(json, "locations");
-    cJSON *location = cJSON_GetArrayItem(locations, 0);
-    const char *newUrl = cJSON_GetStringValue(cJSON_GetObjectItem(location, "location"));
-    printf("Redirecting to %s.\n", newUrl);
-
     int dataSize;
-    const char *data = HttpService_GetAsync(httpService, newUrl, &dataSize);
+    const char *data = CacheableContentProvider_LoadAssetDelivery(this, assetid, &dataSize);
 
     //struct mini_gzip gz;
     //mini_gz_start(&gz, dataCompressed, dataCompressedSize);

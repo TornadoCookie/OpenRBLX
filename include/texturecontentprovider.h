@@ -13,4 +13,6 @@ typedef struct TextureContentProvider {
 
 TextureContentProvider *TextureContentProvider_new(const char *className, Instance *parent);
 
+Texture2D TextureContentProvider_LoadTextureAsset(TextureContentProvider *this, const char *content);
+
 #endif
