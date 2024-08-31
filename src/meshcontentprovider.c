@@ -101,6 +101,79 @@ typedef struct Face2 {
     uint32_t c;
 } Face2;
 
+typedef struct MeshHeader2 {
+    uint16_t size;
+    uint8_t vertexSize;
+    uint8_t faceSize;
+
+    uint32_t vertexCount;
+    uint32_t faceCount;
+} MeshHeader2;
+
+Mesh LoadMeshRBXV2(const char *data, int dataSize)
+{
+    Mesh mesh = { 0 };
+
+    MeshHeader2 header = *(MeshHeader2*)data;
+
+    printf("Header Size: %d\n", header.size);
+    printf("Vertex Size: %d\n", header.vertexSize);
+    printf("Face Size: %d\n", header.faceSize);
+    printf("Vertex Count: %d\n", header.vertexCount);
+    printf("Face Count: %d\n", header.faceCount);
+
+    mesh.triangleCount = header.faceCount;
+    mesh.vertexCount = mesh.triangleCount * 3;
+    mesh.vertices = malloc(sizeof(float) * mesh.vertexCount * 3);
+    mesh.texcoords = malloc(sizeof(float) * mesh.vertexCount * 2);
+    mesh.normals = malloc(sizeof(float) * mesh.vertexCount * 3);
+    if (header.vertexSize == 40) mesh.colors = malloc(mesh.vertexCount * 4);
+
+    data += sizeof(MeshHeader2);
+
+    void *vertices = data;
+    data += header.vertexSize * header.vertexCount;
+
+    Face2 *faces = data;
+    data += header.faceSize * header.faceCount;
+
+    for (int i = 0; i < header.faceCount; i++)
+    {
+        Face2 face = faces[i];
+
+        uint32_t *faceArr = &face;
+
+        for (int j = 0; j < 3; j++)
+        {
+            Vertex2 v = *(Vertex2*)(vertices+header.vertexSize*(i*9+j*3)); //EWWWWWWW
+            //printf("%d\n", i*9+j*3);
+
+            mesh.vertices[i*9+j*3+0] = v.px;
+            mesh.vertices[i*9+j*3+1] = v.py;
+            mesh.vertices[i*9+j*3+2] = v.pz;
+
+            mesh.normals[i*9+j*3+0] = v.nx;
+            mesh.normals[i*9+j*3+1] = v.ny;
+            mesh.normals[i*9+j*3+2] = v.nz;
+
+            mesh.texcoords[i*6+j*2+0] = v.tu;
+            mesh.texcoords[i*6+j*2+1] = v.tv;
+
+            if (header.vertexSize == 40)
+            {
+                mesh.colors[i*12+j*4+0] = v.r;
+                mesh.colors[i*12+j*4+1] = v.g;
+                mesh.colors[i*12+j*4+2] = v.b;
+                mesh.colors[i*12+j*4+3] = v.a;
+            }
+        }
+    }
+
+    UploadMesh(&mesh, false);
+
+    return mesh;
+}
+
 typedef struct MeshHeader4 {
     uint16_t size;
     uint16_t lodType;
@@ -137,7 +210,6 @@ Mesh LoadMeshRBXV4(const char *data, int dataSize)
     mesh.normals = malloc(sizeof(float) * mesh.vertexCount * 3);
     mesh.colors = malloc(mesh.vertexCount * 4);
 
-    printf("Start %p End %p\n", data, data + dataSize);
     data += sizeof(MeshHeader4);
 
     Vertex2 *vertices = data;
@@ -149,10 +221,6 @@ Mesh LoadMeshRBXV4(const char *data, int dataSize)
     uint32_t *lods = data;
     data += sizeof(uint32_t) * header.lodCount;
 
-    printf("Vertices %p Faces %p Lods %p\n", vertices, faces, lods);
-
-    printf("%d, %d\n", lods[0], lods[1]);
-
     // Load LOD 0
     for (int i = lods[0]; i < lods[1]; i++)
     {
@@ -163,7 +231,7 @@ Mesh LoadMeshRBXV4(const char *data, int dataSize)
         for (int j = 0; j < 3; j++)
         {
             Vertex2 v = vertices[faceArr[j]];
-            printf("%d\n", i*9+j*3);
+            //printf("%d\n", i*9+j*3);
 
             mesh.vertices[i*9+j*3+0] = v.px;
             mesh.vertices[i*9+j*3+1] = v.py;
@@ -204,6 +272,10 @@ Mesh LoadMeshFromRobloxFormat(const char *data, int dataSize)
     if (version == 1.0f)
     {
         return LoadMeshRBXV1(data, dataSize);
+    }
+    else if (version == 2.0f)
+    {
+        return LoadMeshRBXV2(data, dataSize);
     }
     else if (version == 4.0f)
     {
