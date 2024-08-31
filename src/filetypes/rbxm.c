@@ -8,6 +8,7 @@
 #include "serialize.h"
 #include "part.h"
 #include "script.h"
+#include <endian.h>
 
 #include "debug.h"
 
@@ -56,6 +57,18 @@ typedef struct ParentsChunk {
     int32_t *Children;
     int32_t *Parents;
 } ParentsChunk;
+
+typedef struct SharedStringValue {
+    uint8_t Hash[16];
+    uint32_t Length;
+    uint8_t *Bytes;
+} SharedStringValue;
+
+typedef struct SharedStringChunk {
+    int32_t Version;
+    uint32_t Length;
+    SharedStringValue *values;
+} SharedStringChunk;
 
 static void DecodeDifferenceInPlace(int32_t *data, int length)
 {
@@ -146,7 +159,7 @@ static float rotationIDList[][9] = {
     [0x23] = {+0, +0, -1, +0, -1, -0, -1, +0, -0},
 };
 
-static void *parse_values(PropertiesChunk chunk, InstanceChunk instChunk, unsigned char *chunkData, int *vsize)
+static void *parse_values(PropertiesChunk chunk, InstanceChunk instChunk, unsigned char *chunkData, int *vsize, SharedStringChunk sstrChunk)
 {
     void *values;
     int valueSize;
@@ -278,6 +291,21 @@ static void *parse_values(PropertiesChunk chunk, InstanceChunk instChunk, unsign
             }
             free(uint8Values);
         } break;
+        case 0x1C: // SharedString value
+        {
+            valueSize = sizeof(char*);
+            values = malloc(sizeof(char*) * instChunk.Length);
+            uint32_t *indices = malloc(sizeof(uint32_t) * instChunk.Length);
+            ReadInterleaveduint32_t(chunkData, instChunk.Length, ReturnUInt32, indices);
+            for (int i = 0; i < instChunk.Length; i++)
+            {
+                char *sstr = sstrChunk.values[indices[i]].Bytes;
+                ((char**)values)[i] = calloc(sstrChunk.values[indices[i]].Length, 1);
+                printf("string %d: copy %d bytes\n", i, sstrChunk.values[indices[i]].Length);
+                memcpy(((char**)values)[i], sstr, sstrChunk.values[indices[i]].Length);
+            }
+            free(indices);
+        } break;
         default:
         {
             printf("Error: unknown value type %#x.\n", chunk.ValueType);
@@ -289,10 +317,10 @@ static void *parse_values(PropertiesChunk chunk, InstanceChunk instChunk, unsign
     return values;
 }
 
-static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChunk instChunk, unsigned char *chunkData)
+static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChunk instChunk, unsigned char *chunkData, SharedStringChunk sstrChunk)
 {
     int valueSize;
-    void *values = parse_values(chunk, instChunk, chunkData, &valueSize);
+    void *values = parse_values(chunk, instChunk, chunkData, &valueSize, sstrChunk);
 
     if (!values) return;
 
@@ -421,6 +449,8 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
 
     data += sizeof(Header);
 
+    SharedStringChunk sstrChunk = { 0 };
+
     while (1)
     {
         Chunk *chunk = data;
@@ -535,7 +565,7 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
                 }
             }
 
-            apply_property_chunk_to_instances(chunk, instChunk, chunkData);
+            apply_property_chunk_to_instances(chunk, instChunk, chunkData, sstrChunk);
 
         }
         else if (!strncmp(chunk->Signature, "PRNT", 4))
@@ -592,6 +622,31 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
                     Instance_SetParent(child, parent);
                 }
             }
+        }
+        else if (!strncmp(chunk->Signature, "SSTR", 4))
+        {
+            SharedStringChunk chunk = { 0 };
+
+            chunk.Version = *(int32_t*)chunkData;
+            chunkData += sizeof(int32_t);
+
+            chunk.Length = *(uint32_t*)chunkData;
+            chunkData += sizeof(uint32_t);
+
+            chunk.values = malloc(sizeof(SharedStringValue) * chunk.Length);
+            for (int i = 0; i < chunk.Length; i++)
+            {
+                SharedStringValue val = { 0 };
+                chunkData += 16; // hash
+                val.Length = *(uint32_t*)chunkData;
+                chunkData += sizeof(uint32_t);
+                val.Bytes = malloc(val.Length);
+                memcpy(val.Bytes, chunkData, val.Length);
+                chunkData += val.Length;
+                chunk.values[i] = val;
+            }
+
+            sstrChunk = chunk;
         }
         else
         {

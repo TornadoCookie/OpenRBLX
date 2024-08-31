@@ -363,6 +363,8 @@ void part_draw(Part *this)
     //printf("drawing part %p, position %s, size %s.\n", this, debugstr_vector3(this->formfactorpart.basepart.Position), debugstr_vector3(this->formfactorpart.basepart.size));
     this->material.maps[MATERIAL_MAP_DIFFUSE].color = rl_from_color3(this->formfactorpart.basepart.Color, this->formfactorpart.basepart.Transparency);
 
+    if (this->formfactorpart.basepart.Transparency == 1) return;
+
     BoundingBox part = (BoundingBox){
         Vector3Subtract(this->formfactorpart.basepart.Position, Vector3Divide(this->formfactorpart.basepart.size, (Vector3){2, 2, 2})),
         Vector3Add(this->formfactorpart.basepart.Position, Vector3Divide(this->formfactorpart.basepart.size, (Vector3){2, 2, 2}))
