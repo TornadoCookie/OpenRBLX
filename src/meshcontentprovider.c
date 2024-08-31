@@ -47,19 +47,8 @@ Mesh MeshContentProvider_GetPartMesh(MeshContentProvider *this, Shape shape)
     }
 }
 
-Mesh LoadMeshFromRobloxFormat(const char *data, int dataSize)
+Mesh LoadMeshRBXV1(const char *data, int dataSize)
 {
-    float version;
-    //printf("%p: %s\n", data, data);
-    sscanf(data, "version %f", &version);
-    data = strchr(data, '\n')+1;
-
-    if (version != 1.0f)
-    {
-        FIXME("Unable to load mesh format version %f.\n", version);
-        return (Mesh){ 0 };
-    }
-
     Mesh mesh = { 0 };
 
     sscanf(data, "%d", &mesh.triangleCount);
@@ -71,7 +60,6 @@ Mesh LoadMeshFromRobloxFormat(const char *data, int dataSize)
     mesh.texcoords = malloc(sizeof(float) * mesh.vertexCount * 2);
     mesh.normals = malloc(sizeof(float) * mesh.vertexCount * 3);
 
-    printf("Version: %f\n", version);
     printf("Triangle Count: %d\n", mesh.triangleCount);
 
     char *theRest = data;
@@ -98,21 +86,56 @@ Mesh LoadMeshFromRobloxFormat(const char *data, int dataSize)
     return mesh;
 }
 
-Mesh MeshContentProvider_GetFileMesh(MeshContentProvider *this, const char *content)
+Mesh LoadMeshFromRobloxFormat(const char *data, int dataSize)
 {
-    int assetid;
+    float version;
+    printf("%p: %s\n", data, data);
+    sscanf(data, "version %f", &version);
+    data = strchr(data, '\n')+1;
 
-    sscanf(content, "http://www.roblox.com/asset/?id=%d", &assetid);
+    printf("Version: %f\n", version);
 
-    printf("Get AssetId %d\n", assetid);
-
-    if (FileExists(TextFormat("cache/%d.obj", assetid)))
+    if (version == 1.0f)
     {
-        printf("Using cached\n");
-        return LoadModel(TextFormat("cache/%d.obj", assetid)).meshes[0];
+        return LoadMeshRBXV1(data, dataSize);
+    }
+    else
+    {
+        FIXME("Unable to load mesh format version %f.\n", version);
+        return (Mesh){ 0 };
     }
 
-    const char *url = TextFormat("https://assetdelivery.roblox.com/v2/assetId/%d", assetid);
+    
+}
+
+Mesh MeshContentProvider_GetFileMesh(MeshContentProvider *this, const char *content)
+{
+    long assetid = 0;
+
+    printf("GetFileMesh %s\n", content);
+    if (!strncmp(content, "http://www.roblox.com/asset", 27))
+    {
+        sscanf(content, "http://www.roblox.com/asset/?id=%ld", &assetid);   
+    }
+    else if (!strncmp(content, "rbxassetid://", 13))
+    {
+        sscanf(content, "rbxassetid://%ld", &assetid);
+    }
+    else
+    {
+        printf("Don't know how to handle this\n");
+        return (Mesh){0};
+    }
+
+    printf("Get AssetId %ld\n", assetid);
+
+    if (FileExists(TextFormat("cache/%ld.obj", assetid)))
+    {
+        printf("Using cached\n");
+        return LoadModel(TextFormat("cache/%ld.obj", assetid)).meshes[0];
+    }
+
+    const char *url = TextFormat("https://assetdelivery.roblox.com/v2/assetId/%ld", assetid);
     printf("Our thing is: %s\n", url);
 
     HttpService *httpService = ServiceProvider_GetService(GetDataModel(), "HttpService");

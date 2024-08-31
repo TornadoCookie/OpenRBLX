@@ -44,6 +44,7 @@ void Instance_Remove(Instance *this);
 Instance *Instance_FindFirstChildWhichIsA(Instance *this, const char *className, bool recursive);
 Instance **Instance_GetDescendants(Instance *this, int *childCount);
 Instance *Instance_FindFirstChildOfClass(Instance *this, const char *className);
+Instance *Instance_FindFirstAncestorWhichIsA(Instance *this, const char *className);
 
 bool ClassName_IsA(const char *className1, const char *className2);
 int GetInstanceCount(void);

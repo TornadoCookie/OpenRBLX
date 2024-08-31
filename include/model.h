@@ -15,6 +15,7 @@ typedef struct Model_Instance {
     PVInstance pvinstance;
 
     BasePart *PrimaryPart;
+    char *ModelMeshData;
 } Model_Instance;
 
 Model_Instance *Model_new(const char *className, Instance *parent);

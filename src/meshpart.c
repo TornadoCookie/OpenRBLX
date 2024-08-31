@@ -3,6 +3,7 @@
 #include "meshcontentprovider.h"
 #include "datamodel.h"
 #include <raymath.h>
+#include <stdio.h>
 
 DEFAULT_DEBUG_CHANNEL(meshpart)
 
@@ -55,6 +56,7 @@ void MeshPart_Draw(MeshPart *this)
 
     if (!this->meshLoaded)
     {
+        printf("Attempt to get MeshId %s\n", this->MeshId);
         this->mesh = MeshContentProvider_GetFileMesh(ServiceProvider_GetService(GetDataModel(), "MeshContentProvider"), this->MeshId);
         this->meshLoaded = true;
         this->material = LoadMaterialDefault();

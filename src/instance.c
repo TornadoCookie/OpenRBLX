@@ -117,8 +117,9 @@ bool ClassName_IsA(const char *className1, const char *className)
     if (!strcmp(className, "Instance") || !strcmp(className1, className)) return true;
 
     else if (!strcmp(className, "PVInstance")) return ClassName_IsA(className1, "Model") || ClassName_IsA(className1, "BasePart");
-    else if (!strcmp(className, "BasePart")) return ClassName_IsA(className1, "FormFactorPart") || ClassName_IsA(className1, "TrussPart");
+    else if (!strcmp(className, "BasePart")) return ClassName_IsA(className1, "FormFactorPart") || ClassName_IsA(className1, "TrussPart") || ClassName_IsA(className1, "TriangleMeshPart");
     else if (!strcmp(className, "FormFactorPart")) return ClassName_IsA(className1, "Part");
+    else if (!strcmp(className, "TriangleMeshPart")) return ClassName_IsA(className1, "MeshPart");
 
     else if (!strcmp(className, "Model")) return ClassName_IsA(className1, "WorldRoot");
     else if (!strcmp(className, "WorldRoot")) return ClassName_IsA(className1, "Workspace");
@@ -194,6 +195,13 @@ Instance *Instance_FindFirstChildWhichIsA(Instance *this, const char *className,
     }
 
     return NULL;
+}
+
+Instance *Instance_FindFirstAncestorWhichIsA(Instance *this, const char *className)
+{
+    if (!this->Parent) return NULL;
+    if (Instance_IsA(this->Parent, className)) return this->Parent;
+    return Instance_FindFirstAncestorWhichIsA(this->Parent, className);
 }
 
 Instance **Instance_GetDescendants(Instance *this, int *childCount)
