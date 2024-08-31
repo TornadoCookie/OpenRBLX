@@ -59,6 +59,7 @@ Source meshpart.c
 Source texturecontentprovider.c
 Source players.c
 Source player.c
+Source stringvalue.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c

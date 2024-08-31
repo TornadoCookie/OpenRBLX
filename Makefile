@@ -149,6 +149,7 @@ instance_SOURCES+=$(DISTDIR)/src/meshpart.o
 instance_SOURCES+=$(DISTDIR)/src/texturecontentprovider.o
 instance_SOURCES+=$(DISTDIR)/src/players.o
 instance_SOURCES+=$(DISTDIR)/src/player.o
+instance_SOURCES+=$(DISTDIR)/src/stringvalue.o
 
 rbxmx_SOURCES+=$(DISTDIR)/src/filetypes/rbxlx.o
 rbxmx_SOURCES+=$(DISTDIR)/src/filetypes/rbxmx.o
@@ -245,6 +246,7 @@ clean:
 	rm -f $(DISTDIR)/src/texturecontentprovider.o
 	rm -f $(DISTDIR)/src/players.o
 	rm -f $(DISTDIR)/src/player.o
+	rm -f $(DISTDIR)/src/stringvalue.o
 	rm -f $(DISTDIR)/src/filetypes/rbxlx.o
 	rm -f $(DISTDIR)/src/filetypes/rbxmx.o
 	rm -f $(DISTDIR)/src/../lib/xml/src/xml.o
