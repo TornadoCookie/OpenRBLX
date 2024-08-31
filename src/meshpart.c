@@ -4,6 +4,7 @@
 #include "datamodel.h"
 #include <raymath.h>
 #include <stdio.h>
+#include <rlgl.h>
 
 DEFAULT_DEBUG_CHANNEL(meshpart)
 
@@ -67,9 +68,18 @@ void MeshPart_Draw(MeshPart *this)
         this->material = LoadMaterialDefault();
         this->material.maps[MATERIAL_MAP_DIFFUSE].texture = TextureContentProvider_LoadTextureAsset(ServiceProvider_GetService(GetDataModel(), "TextureContentProvider"), this->TextureID);
         this->material.maps[MATERIAL_MAP_DIFFUSE].color = rl_from_color3(this->trianglemeshpart.basepart.Color, this->trianglemeshpart.basepart.Transparency);
+        this->meshBoundingBox = GetMeshBoundingBox(this->mesh);
     }
 
-    DrawMesh(this->mesh, this->material, cf_size_to_matrix(this->trianglemeshpart.basepart.CFrame, this->trianglemeshpart.basepart.size));
+    rlPushMatrix();
+
+        Vector3 size = Vector3Subtract(this->meshBoundingBox.max, this->meshBoundingBox.min);
+        Vector3 cancel = Vector3Divide((Vector3){1, 1, 1}, size);
+        rlScalef(cancel.x, cancel.y, cancel.z);
+
+        DrawMesh(this->mesh, this->material, cf_size_to_matrix(this->trianglemeshpart.basepart.CFrame, this->trianglemeshpart.basepart.size));
+
+    rlPopMatrix();
 }
 
 void serialize_MeshPart(MeshPart *meshpart, SerializeInstance *inst)

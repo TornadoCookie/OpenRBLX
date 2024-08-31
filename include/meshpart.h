@@ -12,6 +12,7 @@ typedef struct MeshPart {
     Mesh mesh;
     bool meshLoaded;
     Material material;
+    BoundingBox meshBoundingBox;
 } MeshPart;
 
 MeshPart *MeshPart_new(const char *className, Instance *parent);
