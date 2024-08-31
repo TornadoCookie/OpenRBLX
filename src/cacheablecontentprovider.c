@@ -18,6 +18,10 @@ CacheableContentProvider *CacheableContentProvider_new(const char *className, In
 long CacheableContentProvider_GetAssetIdFromContent(CacheableContentProvider *this, const char *content)
 {
     long assetid;
+
+    if (*content == 0) return 0;
+
+    printf("Get Asset Id from %s\n", content);
     if (!strncmp(content, "http://www.roblox.com/asset", 27))
     {
         sscanf(content, "http://www.roblox.com/asset/?id=%ld", &assetid);   
@@ -25,6 +29,10 @@ long CacheableContentProvider_GetAssetIdFromContent(CacheableContentProvider *th
     else if (!strncmp(content, "rbxassetid://", 13))
     {
         sscanf(content, "rbxassetid://%ld", &assetid);
+    }
+    else if (!strncmp(content, "https://assetdelivery.roblox.com/v1/", 36))
+    {
+        sscanf(content, "https://assetdelivery.roblox.com/v1/asset/?id=%ld", &assetid);
     }
     else
     {

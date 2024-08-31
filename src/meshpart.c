@@ -22,6 +22,11 @@ MeshPart *MeshPart_new(const char *className, Instance *parent)
     return newInst;
 }
 
+static Color rl_from_color3(Color3 col, float transparency)
+{
+    return (Color){col.R * 255, col.G * 255, col.B * 255, (1.0f-transparency) * 255};
+}
+
 static Matrix cf_to_rot_matrix(CFrame cf)
 {
     return (Matrix) {
@@ -60,6 +65,8 @@ void MeshPart_Draw(MeshPart *this)
         this->mesh = MeshContentProvider_GetFileMesh(ServiceProvider_GetService(GetDataModel(), "MeshContentProvider"), this->MeshId);
         this->meshLoaded = true;
         this->material = LoadMaterialDefault();
+        this->material.maps[MATERIAL_MAP_DIFFUSE].texture = TextureContentProvider_LoadTextureAsset(ServiceProvider_GetService(GetDataModel(), "TextureContentProvider"), this->TextureID);
+        this->material.maps[MATERIAL_MAP_DIFFUSE].color = rl_from_color3(this->trianglemeshpart.basepart.Color, this->trianglemeshpart.basepart.Transparency);
     }
 
     DrawMesh(this->mesh, this->material, cf_size_to_matrix(this->trianglemeshpart.basepart.CFrame, this->trianglemeshpart.basepart.size));

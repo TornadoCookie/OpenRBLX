@@ -159,6 +159,11 @@ void DataModel_Draw(DataModel *this)
 
     clock_t render_start_clock = clock();
 
+    if (IsKeyPressed(KEY_F4))
+    {
+        rlEnableWireMode();
+    }
+
     BeginMode3D(cam->camera);
     Lighting *lighting = Instance_FindFirstChildOfClass(this, "Lighting");
     Lighting_draw(lighting);
@@ -247,6 +252,8 @@ void DataModel_Draw(DataModel *this)
     //DrawCube((Vector3){1, 0, -1}, 1, 2, 2, MAGENTA);
 
     EndMode3D();
+
+    rlDisableWireMode();
 
     clock_t render_end_clock = clock();
 
