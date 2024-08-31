@@ -86,6 +86,112 @@ Mesh LoadMeshRBXV1(const char *data, int dataSize)
     return mesh;
 }
 
+typedef struct Vertex2 {
+    float px, py, pz;
+    float nx, ny, nz;
+    float tu, tv;
+
+    int8_t tx, ty, tz, ts;
+    uint8_t  r, g, b, a;
+} Vertex2;
+
+typedef struct Face2 {
+    uint32_t a;
+    uint32_t b;
+    uint32_t c;
+} Face2;
+
+typedef struct MeshHeader4 {
+    uint16_t size;
+    uint16_t lodType;
+    uint32_t vertexCount;
+    uint32_t faceCount;
+    uint16_t lodCount;
+    uint16_t boneCount;
+    uint32_t boneNameBufferSize;
+    uint16_t subsetCount;
+    uint8_t hqLodCount;
+    uint8_t unused;
+} MeshHeader4;
+
+Mesh LoadMeshRBXV4(const char *data, int dataSize)
+{
+    Mesh mesh = { 0 };
+
+    MeshHeader4 header = *(MeshHeader4*)data;
+
+    printf("Header Size: %d\n", header.size);
+    printf("LOD Type: %d\n", header.lodType);
+    printf("Vertex Count: %d\n", header.vertexCount);
+    printf("Face Count: %d\n", header.faceCount);
+    printf("LOD Count: %d\n", header.lodCount);
+    printf("Bone Count: %d\n", header.boneCount);
+    printf("Bone name buffer size: %d\n", header.boneNameBufferSize);
+    printf("Subset count: %d\n", header.subsetCount);
+    printf("HQ LOD count: %d\n", header.hqLodCount);
+
+    mesh.triangleCount = header.faceCount;
+    mesh.vertexCount = mesh.triangleCount * 3;
+    mesh.vertices = malloc(sizeof(float) * mesh.vertexCount * 3);
+    mesh.texcoords = malloc(sizeof(float) * mesh.vertexCount * 2);
+    mesh.normals = malloc(sizeof(float) * mesh.vertexCount * 3);
+    mesh.colors = malloc(mesh.vertexCount * 4);
+
+    printf("Start %p End %p\n", data, data + dataSize);
+    data += sizeof(MeshHeader4);
+
+    Vertex2 *vertices = data;
+    data += sizeof(Vertex2) * header.vertexCount;
+
+    Face2 *faces = data;
+    data += sizeof(Face2) * header.faceCount;
+
+    uint32_t *lods = data;
+    data += sizeof(uint32_t) * header.lodCount;
+
+    printf("Vertices %p Faces %p Lods %p\n", vertices, faces, lods);
+
+    printf("%d, %d\n", lods[0], lods[1]);
+
+    // Load LOD 0
+    for (int i = lods[0]; i < lods[1]; i++)
+    {
+        Face2 face = faces[i];
+
+        uint32_t *faceArr = &face;
+
+        for (int j = 0; j < 3; j++)
+        {
+            Vertex2 v = vertices[faceArr[j]];
+            printf("%d\n", i*9+j*3);
+
+            mesh.vertices[i*9+j*3+0] = v.px;
+            mesh.vertices[i*9+j*3+1] = v.py;
+            mesh.vertices[i*9+j*3+2] = v.pz;
+
+
+            mesh.normals[i*9+j*3+0] = v.nx;
+            mesh.normals[i*9+j*3+1] = v.ny;
+            mesh.normals[i*9+j*3+2] = v.nz;
+
+            mesh.texcoords[i*6+j*2+0] = v.tu;
+            mesh.texcoords[i*6+j*2+1] = v.tv;
+
+            mesh.colors[i*12+j*4+0] = v.r;
+            mesh.colors[i*12+j*4+1] = v.g;
+            mesh.colors[i*12+j*4+2] = v.b;
+            mesh.colors[i*12+j*4+3] = v.a;
+        }
+    }
+
+    UploadMesh(&mesh, false);
+
+    // TODO: Read bone / animation data
+    if (header.boneCount) FIXME("TODO read animation data (boneCOunt %d)\n", header.boneCount);
+
+    return mesh;
+}
+
 Mesh LoadMeshFromRobloxFormat(const char *data, int dataSize)
 {
     float version;
@@ -98,6 +204,10 @@ Mesh LoadMeshFromRobloxFormat(const char *data, int dataSize)
     if (version == 1.0f)
     {
         return LoadMeshRBXV1(data, dataSize);
+    }
+    else if (version == 4.0f)
+    {
+        return LoadMeshRBXV4(data, dataSize);
     }
     else
     {
@@ -165,7 +275,7 @@ Mesh MeshContentProvider_GetFileMesh(MeshContentProvider *this, const char *cont
 
     Mesh ret = LoadMeshFromRobloxFormat(data, dataSize);
 
-    ExportMesh(ret, TextFormat("cache/%d.obj", assetid));
+    ExportMesh(ret, TextFormat("cache/%ld.obj", assetid));
     
     //printf("Unable to retrieve mesh data.\n");
 
