@@ -145,8 +145,8 @@ Mesh LoadMeshRBXV2(const char *data, int dataSize)
 
         for (int j = 0; j < 3; j++)
         {
-            Vertex2 v = *(Vertex2*)(vertices+header.vertexSize*(i*9+j*3)); //EWWWWWWW
-            //printf("%d\n", i*9+j*3);
+            Vertex2 v = *(Vertex2*)(vertices+header.vertexSize*(faceArr[j])); //EWWWWWWW
+            //printf("%f %f %f\n", v.px, v.py, v.pz);
 
             mesh.vertices[i*9+j*3+0] = v.px;
             mesh.vertices[i*9+j*3+1] = v.py;
@@ -203,13 +203,6 @@ Mesh LoadMeshRBXV4(const char *data, int dataSize)
     printf("Subset count: %d\n", header.subsetCount);
     printf("HQ LOD count: %d\n", header.hqLodCount);
 
-    mesh.triangleCount = header.faceCount;
-    mesh.vertexCount = mesh.triangleCount * 3;
-    mesh.vertices = malloc(sizeof(float) * mesh.vertexCount * 3);
-    mesh.texcoords = malloc(sizeof(float) * mesh.vertexCount * 2);
-    mesh.normals = malloc(sizeof(float) * mesh.vertexCount * 3);
-    mesh.colors = malloc(mesh.vertexCount * 4);
-
     data += sizeof(MeshHeader4);
 
     Vertex2 *vertices = data;
@@ -220,6 +213,13 @@ Mesh LoadMeshRBXV4(const char *data, int dataSize)
 
     uint32_t *lods = data;
     data += sizeof(uint32_t) * header.lodCount;
+
+    mesh.triangleCount = lods[1] - lods[0];
+    mesh.vertexCount = mesh.triangleCount * 3;
+    mesh.vertices = malloc(sizeof(float) * mesh.vertexCount * 3);
+    mesh.texcoords = malloc(sizeof(float) * mesh.vertexCount * 2);
+    mesh.normals = malloc(sizeof(float) * mesh.vertexCount * 3);
+    mesh.colors = malloc(mesh.vertexCount * 4);
 
     // Load LOD 0
     for (int i = lods[0]; i < lods[1]; i++)
@@ -277,7 +277,7 @@ Mesh LoadMeshFromRobloxFormat(const char *data, int dataSize)
     {
         return LoadMeshRBXV2(data, dataSize);
     }
-    else if (version == 4.0f)
+    else if (version == 4.0f || version == 4.01f)
     {
         return LoadMeshRBXV4(data, dataSize);
     }
