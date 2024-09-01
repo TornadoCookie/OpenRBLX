@@ -37,13 +37,13 @@ Ideally, we want to be 100% compatible with Roblox, without infringing on this p
 - [ ] The software can upload game files to a server for use by the plurality of users.
 
 ## Claim 7:
-- [ ] The software can receive a request for an existing model created by a different user.
-- [ ] The software can request a model file for that model from the server.
-- [ ] The software can present that model to the user.
+- [x] The software can receive a request for an existing model created by a different user.
+- [x] The software can request a model file for that model from the server.
+- [x] The software can present that model to the user.
 - [ ] The software can modify the model based on the user's actions.
 
 ## Claim 8:
-- [ ] The software can receive a request for an existing model created by a different user.
+- [ ] The software can receive a request for an existing game created by a different user.
 - [ ] The software can request a game file for that game from the server.
 - [ ] The software can present that game to the user.
 - [ ] The software allows the user to play that game.
@@ -78,7 +78,7 @@ Ideally, we want to be 100% compatible with Roblox, without infringing on this p
 
 ## Claim 18:
 - [x] The system has memory.
-- [ ] The system has a processing system that is coupled to the memory causing:
+- [x] The system has a processing system that is coupled to the memory causing:
 - [ ] A user interface presenter to present a user interface for creating the game.
 - [ ] An editing engine to place the set of parts in the 3D world determined by the user.
 - [ ] A joint engine to resolve joints and joint types for adjacent parts.
