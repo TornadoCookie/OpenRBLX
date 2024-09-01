@@ -315,6 +315,23 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
     }
 }
 
+static int luau_Vector3_new(lua_State *L)
+{
+    if (lua_gettop(L) != 3)
+    {
+        lua_pushstring(L, "Expected 3 arguments.\n");
+        lua_error(L);
+    }
+
+    lua_Number x = lua_tonumber(L, 1);
+    lua_Number y = lua_tonumber(L, 2);
+    lua_Number z = lua_tonumber(L, 3);
+
+    luau_pushvector3(L, (Vector3){x, y, z});
+
+    return 1;
+}
+
 static void init_lua_state(lua_State *L, Script *script)
 {
     luaL_openlibs(L);
@@ -332,7 +349,13 @@ static void init_lua_state(lua_State *L, Script *script)
     lua_setglobal(L, "game");
 
     lua_newtable(L);
+
+    lua_pushstring(L, "new");
+    lua_pushcfunction(L, luau_Vector3_new);
+    lua_settable(L, -3);
+
     lua_setglobal(L, "Vector3");
+    
 }
 
 static void *run_script(Script *script)
