@@ -45,6 +45,12 @@ static int luau_wait(lua_State *L)
     return 2;
 }
 
+static int luau_tick(lua_State *L)
+{
+    lua_pushinteger(L, time(NULL));
+    return 1;
+}
+
 static int luau_Instance_FindFirstChild(lua_State *L);
 static void luau_pushinstance(lua_State *L, Instance *inst);
 static void luau_pushvector3(lua_State *L, Vector3 v);
@@ -181,6 +187,11 @@ static int luau_Instance__index(lua_State *L)
             luau_pushcframe(L, basepart->CFrame);
             return 1;
         }
+        else if (!strcmp(name, "Position"))
+        {
+            luau_pushvector3(L, basepart->Position);
+            return 1;
+        }
     }
 
     lua_pushnil(L);
@@ -258,6 +269,56 @@ static int luau_Instance_Clone(lua_State *L)
     return 1;
 }
 
+static int luau_Instance_WaitForChild(lua_State *L)
+{
+    int nargs = lua_gettop(L);
+    if (nargs < 2)
+    {
+        lua_pushstring(L, "Expected at least 2 arguments.\n");
+        lua_error(L);
+    }
+
+    lua_pushstring(L, "__inst_ptr");
+    lua_rawget(L, 1);
+
+    const char *childName = luaL_checkstring(L, 2);
+    double timeOut = 0.0;
+    if (nargs > 2)
+    {
+        timeOut = luaL_checknumber(L, 3);
+    }
+
+    Instance *inst = lua_touserdata(L, -1);
+
+    luau_pushinstance(L, Instance_WaitForChild(inst, childName, timeOut));
+
+    return 1;
+}
+
+static int luau_Instance_IsDescendantOf(lua_State *L)
+{
+    int nargs = lua_gettop(L);
+    if (nargs != 2)
+    {
+        lua_pushstring(L, "Expected 2 arguments.\n");
+        lua_error(L);
+    }
+
+    lua_pushstring(L, "__inst_ptr");
+    lua_rawget(L, 1);
+
+    Instance *inst = lua_touserdata(L, -1);
+
+    lua_pushstring(L, "__inst_ptr");
+    lua_rawget(L, 2);
+
+    Instance *ancestor = lua_touserdata(L, -1);
+
+    lua_pushboolean(L, Instance_IsDescendantOf(inst, ancestor));
+
+    return 1;
+}
+
 static int luau_ServiceProvider_GetService(lua_State *L)
 {
     lua_pushstring(L, "__inst_ptr");
@@ -299,8 +360,20 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
     lua_pushcfunction(L, luau_Instance_GetChildren);
     lua_settable(L, -3);
 
+    lua_pushstring(L, "children");
+    lua_pushcfunction(L, luau_Instance_GetChildren);
+    lua_settable(L, -3);
+
     lua_pushstring(L, "Clone");
     lua_pushcfunction(L, luau_Instance_Clone);
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "WaitForChild");
+    lua_pushcfunction(L, luau_Instance_WaitForChild);
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "IsDescendantOf");
+    lua_pushcfunction(L, luau_Instance_IsDescendantOf);
     lua_settable(L, -3);
     
     lua_pushstring(L, "__inst_ptr");
@@ -336,9 +409,14 @@ static void init_lua_state(lua_State *L, Script *script)
 {
     luaL_openlibs(L);
 
+    // Roblox global functions
     lua_pushcfunction(L, luau_wait);
     lua_setglobal(L, "wait");
 
+    lua_pushcfunction(L, luau_tick);
+    lua_setglobal(L, "tick");
+
+    // Global instances
     luau_pushinstance(L, GetDataModel()->Workspace);
     lua_setglobal(L, "Workspace");
 
@@ -348,6 +426,7 @@ static void init_lua_state(lua_State *L, Script *script)
     luau_pushinstance(L, GetDataModel());
     lua_setglobal(L, "game");
 
+    // Data type constructors
     lua_newtable(L);
 
     lua_pushstring(L, "new");
@@ -355,6 +434,10 @@ static void init_lua_state(lua_State *L, Script *script)
     lua_settable(L, -3);
 
     lua_setglobal(L, "Vector3");
+
+    lua_newtable(L);
+
+    lua_setglobal(L, "CFrame");
     
 }
 
