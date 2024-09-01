@@ -185,7 +185,7 @@ static const char *tokenPropNames[] = {
 static const char *tokenTables[][50] = {
     { "Ball", "Block", "Cylinder", "Wedge", "CornerWedge", NULL }, // shape
     { "None", "Player", "KeyboardLeft", "KeyboardRight", "Joypad1", "Joypad2", "Chase", "Flee", NULL }, //Controller
-    { "Smooth", "Glue", "Weld", "Studs", "Inlet", "Universal", "Hinge", "Motor", "SteppingMotor", "Bumps", "Spawn", NULL }, // Type
+    { "Smooth", "Glue", "Weld", "Studs", "Inlet", "Universal", "Hinge", "Motor", "SteppingMotor", "Unjoinable", "SmoothNoOutlines", "Bumps", "Spawn", NULL }, // Type
     { "None", "Hinge", "Motor", "SteppingMotor", NULL }, //Constraint
     { "NoInput", "LeftTread", "RightTread", "Steer", "Throttle", "Updown", "Action1", "Action2", "Action3", "Action4", "Action5", "Sin", "Constant", NULL }, // SurfaceInput
     { "Stand", NULL } // PostureXML
@@ -201,6 +201,7 @@ static void xmlserialize_token(int *val, char *prop, char *propName)
     if (endptr != prop)
     {
         *val = asNumber;
+        return;
     }
 
     printf("serialize_token: prop %s, propName %s, asNumber %ld.\n", prop, propName, asNumber);
@@ -212,6 +213,10 @@ static void xmlserialize_token(int *val, char *prop, char *propName)
     else if (strstr(propName, "Surface"))
     {
         propName = "Type";
+    }
+    else if (strstr(propName, "Constraint"))
+    {
+        propName = "Constraint";
     }
 
     int index = -1;
@@ -228,7 +233,7 @@ static void xmlserialize_token(int *val, char *prop, char *propName)
 
     if (*val == 0 && index == -1 && strlen(prop) > 1)
     {
-        FIXME("token not serialized: %s\n", prop);
+        FIXME("token not serialized: %s (propname %s)\n", prop, propName);
     }
 }
 
@@ -244,7 +249,7 @@ static void serialize(SerializeInstance *inst, char *prop, char *propName, struc
             struct xml_node *child2 = xml_node_child(child, i);
             char *prop2 = xml_easy_string(xml_node_content(child2));
             char *propName2 = xml_easy_string(xml_node_attribute_content(child2, 0));
-            char *propName2_Concat[128];
+            char propName2_Concat[128];
             char *propName2_trans = propName2;
             if (!strcmp(propName2_trans, "Type")) propName2_trans = "Surface";
             snprintf(propName2_Concat, 128, "%s%s", propName, propName2_trans);
@@ -353,7 +358,7 @@ static int SurfaceType_from_Constraint05(int constraint05)
 {
     switch (constraint05)
     {
-        case Constraint05_None: return -1;
+        case Constraint05_None: return 0;
         case Constraint05_Hinge: return SurfaceType_Hinge;
         case Constraint05_Motor: return SurfaceType_Motor;
         case Constraint05_SteppingMotor: return SurfaceType_SteppingMotor;

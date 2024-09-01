@@ -45,6 +45,11 @@ static Matrix cf_size_to_matrix(CFrame cf, Vector3 size)
     return MatrixMultiply(MatrixMultiply(size_to_scale_matrix(size), cf_to_rot_matrix(cf)), cf_to_trans_matrix(cf));
 }
 
+static Matrix cf_to_matrix(CFrame cf)
+{
+    return MatrixMultiply(cf_to_rot_matrix(cf), cf_to_trans_matrix(cf));
+}
+
 static void draw_bump_surface(Part *this, Vector3 unit)
 {
     unit = Vector3Multiply(unit, Vector3Divide(this->formfactorpart.basepart.size, (Vector3){2, 2, 2}));
@@ -105,14 +110,14 @@ static void draw_bumps(Part *this)
 void BeginSurfaceMode(SurfaceType surface, Shader tilingShader, int tilePositionLoc, Texture2D studs)
 {
     int texOffset = 0;
-    bool shouldDraw = surface != SurfaceType_Smooth && surface != SurfaceType_SmoothNoOutlines;
+    bool shouldDraw = surface != SurfaceType_Smooth && surface != SurfaceType_SmoothNoOutlines && surface != SurfaceType_Hinge && surface != SurfaceType_Motor && surface != SurfaceType_SteppingMotor;
     if (shouldDraw)
     {
         //printf("Begin Surface Mode %d\n", surface);
         switch (surface)
         {
             case SurfaceType_Bumps:
-                FIXME("treating bumps as studs (%d)\n", surface);
+                FIXME("treating 2005 SurfaceType as studs (%d)\n", surface);
             case SurfaceType_Studs:
             {
                 texOffset = 0;
@@ -131,7 +136,7 @@ void BeginSurfaceMode(SurfaceType surface, Shader tilingShader, int tilePosition
             } break;
             default:
             {
-                printf("Unknown SurfaceType %d.\n", surface);
+                FIXME("Unknown SurfaceType %d.\n", surface);
             } break;
         }
         rlSetTexture(studs.id);
@@ -142,6 +147,38 @@ void BeginSurfaceMode(SurfaceType surface, Shader tilingShader, int tilePosition
     {
         //printf("no surface.\n");
     }
+}
+
+static Vector3 normal_from_NormalId(NormalId nid)
+{
+    switch (nid)
+    {
+        case NormalId_Right: return (Vector3){ 1, 0, 0};
+        case NormalId_Top:   return (Vector3){ 0, 1, 0};
+        case NormalId_Back:  return (Vector3){ 0, 0,-1};
+        case NormalId_Left:  return (Vector3){-1, 0, 0};
+        case NormalId_Bottom:return (Vector3){ 0,-1, 0};
+        case NormalId_Front: return (Vector3){ 0, 0, 1};
+    }
+    return (Vector3){0, 0, 0};
+}
+
+void Draw3DSurface(SurfaceType sf, NormalId normal, Vector3 ptSize)
+{
+    if (sf != SurfaceType_Hinge && sf != SurfaceType_Motor && sf != SurfaceType_SteppingMotor)
+    {
+        return;
+    }
+    rlPushMatrix();
+        Vector3 translate = Vector3Multiply(normal_from_NormalId(normal), Vector3Divide(ptSize, (Vector3){2, 2, 2}));
+        rlTranslatef(translate.x, translate.y, translate.z);
+        rlRotatef(90, 1, 0, 0);
+        DrawCylinder((Vector3){0, -0.4f, 0}, 0.1f, 0.1f, 0.8f, 12, YELLOW);
+        if (sf != SurfaceType_Hinge)
+        {
+            DrawCylinder((Vector3){0, -0.2f, 0}, 0.2f, 0.2f, 0.4f, 12, GRAY);
+        }
+    rlPopMatrix();
 }
 
 void EndSurfaceMode()
@@ -350,6 +387,24 @@ static void draw_block(Part *this)
 
             EndSurfaceMode();
         rlEnd();
+    rlPopMatrix();
+
+    // 3D Surfaces
+    rlPushMatrix();
+        rlMultMatrixf(MatrixToFloat(cf_to_matrix(this->formfactorpart.basepart.CFrame)));
+
+        BasePart pt = this->formfactorpart.basepart;
+
+        // front back top bottom right left
+        #define X(sf) Draw3DSurface(this->formfactorpart.basepart.sf##Surface, NormalId_##sf, this->formfactorpart.basepart.size)
+        X(Front);
+        X(Back);
+        X(Bottom);
+        X(Top);
+        X(Right);
+        X(Left);
+        #undef X
+
     rlPopMatrix();
 
     EndShaderMode();
