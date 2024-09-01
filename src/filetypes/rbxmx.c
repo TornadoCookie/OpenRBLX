@@ -554,13 +554,14 @@ Instance **LoadModelRBXMX(const char *file, int *mdlCount)
 
     if (*mdlCount != 0)
     {
+        printf("Loading %d mdl\n", *mdlCount);
         if (*mdlCount > 1)
         {
             printf("limitation: refs don't work with multiple top-level instances in a model.\n");
         }
         else
         {
-            load_model_refs(&refsInst, ret[0]);
+            //load_model_refs(&refsInst, ret[0]);
         }
     }
 
