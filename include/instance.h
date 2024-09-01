@@ -45,6 +45,7 @@ Instance *Instance_FindFirstChildWhichIsA(Instance *this, const char *className,
 Instance **Instance_GetDescendants(Instance *this, int *childCount);
 Instance *Instance_FindFirstChildOfClass(Instance *this, const char *className);
 Instance *Instance_FindFirstAncestorWhichIsA(Instance *this, const char *className);
+Instance *Instance_WaitForChild(Instance *this, const char *childName, double timeOut);
 
 bool ClassName_IsA(const char *className1, const char *className2);
 int GetInstanceCount(void);

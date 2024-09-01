@@ -6,6 +6,7 @@
 #include "debug.h"
 #include <dlfcn.h>
 #include "serialize.h"
+#include <time.h>
 
 DEFAULT_DEBUG_CHANNEL(instance)
 
@@ -111,6 +112,30 @@ char *Instance_GetFullName(Instance *this)
     }
 
     return fullName;
+}
+
+Instance *Instance_WaitForChild(Instance *this, const char *childName, double timeOut)
+{
+    double elapsed = 0.0;
+    bool saidInfiniteYield = false;
+    while (timeOut == 0.0 || elapsed < timeOut)
+    {
+        clock_t st = clock();
+        if (elapsed > 1 && !saidInfiniteYield)
+        {
+            const char *fullname = Instance_GetFullName(this);
+            printf("Infinite yield possible on '%s:WaitForChild(\"%s\")'\n", fullname, childName);
+            free(fullname);
+            saidInfiniteYield = true;
+        }
+        Instance *try = Instance_FindFirstChild(this, childName, false);
+        if (try) return try;
+        clock_t ed = clock();
+        double t = ((double)(ed - st)) / CLOCKS_PER_SEC;
+        elapsed += t;
+    }
+
+    return NULL;
 }
 
 bool ClassName_IsA(const char *className1, const char *className)
