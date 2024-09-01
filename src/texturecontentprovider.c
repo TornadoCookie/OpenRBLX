@@ -5,6 +5,7 @@ TextureContentProvider *TextureContentProvider_new(const char *className, Instan
 {
     TextureContentProvider *newInst = CacheableContentProvider_new(className, parent);
 
+    newInst->cacheablecontentprovider.instance.DataCost = sizeof(TextureContentProvider);
     newInst = realloc(newInst, sizeof(TextureContentProvider));
 
     newInst->studsTexture = LoadTexture("staticdata/studs.dds");

@@ -7,6 +7,7 @@ Player *Player_new(const char *className, Instance *parent)
 {
     Player *newInst = Instance_new(className, parent);
 
+    newInst->instance.DataCost = sizeof(Player);
     newInst = realloc(newInst, sizeof(Player));
 
     if (parent) Instance_SetParent(newInst, parent);
