@@ -465,7 +465,7 @@ static Instance *load_model_part_xml(struct xml_node *node, XMLRefsInstance *ref
 
     if (!strcmp(className, "Model"))
     {
-        //Model_MoveTo(ret, (Vector3){inst.modelOffset.X, inst.modelOffset.Y, inst.modelOffset.Z});
+        //Model_TranslateBy(ret, (Vector3){inst.modelOffset.X, inst.modelOffset.Y, inst.modelOffset.Z});
     }
 
     if (Instance_IsA(ret, "BasePart"))

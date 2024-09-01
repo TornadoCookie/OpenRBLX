@@ -24,6 +24,8 @@ Model_Instance *Model_new(const char *className, Instance *parent)
     newInst = realloc(newInst, sizeof(Model_Instance));
     newInst->PrimaryPart = NULL;
 
+    newInst->WorldPivot = (CFrame){0};
+
     if (!strcmp(newInst->pvinstance.instance.ClassName, "Model") && parent) Instance_SetParent(newInst, parent);
 
     return newInst;
@@ -38,7 +40,7 @@ CFrame Model_GetModelCFrame(Model_Instance *this)
 {
     if (this->PrimaryPart) return this->PrimaryPart->CFrame;
 
-    return Model_GetBoundingBox(this).orientation;
+    return this->WorldPivot;
 }
 
 Vector3 Model_GetModelSize(Model_Instance *this)
@@ -125,6 +127,11 @@ void Model_MoveTo(Model_Instance *this, Vector3 position)
     Model_TranslateBy(this, delta);
 }
 
+void translate_recursive(Instance *this, Vector3 delta, Vector3 init)
+{
+    if (Instance_IsA(this, "BasePart")) BasePart_SetPosition(this, Vector3Add(((BasePart*)this)->Position, delta));
+}
+
 void Model_TranslateBy(Model_Instance *this, Vector3 delta)
 {
     Instance **children;
@@ -132,11 +139,17 @@ void Model_TranslateBy(Model_Instance *this, Vector3 delta)
 
     children = Instance_GetChildren(this, &childCount);
 
-    if (Instance_IsA(this, "BasePart")) BasePart_SetPosition(this, Vector3Add(((BasePart*)this)->Position, delta));
-
+    Vector3 init = (Vector3){this->WorldPivot.X, this->WorldPivot.Y, this->WorldPivot.Z};
+    
     for (int i = 0; i < childCount; i++)
     {
-        Model_TranslateBy(children[i], delta);
+        if (Instance_IsA(children[i], "BasePart"))
+        {
+            Vector3 p = ((BasePart*)children[i])->Position;
+            Vector3 d = Vector3Subtract(init, p);
+            delta = Vector3Add(d, delta);
+        }
+        translate_recursive(children[i], delta, init);
     }
 
 }

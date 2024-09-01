@@ -16,6 +16,7 @@ typedef struct Model_Instance {
 
     BasePart *PrimaryPart;
     char *ModelMeshData;
+    CFrame WorldPivot;
 } Model_Instance;
 
 Model_Instance *Model_new(const char *className, Instance *parent);
