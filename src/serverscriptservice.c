@@ -364,7 +364,7 @@ static void *run_script(Script *script)
 
     init_lua_state(L, script);
 
-    printf("Running script source [%s]: \"%s\"\n", script->basescript.luasourcecontainer.instance.Name, script->Source);
+    printf("Running script source [%s]\n", script->basescript.luasourcecontainer.instance.Name);
 
     if (luaL_loadbuffer(L, script->Source, script->sourceLength, script->basescript.luasourcecontainer.instance.Name))
     {
@@ -380,6 +380,7 @@ static void *run_script(Script *script)
     printf("worked.\n");
 
 end:
+    printf("Source:  \"%s\"\n", script->Source);
     lua_close(L);
 }
 

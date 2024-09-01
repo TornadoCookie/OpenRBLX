@@ -45,7 +45,7 @@ int GetInstanceCount()
 
 Instance *Instance_Clone(Instance *this)
 {
-    Instance *clone = malloc(sizeof(Instance));
+    Instance *clone = malloc(this->DataCost);
 
     memcpy(clone, this, this->DataCost);
     Instance_SetParent(clone, clone->Parent);

@@ -105,7 +105,7 @@ static void draw_bumps(Part *this)
 void BeginSurfaceMode(SurfaceType surface, Shader tilingShader, int tilePositionLoc, Texture2D studs)
 {
     int texOffset = 0;
-    bool shouldDraw = surface != SurfaceType_Smooth;
+    bool shouldDraw = surface != SurfaceType_Smooth && surface != SurfaceType_SmoothNoOutlines;
     if (shouldDraw)
     {
         //printf("Begin Surface Mode %d\n", surface);

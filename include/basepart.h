@@ -15,10 +15,12 @@ typedef enum {
     SurfaceType_Hinge,
     SurfaceType_Motor,
     SurfaceType_SteppingMotor,
+    SurfaceType_Unjoinable,
+    SurfaceType_SmoothNoOutlines, // Previously called "Blank"
 
     // 2005 SurfaceTypes
-    SurfaceType_Bumps,
-    SurfaceType_Spawn
+    SurfaceType_Bumps, // Treat as studs unless in 2005 compat mode
+    SurfaceType_Spawn  // Treat as Smooth
 } SurfaceType;
 
 typedef enum {
