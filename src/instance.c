@@ -48,6 +48,7 @@ Instance *Instance_Clone(Instance *this)
     Instance *clone = malloc(sizeof(Instance));
 
     memcpy(clone, this, this->DataCost);
+    Instance_SetParent(clone, clone->Parent);
 
     return clone;
 }

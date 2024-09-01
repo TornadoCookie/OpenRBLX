@@ -240,6 +240,24 @@ static int luau_Instance_GetChildren(lua_State *L)
     return 1;
 }
 
+static int luau_Instance_Clone(lua_State *L)
+{
+    if (lua_gettop(L) != 1)
+    {
+        lua_pushstring(L, "Expected 1 arguments.\n");
+        lua_error(L);
+    }
+
+    lua_pushstring(L, "__inst_ptr");
+    lua_rawget(L, 1);
+
+    Instance *inst = lua_touserdata(L, -1);
+
+    luau_pushinstance(L, Instance_Clone(inst));
+
+    return 1;
+}
+
 static int luau_ServiceProvider_GetService(lua_State *L)
 {
     lua_pushstring(L, "__inst_ptr");
@@ -279,6 +297,10 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
 
     lua_pushstring(L, "GetChildren");
     lua_pushcfunction(L, luau_Instance_GetChildren);
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "Clone");
+    lua_pushcfunction(L, luau_Instance_Clone);
     lua_settable(L, -3);
     
     lua_pushstring(L, "__inst_ptr");
