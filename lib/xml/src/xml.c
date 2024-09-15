@@ -868,7 +868,7 @@ struct xml_document* xml_open_document(FILE* source) {
 
 	/* Prepare buffer
 	 */
-	size_t const read_chunk = 1; // TODO 4096;
+	size_t const read_chunk = 4096; // TODO 4096;
 
 	size_t document_length = 0;
 	size_t buffer_size = 1;	// TODO 4069

@@ -25,3 +25,16 @@ TODO:
 
 Testing:
 - test_*: test that file format. takes the file as an argument.
+
+Lumber INC memory usage:
+62.31 MB: Original
+39.42 MB: After removing unused pthread objects from RBXScriptSignal
+33.75 MB: After patching memory leaks in rbxm
+20.82 MB: After disabling textures from TextureContentProvider
+
+Crossroads memory usage:
+37.72 MB: After disabling textures from TextureContentProvider
+37.72 MB: (but faster) after patching xml.c to have larger buffer size.
+
+Maquettes memory usage:
+111.4 MB: After disabling textures from TextureContentProvider

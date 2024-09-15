@@ -11,6 +11,8 @@ TextureContentProvider *TextureContentProvider_new(const char *className, Instan
     newInst->studsTexture = LoadTexture("staticdata/studs.dds");
     newInst->tilingShader = LoadShader("staticdata/default.vs", "staticdata/repeat.fs");
 
+    newInst->texturesEnabled = true;
+
     if (parent) Instance_SetParent(newInst, parent);
 
     return newInst;
@@ -28,6 +30,10 @@ Texture2D TextureContentProvider_LoadTextureAsset(TextureContentProvider *this, 
     if (FileExists(TextFormat("cache/%ld.png", assetid)))
     {
         printf("Using cached\n");
+        if (!this->texturesEnabled)
+        {
+            return (Texture2D){0};
+        }
         return LoadTexture(TextFormat("cache/%ld.png", assetid));
     }
 

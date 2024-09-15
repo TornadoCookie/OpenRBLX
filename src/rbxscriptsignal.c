@@ -4,8 +4,8 @@
 #include <stdarg.h>
 
 struct _RBXScriptSignal_Internal {
-    pthread_cond_t cond;
-    pthread_mutex_t mutex;
+    //pthread_cond_t cond;
+    //pthread_mutex_t mutex;
 };
 
 void RBXScriptConnection_Disconnect(RBXScriptConnection *this)
@@ -17,8 +17,8 @@ RBXScriptSignal *RBXScriptSignal_new()
 {
     RBXScriptSignal *signal = malloc(sizeof(RBXScriptSignal));
     signal->private = malloc(sizeof(_RBXScriptSignal_Internal));
-    pthread_cond_init(&signal->private->cond, NULL);
-    pthread_mutex_init(&signal->private->mutex, NULL);
+    //pthread_cond_init(&signal->private->cond, NULL);
+    //pthread_mutex_init(&signal->private->mutex, NULL);
 
     signal->connections = NULL;
     signal->connectionCount = 0;
@@ -53,8 +53,8 @@ RBXScriptConnection *RBXScriptSignal_Once(RBXScriptSignal *this, void *func)
 
 void RBXScriptSignal_Wait(RBXScriptSignal *this)
 {
-    pthread_mutex_lock(&this->private->mutex);
-    pthread_cond_wait(&this->private->cond, &this->private->mutex);
+    //pthread_mutex_lock(&this->private->mutex);
+    //pthread_cond_wait(&this->private->cond, &this->private->mutex);
 }
 
 void RBXScriptSignal_Fire(RBXScriptSignal *this, void *arg)

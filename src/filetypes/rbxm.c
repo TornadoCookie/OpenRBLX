@@ -396,6 +396,8 @@ static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChu
             FIXME("Not serialized: ClassName %s, Property %.*s\n", inst->ClassName, chunk.nameLength, chunk.Name);
         }
     }
+
+    if (values != -1 && values != chunkData) free(values);
 }
 
 static int32_t *LoadReferences(int length, unsigned char *data)
@@ -428,6 +430,7 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
     fseek(f, 0, SEEK_SET);
 
     unsigned char *data = malloc(size);
+    void *initData = data;
     fread(data, 1, size, f);
 
     if (memcmp(data, signature, sizeof(signature)))
@@ -460,12 +463,14 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
         printf("CompressedLength: %d\n", chunk->CompressedLength);
         printf("UncompressedLength: %d\n", chunk->UncompressedLength);
         unsigned char *chunkData = chunkDataCompressed;
+        void *chunkDataOrig = chunkData;
         if (chunk->CompressedLength)
         {
             if (chunkDataCompressed[0] == 0x78 || chunkDataCompressed[0] == 0x58)
             {
                 int dataSize;
                 chunkData = DecompressData(chunkDataCompressed, chunk->CompressedLength, &dataSize);
+                chunkDataOrig = chunkData;
                 if (dataSize != chunk->UncompressedLength)
                 {
                     printf("Error: mismatched compressed and uncompressed data sizes.\n");
@@ -478,6 +483,7 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
             else
             {
                 chunkData = malloc(chunk->UncompressedLength);
+                chunkDataOrig = chunkData;
                 LZ4_decompress_safe(chunkDataCompressed, chunkData, chunk->CompressedLength, chunk->UncompressedLength);
             }
         }
@@ -622,6 +628,9 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
                     Instance_SetParent(child, parent);
                 }
             }
+
+            free(chunk.Children);
+            free(chunk.Parents);
         }
         else if (!strncmp(chunk->Signature, "SSTR", 4))
         {
@@ -653,7 +662,22 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
             printf("error: Unknown signature.\n");
         }
         data += sizeof(Chunk) + chunk->CompressedLength;
+        if (chunkDataOrig != chunkDataCompressed) free(chunkDataOrig);
     }
+
+    // unload...
+    for (int i = 0; i < instChunkCount; i++)
+    {
+        for (int j = 0; j < instChunks[i].Length; j++)
+        {
+            free(instChunks[i].serializeInstances[j].serializations);
+        }
+        free(instChunks[i].serializeInstances);
+        free(instChunks[i].IDs);
+        free(instChunks[i].instances);
+    }
+    free(instChunks);
+    free(initData);
 
     return ret;
 }

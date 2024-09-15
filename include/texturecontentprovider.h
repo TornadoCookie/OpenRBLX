@@ -9,6 +9,7 @@ typedef struct TextureContentProvider {
 
     Texture2D studsTexture;
     Shader tilingShader;
+    bool texturesEnabled;
 } TextureContentProvider;
 
 TextureContentProvider *TextureContentProvider_new(const char *className, Instance *parent);
