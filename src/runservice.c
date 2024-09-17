@@ -16,6 +16,7 @@ RunService *RunService_new(const char *className, Instance *parent)
 
     newInst->Heartbeat = RBXScriptSignal_new();
     newInst->Stepped = RBXScriptSignal_new();
+    newInst->running = false;
 
     if (parent) Instance_SetParent(newInst, parent);
 

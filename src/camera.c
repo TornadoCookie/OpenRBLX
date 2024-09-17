@@ -3,8 +3,16 @@
 #include <stdlib.h>
 #include "datamodel.h"
 #include "players.h"
+#include <string.h>
 
 DEFAULT_DEBUG_CHANNEL(camera)
+
+#include <rlgl.h>
+
+#define UpdateCamera _UpdateCamera
+#define RCAMERA_IMPLEMENTATION
+#include "raylib/rcamera.h"
+#undef UpdateCamera
 
 Camera_Instance *Camera_new(const char *className, Instance *parent)
 {
@@ -50,11 +58,11 @@ void Camera_Process(Camera_Instance *this)
     {
         this->camera.target = players->LocalPlayer->Character->PrimaryPart->Position;
         FIXME("Target on position: %s\n", debugstr_vector3(this->camera.target));
-        UpdateCamera(&this->camera, CAMERA_THIRD_PERSON);
+        _UpdateCamera(&this->camera, CAMERA_THIRD_PERSON);
     }
     else
     {
-        UpdateCamera(&this->camera, CAMERA_FREE);
+        _UpdateCamera(&this->camera, CAMERA_FREE);
     }
 }
 
@@ -65,7 +73,7 @@ void serialize_Camera(Camera_Instance *camera, SerializeInstance *inst)
 
     serialize_Instance(camera, inst);
 
-    camera->instance.ClassName = "Camera";
+    //camera->instance.ClassName = "Camera";
 
     serialize_atomic(Ref, camera, CameraSubject);
     serialize_atomic(token, camera, CameraType);

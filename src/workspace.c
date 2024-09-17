@@ -64,5 +64,5 @@ void serialize_Workspace(Workspace *workspace, SerializeInstance *inst)
     workspace->rootinstance.model.pvinstance.instance.ClassName = "Workspace";
 
     serialize_atomic(double, workspace, DistributedGameTime);
-    serialize_atomic(Ref, workspace, CurrentCamera);
+    //serialize_atomic(Ref, workspace, CurrentCamera);
 }

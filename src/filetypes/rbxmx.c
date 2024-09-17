@@ -492,8 +492,6 @@ static Instance *load_model_part_xml(struct xml_node *node, XMLRefsInstance *ref
         }
     }
 
-    free(className);
-
     return ret;
 }
 
