@@ -15,4 +15,6 @@ FormFactorPart *FormFactorPart_new(const char *className, Instance *parent)
 void serialize_FormFactorPart(FormFactorPart *formfactorpart, SerializeInstance *inst)
 {
     serialize_BasePart(formfactorpart, inst);
+
+    serialize_atomic(token, formfactorpart, FormFactor);
 }

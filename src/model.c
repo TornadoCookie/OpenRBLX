@@ -160,4 +160,5 @@ void serialize_Model(Model_Instance *model, SerializeInstance *inst)
 
     _serialize_atomic(inst, (Serialization){Serialize_CoordinateFrame, "CoordinateFrame", &inst->modelOffset});
     serialize_atomic(string, model, ModelMeshData);
+    serialize_atomic(Ref, model, PrimaryPart);
 }
