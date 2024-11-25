@@ -130,6 +130,7 @@ void Model_MoveTo(Model_Instance *this, Vector3 position)
 void translate_recursive(Instance *this, Vector3 delta, Vector3 init)
 {
     if (Instance_IsA(this, "BasePart")) BasePart_SetPosition(this, Vector3Add(((BasePart*)this)->Position, delta));
+    for (int i = 0; i < this->childCount; i++) translate_recursive(this->children[i], delta, init);
 }
 
 void Model_TranslateBy(Model_Instance *this, Vector3 delta)
@@ -143,12 +144,6 @@ void Model_TranslateBy(Model_Instance *this, Vector3 delta)
     
     for (int i = 0; i < childCount; i++)
     {
-        if (Instance_IsA(children[i], "BasePart"))
-        {
-            Vector3 p = ((BasePart*)children[i])->Position;
-            Vector3 d = Vector3Subtract(init, p);
-            delta = Vector3Add(d, delta);
-        }
         translate_recursive(children[i], delta, init);
     }
 

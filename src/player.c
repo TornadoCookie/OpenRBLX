@@ -26,31 +26,37 @@ void Player_LoadCharacter(Player *this)
     torso->formfactorpart.basepart.pvinstance.instance.Name = "Torso";
     BasePart_SetCFrame(torso, (CFrame){0, 3, 0, -1, 0, 0, 0, 1, 0, 0, 0, -1});
     torso->formfactorpart.basepart.size = (Vector3){2, 2, 1};
+    BasePart_SetColor(torso, (Color3){0.565, 0.78, 0.922});
 
     Part *head = Part_new("Part", mdl);
-    torso->formfactorpart.basepart.pvinstance.instance.Name = "Head";
-    BasePart_SetCFrame(torso, (CFrame){0, 4.5, 0, -1, 0, 0, 0, 1, 0, 0, 0, -1});
-    torso->formfactorpart.basepart.size = (Vector3){2, 1, 1};
+    head->formfactorpart.basepart.pvinstance.instance.Name = "Head";
+    BasePart_SetCFrame(head, (CFrame){0, 4.5, 0, -1, 0, 0, 0, 1, 0, 0, 0, -1});
+    head->formfactorpart.basepart.size = (Vector3){2, 1, 1};
+    BasePart_SetColor(head, (Color3){0.953, 1, 0.686});
 
     Part *leftArm = Part_new("Part", mdl);
-    torso->formfactorpart.basepart.pvinstance.instance.Name = "Left Arm";
-    BasePart_SetCFrame(torso, (CFrame){1.5, 3, 0, -1, 0, 0, 0, 1, 0, 0, 0, -1});
-    torso->formfactorpart.basepart.size = (Vector3){1, 2, 1};
+    leftArm->formfactorpart.basepart.pvinstance.instance.Name = "Left Arm";
+    BasePart_SetCFrame(leftArm, (CFrame){1.5, 3, 0, -1, 0, 0, 0, 1, 0, 0, 0, -1});
+    leftArm->formfactorpart.basepart.size = (Vector3){1, 2, 1};
+    BasePart_SetColor(leftArm, (Color3){0.953, 1, 0.686});
 
     Part *rightArm = Part_new("Part", mdl);
-    torso->formfactorpart.basepart.pvinstance.instance.Name = "Right Arm";
-    BasePart_SetCFrame(torso, (CFrame){-1.5, 3, 0, -1, 0, 0, 0, 1, 0, 0, 0, -1});
-    torso->formfactorpart.basepart.size = (Vector3){1, 2, 1};
+    rightArm->formfactorpart.basepart.pvinstance.instance.Name = "Right Arm";
+    BasePart_SetCFrame(rightArm, (CFrame){-1.5, 3, 0, -1, 0, 0, 0, 1, 0, 0, 0, -1});
+    rightArm->formfactorpart.basepart.size = (Vector3){1, 2, 1};
+    BasePart_SetColor(rightArm, (Color3){0.953, 1, 0.686});
 
     Part *leftLeg = Part_new("Part", mdl);
-    torso->formfactorpart.basepart.pvinstance.instance.Name = "Left Leg";
-    BasePart_SetCFrame(torso, (CFrame){0.5, 1, 0, -1, 0, 0, 0, 1, 0, 0, 0, -1});
-    torso->formfactorpart.basepart.size = (Vector3){1, 2, 1};
+    leftLeg->formfactorpart.basepart.pvinstance.instance.Name = "Left Leg";
+    BasePart_SetCFrame(leftLeg, (CFrame){0.5, 1, 0, -1, 0, 0, 0, 1, 0, 0, 0, -1});
+    leftLeg->formfactorpart.basepart.size = (Vector3){1, 2, 1};
+    BasePart_SetColor(leftLeg, (Color3){0.443, 0.729, 0.42});
 
     Part *rightLeg = Part_new("Part", mdl);
-    torso->formfactorpart.basepart.pvinstance.instance.Name = "Right Leg";
-    BasePart_SetCFrame(torso, (CFrame){-0.5, 1, 0, -1, 0, 0, 0, 1, 0, 0, 0, -1});
-    torso->formfactorpart.basepart.size = (Vector3){1, 2, 1};
+    rightLeg->formfactorpart.basepart.pvinstance.instance.Name = "Right Leg";
+    BasePart_SetCFrame(rightLeg, (CFrame){-0.5, 1, 0, -1, 0, 0, 0, 1, 0, 0, 0, -1});
+    rightLeg->formfactorpart.basepart.size = (Vector3){1, 2, 1};
+    BasePart_SetColor(rightLeg, (Color3){0.443, 0.729, 0.42});
 
     mdl->PrimaryPart = head;
 

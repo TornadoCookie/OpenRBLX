@@ -19,6 +19,13 @@ static int nextUserId;
 void Players_CreateLocalPlayer(Players *this)
 {
     this->LocalPlayer = Player_new("Player", this);
-    this->LocalPlayer->UserId = --nextUserId;
+    this->LocalPlayer->UserId = --nextUserId; // start at -1, then -2, -3, etc.
     this->LocalPlayer->instance.Name = "OpenRBLXPlayer";
+}
+
+void serialize_Players(Players *players, SerializeInstance *inst)
+{
+    serialize_Instance(players, inst);
+
+    serialize_atomic(bool, players, CharacterAutoLoads);
 }

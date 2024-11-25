@@ -39,6 +39,7 @@ const BrickColor brickColors[] = {
     {"Cool yellow", (Color3){0.993, 0.918, 0.553}, 226},
     {"Institutional white", (Color3){0.973, 0.973, 0.973}, 1001},
     {"Mid gray", (Color3){0.804, 0.804, 0.804}, 1002},
+    {"Really black", (Color3){0.067, 0.067, 0.067}, 1003},
     {"Really red", (Color3){1.0f, 0, 0}, 1004},
     {"Dusty Rose", (Color3){0.640, 0.295, 0.295}, 1007},
     {"Grime", (Color3){0.499, 0.557, 0.393}, 1022},
