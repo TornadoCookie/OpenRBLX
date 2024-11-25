@@ -1,4 +1,4 @@
-# Generated using Helium v2.0.0 (https://github.com/tornadocookie/he)
+# Generated using Helium v2.0.1 (https://github.com/tornadocookie/he)
 
 PLATFORM?=linux64-debug
 DISTDIR?=build
@@ -41,6 +41,18 @@ CFLAGS+=-O2
 CFLAGS+=-D RELEASE
 CFLAGS+=-D EXEC_EXTENSION=\".exe\"
 CFLAGS+=-D LIB_EXTENSION=\".dll\"
+endif
+
+ifeq ($(PLATFORM), web)
+EXEC_EXTENSION=.html
+LIB_EXTENSION=.a
+CC=emcc
+CXX=em++
+RAYLIB_DLL=-lraylib
+CFLAGS+=-O2
+CFLAGS+=-D RELEASE
+CFLAGS+=-D EXEC_EXTENSION=\".html\"
+CFLAGS+=-D LIB_EXTENSION=\".a\"
 endif
 
 PROGRAMS=test_rbxmx test_rbxlx studio test_rbxm test_rbxl test_rbxmesh
@@ -269,3 +281,4 @@ all_dist:
 	DISTDIR=$(DISTDIR)/dist/linux64 PLATFORM=linux64 $(MAKE)
 	DISTDIR=$(DISTDIR)/dist/linux64-debug PLATFORM=linux64-debug $(MAKE)
 	DISTDIR=$(DISTDIR)/dist/win64 PLATFORM=win64 $(MAKE)
+	DISTDIR=$(DISTDIR)/dist/web PLATFORM=web $(MAKE)
