@@ -226,7 +226,7 @@ static void draw_block(Part *this)
         {
             Decal *dc = children[i];
             decals[dc->faceinstance.Face] = dc;
-            if (!IsTextureReady(dc->texture))
+            if (!IsTextureValid(dc->texture))
             {
                 dc->texture = TextureContentProvider_LoadTextureAsset(ServiceProvider_GetService(GetDataModel(), "TextureContentProvider"), dc->Texture);
             }
