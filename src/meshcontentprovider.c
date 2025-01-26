@@ -323,6 +323,11 @@ Mesh MeshContentProvider_GetFileMesh(MeshContentProvider *this, const char *cont
     
 
     //printf("%d\n", mini_gz_unpack(&gz, data, gz.data_len));
+
+    if (!data)
+    {
+        return (Mesh){0};
+    }
     
 
     Mesh ret = LoadMeshFromRobloxFormat(data, dataSize);

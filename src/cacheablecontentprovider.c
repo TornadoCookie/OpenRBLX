@@ -57,6 +57,11 @@ const char *CacheableContentProvider_LoadAssetDelivery(CacheableContentProvider 
     cJSON *locations = cJSON_GetObjectItem(json, "locations");
     cJSON *location = cJSON_GetArrayItem(locations, 0);
     const char *newUrl = cJSON_GetStringValue(cJSON_GetObjectItem(location, "location"));
+    if (!newUrl)
+    {
+        *dataSize = 0;
+        return NULL;
+    }
     printf("Redirecting to %s.\n", newUrl);
 
     return HttpService_GetAsync(httpService, newUrl, dataSize);
