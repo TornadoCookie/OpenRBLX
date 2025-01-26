@@ -194,6 +194,9 @@ static int luau_Instance__index(lua_State *L)
         }
     }
 
+    lua_pushstring(L, TextFormat("Instance %s has no child or property %s\n", inst->ClassName, name));
+    lua_error(L);
+
     lua_pushnil(L);
     return 1;
 }
@@ -353,6 +356,10 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
     lua_setmetatable(L, -2);
 
     lua_pushstring(L, "FindFirstChild");
+    lua_pushcfunction(L, luau_Instance_FindFirstChild);
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "findFirstChild");
     lua_pushcfunction(L, luau_Instance_FindFirstChild);
     lua_settable(L, -3);
 
