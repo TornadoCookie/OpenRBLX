@@ -1,4 +1,4 @@
-# Generated using Helium v2.0.1 (https://github.com/tornadocookie/he)
+# Generated using Helium v2.1.1 (https://github.com/tornadocookie/he)
 
 PLATFORM?=linux64-debug
 DISTDIR?=build
@@ -10,6 +10,7 @@ RAYLIB_NAME=raylib5.5-$(PLATFORM)
 ifeq ($(PLATFORM), linux64)
 EXEC_EXTENSION=
 LIB_EXTENSION=.so
+LIB_EXTENSION_STATIC=.a
 CC=gcc
 CXX=g++
 RAYLIB_DLL=-lraylib
@@ -21,19 +22,21 @@ endif
 
 ifeq ($(PLATFORM), linux64-debug)
 EXEC_EXTENSION=-debug
-LIB_EXTENSION=-debug.so
+LIB_EXTENSION=.so
+LIB_EXTENSION_STATIC=.a
 CC=gcc
 CXX=g++
 RAYLIB_DLL=-lraylib
 CFLAGS+=-g
 CFLAGS+=-D DEBUG
 CFLAGS+=-D EXEC_EXTENSION=\"-debug\"
-CFLAGS+=-D LIB_EXTENSION=\"-debug.so\"
+CFLAGS+=-D LIB_EXTENSION=\".so\"
 endif
 
 ifeq ($(PLATFORM), win64)
 EXEC_EXTENSION=.exe
 LIB_EXTENSION=.dll
+LIB_EXTENSION_STATIC=.a
 CC=x86_64-w64-mingw32-gcc
 CXX=x86_64-w64-mingw32-g++
 RAYLIB_DLL=-lraylibdll
@@ -46,6 +49,7 @@ endif
 ifeq ($(PLATFORM), web)
 EXEC_EXTENSION=.html
 LIB_EXTENSION=.a
+LIB_EXTENSION_STATIC=.a
 CC=emcc
 CXX=em++
 RAYLIB_DLL=-lraylib
@@ -55,15 +59,15 @@ CFLAGS+=-D EXEC_EXTENSION=\".html\"
 CFLAGS+=-D LIB_EXTENSION=\".a\"
 endif
 
-PROGRAMS=test_rbxmx test_rbxlx studio test_rbxm test_rbxl test_rbxmesh
+PROGRAMS=studio player
 LIBRARIES=
 
-all: $(DISTDIR) $(DISTDIR)/src $(DISTDIR)/src/../lib/cJSON/src $(DISTDIR)/src/filetypes $(DISTDIR)/src/../lib/xml/src $(DISTDIR)/src/../lib/lz4/src $(DISTDIR)/src/../tests $(DISTDIR)/src/../studio $(foreach prog, $(PROGRAMS), $(DISTDIR)/$(prog)$(EXEC_EXTENSION)) $(foreach lib, $(LIBRARIES), $(DISTDIR)/$(lib)$(LIB_EXTENSION)) deps
+all: $(DISTDIR) $(DISTDIR)/src $(DISTDIR)/src/../lib/cJSON/src $(DISTDIR)/src/filetypes $(DISTDIR)/src/../lib/xml/src $(DISTDIR)/src/../lib/lz4/src $(DISTDIR)/src/../studio $(DISTDIR)/src/../player $(foreach prog, $(PROGRAMS), $(DISTDIR)/$(prog)$(EXEC_EXTENSION)) $(foreach lib, $(LIBRARIES), $(DISTDIR)/$(lib)$(LIB_EXTENSION) $(DISTDIR)/$(lib)$(LIB_EXTENSION_STATIC)) deps
 
 ifneq ($(DISTDIR), .)
 deps:
 	mkdir -p $(DISTDIR)/lib
-	if [ -d lib/$(RAYLIB_NAME) ]; then cp -r lib/$(RAYLIB_NAME) $(DISTDIR)/lib; fi
+	if [ -d lib/$(RAYLIB_NAME) ] && [ ! -d $(DISTDIR)/lib/$(RAYLIB_NAME) ]; then cp -r lib/$(RAYLIB_NAME) $(DISTDIR)/lib; fi
 else
 deps:
 endif
@@ -83,10 +87,10 @@ $(DISTDIR)/src/../lib/xml/src:
 $(DISTDIR)/src/../lib/lz4/src:
 	mkdir -p $@
 
-$(DISTDIR)/src/../tests:
+$(DISTDIR)/src/../studio:
 	mkdir -p $@
 
-$(DISTDIR)/src/../studio:
+$(DISTDIR)/src/../player:
 	mkdir -p $@
 
 $(DISTDIR):
@@ -170,20 +174,6 @@ rbxmx_SOURCES+=$(DISTDIR)/src/../lib/xml/src/xml.o
 rbxm_SOURCES+=$(DISTDIR)/src/filetypes/rbxm.o
 rbxm_SOURCES+=$(DISTDIR)/src/../lib/lz4/src/lz4.o
 
-test_rbxmx_SOURCES+=$(DISTDIR)/src/../tests/test_rbxmx.o
-test_rbxmx_SOURCES+=$(instance_SOURCES)
-test_rbxmx_SOURCES+=$(rbxmx_SOURCES)
-
-$(DISTDIR)/test_rbxmx$(EXEC_EXTENSION): $(test_rbxmx_SOURCES)
-	$(CC) -o $@ $^ $(LDFLAGS)
-
-test_rbxlx_SOURCES+=$(DISTDIR)/src/../tests/test_rbxlx.o
-test_rbxlx_SOURCES+=$(instance_SOURCES)
-test_rbxlx_SOURCES+=$(rbxmx_SOURCES)
-
-$(DISTDIR)/test_rbxlx$(EXEC_EXTENSION): $(test_rbxlx_SOURCES)
-	$(CC) -o $@ $^ $(LDFLAGS)
-
 studio_SOURCES+=$(DISTDIR)/src/../studio/studio.o
 studio_SOURCES+=$(instance_SOURCES)
 studio_SOURCES+=$(rbxmx_SOURCES)
@@ -192,24 +182,12 @@ studio_SOURCES+=$(rbxm_SOURCES)
 $(DISTDIR)/studio$(EXEC_EXTENSION): $(studio_SOURCES)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
-test_rbxm_SOURCES+=$(DISTDIR)/src/../tests/test_rbxm.o
-test_rbxm_SOURCES+=$(instance_SOURCES)
-test_rbxm_SOURCES+=$(rbxm_SOURCES)
+player_SOURCES+=$(DISTDIR)/src/../player/player.o
+player_SOURCES+=$(instance_SOURCES)
+player_SOURCES+=$(rbxmx_SOURCES)
+player_SOURCES+=$(rbxm_SOURCES)
 
-$(DISTDIR)/test_rbxm$(EXEC_EXTENSION): $(test_rbxm_SOURCES)
-	$(CC) -o $@ $^ $(LDFLAGS)
-
-test_rbxl_SOURCES+=$(DISTDIR)/src/../tests/test_rbxl.o
-test_rbxl_SOURCES+=$(instance_SOURCES)
-test_rbxl_SOURCES+=$(rbxm_SOURCES)
-
-$(DISTDIR)/test_rbxl$(EXEC_EXTENSION): $(test_rbxl_SOURCES)
-	$(CC) -o $@ $^ $(LDFLAGS)
-
-test_rbxmesh_SOURCES+=$(DISTDIR)/src/../tests/test_rbxmesh.o
-test_rbxmesh_SOURCES+=$(instance_SOURCES)
-
-$(DISTDIR)/test_rbxmesh$(EXEC_EXTENSION): $(test_rbxmesh_SOURCES)
+$(DISTDIR)/player$(EXEC_EXTENSION): $(player_SOURCES)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 $(DISTDIR)/%.o: %.c
@@ -264,18 +242,10 @@ clean:
 	rm -f $(DISTDIR)/src/../lib/xml/src/xml.o
 	rm -f $(DISTDIR)/src/filetypes/rbxm.o
 	rm -f $(DISTDIR)/src/../lib/lz4/src/lz4.o
-	rm -f $(DISTDIR)/src/../tests/test_rbxmx.o
-	rm -f $(DISTDIR)/test_rbxmx$(EXEC_EXTENSION)
-	rm -f $(DISTDIR)/src/../tests/test_rbxlx.o
-	rm -f $(DISTDIR)/test_rbxlx$(EXEC_EXTENSION)
 	rm -f $(DISTDIR)/src/../studio/studio.o
 	rm -f $(DISTDIR)/studio$(EXEC_EXTENSION)
-	rm -f $(DISTDIR)/src/../tests/test_rbxm.o
-	rm -f $(DISTDIR)/test_rbxm$(EXEC_EXTENSION)
-	rm -f $(DISTDIR)/src/../tests/test_rbxl.o
-	rm -f $(DISTDIR)/test_rbxl$(EXEC_EXTENSION)
-	rm -f $(DISTDIR)/src/../tests/test_rbxmesh.o
-	rm -f $(DISTDIR)/test_rbxmesh$(EXEC_EXTENSION)
+	rm -f $(DISTDIR)/src/../player/player.o
+	rm -f $(DISTDIR)/player$(EXEC_EXTENSION)
 
 all_dist:
 	DISTDIR=$(DISTDIR)/dist/linux64 PLATFORM=linux64 $(MAKE)

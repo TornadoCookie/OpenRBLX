@@ -70,32 +70,15 @@ SourceGroup rbxm
 Source filetypes/rbxm.c
 Source ../lib/lz4/src/lz4.c
 
-Program test_rbxmx
-Source ../tests/test_rbxmx.c
-UseSourceGroup instance
-UseSourceGroup rbxmx
-
-Program test_rbxlx
-Source ../tests/test_rbxlx.c
-UseSourceGroup instance
-UseSourceGroup rbxmx
-
 Program studio
 Source ../studio/studio.c
 UseSourceGroup instance
 UseSourceGroup rbxmx
 UseSourceGroup rbxm
 
-Program test_rbxm
-Source ../tests/test_rbxm.c
+Program player
+Source ../player/player.c
 UseSourceGroup instance
+UseSourceGroup rbxmx
 UseSourceGroup rbxm
 
-Program test_rbxl
-Source ../tests/test_rbxl.c
-UseSourceGroup instance
-UseSourceGroup rbxm
-
-Program test_rbxmesh
-Source ../tests/test_rbxmesh.c
-UseSourceGroup instance
