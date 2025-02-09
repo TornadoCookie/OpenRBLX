@@ -512,7 +512,7 @@ Part *Part_new(const char *className, Instance *parent)
 
     //newInst->material.maps[MATERIAL_MAP_DIFFUSE].texture = mcp->studs;
 
-    if (parent) Instance_SetParent(newInst, parent);
+    if (parent && !strcmp(className, "Part")) Instance_SetParent(newInst, parent);
 
     return newInst;
 }

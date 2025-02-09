@@ -60,6 +60,7 @@ Source texturecontentprovider.c
 Source players.c
 Source player.c
 Source stringvalue.c
+Source spawnlocation.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c
