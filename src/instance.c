@@ -138,6 +138,7 @@ Instance *Instance_WaitForChild(Instance *this, const char *childName, double ti
     return NULL;
 }
 
+// TODO FIX THIS!!!!
 bool ClassName_IsA(const char *className1, const char *className)
 {
     if (!strcmp(className, "Instance") || !strcmp(className1, className)) return true;
@@ -206,6 +207,12 @@ void Instance_Remove(Instance *this)
 
         RBXScriptSignal_Fire(this->Parent->ChildRemoved, this);
     }
+}
+
+void Instance_Destroy(Instance *this)
+{
+    Instance_Remove(this);
+    free(this);
 }
 
 Instance *Instance_FindFirstChildWhichIsA(Instance *this, const char *className, bool recursive)
