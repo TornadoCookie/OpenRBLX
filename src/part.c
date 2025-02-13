@@ -493,7 +493,7 @@ void part_draw(Part *this)
 
 Part *Part_new(const char *className, Instance *parent)
 {
-    Part *newInst = FormFactorPart_new("Part", parent);
+    Part *newInst = FormFactorPart_new(className, parent);
 
     newInst->formfactorpart.basepart.pvinstance.instance.DataCost = sizeof(Part);
     newInst = realloc(newInst, sizeof(Part));
