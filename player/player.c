@@ -4,6 +4,9 @@
 #include <string.h>
 #include "httpservice.h"
 #include "filetypes.h"
+#include "players.h"
+#include "runservice.h"
+#include "cacheablecontentprovider.h"
 
 #define DEBUG_IMPL
 #include "debug.h"
@@ -122,6 +125,14 @@ int main(int argc, char **argv)
 
     SetTargetFPS(60);
     DisableCursor();
+
+    Players *players = ServiceProvider_GetService(game, "Players");
+    Players_CreateLocalPlayer(players);
+    Player *localPlayer = players->LocalPlayer;
+    Player_LoadCharacter(localPlayer);
+
+    RunService *runService = ServiceProvider_GetService(game, "RunService");
+    RunService_Run(runService);
 
     while (!WindowShouldClose())
     {
