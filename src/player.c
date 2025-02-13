@@ -4,6 +4,8 @@
 #include "decal.h"
 #include <string.h>
 #include "scriptruntime.h"
+#include "starterplayerscripts.h"
+#include "playerscripts.h"
 
 Player *Player_new(const char *className, Instance *parent)
 {
@@ -16,12 +18,33 @@ Player *Player_new(const char *className, Instance *parent)
 
     newInst->Character = NULL;
 
+    Instance **children;
+    int childCount;
+
+    // StarterPack
+    // StarterGui
+    // StarterPlayerScripts
+    StarterPlayerScripts *starterPlayerScripts = Instance_FindFirstChildOfClass(ServiceProvider_GetService(GetDataModel(), "StarterPlayer"), "StarterPlayerScripts");
+    if (starterPlayerScripts)
+    {
+        PlayerScripts *playerScripts = PlayerScripts_new("PlayerScripts", newInst);
+        children = Instance_GetChildren(starterPlayerScripts, &childCount);
+        for (int i = 0; i < childCount; i++)
+        {
+            printf("%s\n", children[i]->ClassName);
+            Instance *clone = Instance_Clone(children[i]);
+            Instance_SetParent(clone, playerScripts);
+        }
+    }
+
     return newInst;
 }
 
 static void run_scripts(Instance *inst)
 {
     if (!inst) return;
+
+    printf("%s\n", inst->ClassName);
 
     if (!strcmp(inst->ClassName, "LocalScript"))
     {
@@ -77,6 +100,9 @@ void Player_LoadCharacter(Player *this)
     BasePart_SetColor(rightLeg, (Color3){0.443, 0.729, 0.42});
 
     mdl->PrimaryPart = head;
+
+    // StarterCharacterScripts
+
     this->Character = mdl;
 
     run_scripts(this->Character);
@@ -103,8 +129,8 @@ void Player_Move(Player *this, Vector3 walkDirection, bool relativeToCamera)
 void Player_RunScripts(Player *this)
 {
     run_scripts(ServiceProvider_GetService(GetDataModel(), "ReplicatedFirst"));
-    run_scripts(Instance_FindFirstChild(this, "PlayerScripts", false));
-    run_scripts(Instance_FindFirstChild(this, "PlayerGui", false));
-    run_scripts(Instance_FindFirstChild(this, "Backpack", false));
+    run_scripts(Instance_FindFirstChildOfClass(this, "PlayerScripts"));
+    run_scripts(Instance_FindFirstChildOfClass(this, "PlayerGui"));
+    run_scripts(Instance_FindFirstChildOfClass(this, "Backpack"));
 }
 
