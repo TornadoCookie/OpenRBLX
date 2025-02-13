@@ -2,6 +2,8 @@
 #include "datamodel.h"
 #include "part.h"
 #include "decal.h"
+#include <string.h>
+#include "scriptruntime.h"
 
 Player *Player_new(const char *className, Instance *parent)
 {
@@ -15,6 +17,22 @@ Player *Player_new(const char *className, Instance *parent)
     newInst->Character = NULL;
 
     return newInst;
+}
+
+static void run_scripts(Instance *inst)
+{
+    if (!inst) return;
+
+    if (!strcmp(inst->ClassName, "LocalScript"))
+    {
+        ScriptRuntime *scrRuntime = ScriptRuntime_new("ScriptRuntime", inst);
+        ScriptRuntime_RunLocalScript(scrRuntime, inst);
+    }
+
+    for (int i = 0; i < inst->childCount; i++)
+    {
+        run_scripts(inst->children[i]);
+    }
 }
 
 void Player_LoadCharacter(Player *this)
@@ -59,8 +77,9 @@ void Player_LoadCharacter(Player *this)
     BasePart_SetColor(rightLeg, (Color3){0.443, 0.729, 0.42});
 
     mdl->PrimaryPart = head;
-
     this->Character = mdl;
+
+    run_scripts(this->Character);
 }
 
 void Player_Move(Player *this, Vector3 walkDirection, bool relativeToCamera)
@@ -79,3 +98,13 @@ void Player_Move(Player *this, Vector3 walkDirection, bool relativeToCamera)
         Model_TranslateBy(this->Character, walkDirection);
     }
 }
+
+
+void Player_RunScripts(Player *this)
+{
+    run_scripts(ServiceProvider_GetService(GetDataModel(), "ReplicatedFirst"));
+    run_scripts(Instance_FindFirstChild(this, "PlayerScripts", false));
+    run_scripts(Instance_FindFirstChild(this, "PlayerGui", false));
+    run_scripts(Instance_FindFirstChild(this, "Backpack", false));
+}
+
