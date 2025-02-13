@@ -12,7 +12,10 @@
 
 #include "debug.h"
 
-DEFAULT_DEBUG_CHANNEL(rbxm)
+DEFAULT_DEBUG_CHANNEL(rbxm);
+
+// Resources:
+// https://github.com/rojo-rbx/rbx-dom/blob/master/docs/binary.md
 
 const unsigned char signature[] = {
     0x3C, 0x72, 0x6F, 0x62, 0x6C, 0x6F, 0x78, 0x21, 0x89, 0xFF, 0x0D, 0x0A, 0x1A, 0x0A,
