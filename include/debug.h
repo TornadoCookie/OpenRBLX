@@ -66,6 +66,7 @@ const char *debugstr_color3(Color3 c);
 void dbg_printf(const char *type, const char *channel, const char *func, const char *restrict format, ...);
 
 #define FIXME(fmt, ...) dbg_printf("FIXME", __dbg_channel, __func__, fmt, __VA_ARGS__)
+#define ERR(fmt, ...) dbg_printf("ERR", __dbg_channel, __func__, fmt, __VA_ARGS__)
 
 #define DEFAULT_DEBUG_CHANNEL(x) static const char *__dbg_channel = #x;
 
