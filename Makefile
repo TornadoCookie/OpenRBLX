@@ -167,6 +167,9 @@ instance_SOURCES+=$(DISTDIR)/src/players.o
 instance_SOURCES+=$(DISTDIR)/src/player.o
 instance_SOURCES+=$(DISTDIR)/src/stringvalue.o
 instance_SOURCES+=$(DISTDIR)/src/spawnlocation.o
+instance_SOURCES+=$(DISTDIR)/src/modulescript.o
+instance_SOURCES+=$(DISTDIR)/src/localscript.o
+instance_SOURCES+=$(DISTDIR)/src/starterplayerscripts.o
 
 rbxmx_SOURCES+=$(DISTDIR)/src/filetypes/rbxlx.o
 rbxmx_SOURCES+=$(DISTDIR)/src/filetypes/rbxmx.o
@@ -239,6 +242,9 @@ clean:
 	rm -f $(DISTDIR)/src/player.o
 	rm -f $(DISTDIR)/src/stringvalue.o
 	rm -f $(DISTDIR)/src/spawnlocation.o
+	rm -f $(DISTDIR)/src/modulescript.o
+	rm -f $(DISTDIR)/src/localscript.o
+	rm -f $(DISTDIR)/src/starterplayerscripts.o
 	rm -f $(DISTDIR)/src/filetypes/rbxlx.o
 	rm -f $(DISTDIR)/src/filetypes/rbxmx.o
 	rm -f $(DISTDIR)/src/../lib/xml/src/xml.o
