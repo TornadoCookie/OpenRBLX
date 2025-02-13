@@ -7,6 +7,7 @@
 #include "players.h"
 #include "runservice.h"
 #include "cacheablecontentprovider.h"
+#include "localscript.h"
 
 #define DEBUG_IMPL
 #include "debug.h"
@@ -126,10 +127,15 @@ int main(int argc, char **argv)
     SetTargetFPS(60);
     DisableCursor();
 
+    // CoreScripts loader
+    LocalScript *scr = LocalScript_new("LocalScript", Instance_FindFirstChildOfClass(ServiceProvider_GetService(game, "StarterPlayer"), "StarterPlayerScripts"));
+    scr->script.Source = "require(game.PlayerScripts.StarterPlayerScripts.PlayerScriptsLoader)";
+    scr->script.sourceLength = strlen(scr->script.Source);
+
     Players *players = ServiceProvider_GetService(game, "Players");
     Players_CreateLocalPlayer(players);
     Player *localPlayer = players->LocalPlayer;
-    Player_LoadCharacter(localPlayer);
+    Player_LoadCharacter(localPlayer); 
 
     RunService *runService = ServiceProvider_GetService(game, "RunService");
     RunService_Run(runService);
