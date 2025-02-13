@@ -64,6 +64,8 @@ Source spawnlocation.c
 Source modulescript.c
 Source localscript.c
 Source starterplayerscripts.c
+Source starterplayer.c
+Source scriptruntime.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c
