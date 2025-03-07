@@ -46,10 +46,12 @@ int GetInstanceCount()
 
 Instance *Instance_Clone(Instance *this)
 {
+    if (!this->archivable) return NULL;
+
     Instance *clone = malloc(this->DataCost);
 
     memcpy(clone, this, this->DataCost);
-    Instance_SetParent(clone, clone->Parent);
+    //Instance_SetParent(clone, clone->Parent);
 
     return clone;
 }
