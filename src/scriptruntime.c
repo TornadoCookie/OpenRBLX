@@ -1,6 +1,7 @@
 #include "scriptruntime.h"
 #include "basepart.h"
 #include "datamodel.h"
+#include <pthread.h>
 
 #include "debug.h"
 
@@ -475,15 +476,50 @@ end:
     lua_close(L);
 }
 
+typedef struct ScriptRunnerArgs {
+    Instance *script;
+    const char *source;
+    int sourceLength;
+    bool client;
+    ScriptRuntime *this;
+} ScriptRunnerArgs;
+
+void *run_script_runner(void *args)
+{
+    ScriptRunnerArgs *srargs = args;
+
+    run_script(srargs->script, srargs->source, srargs->sourceLength, srargs->client);
+
+    Instance_Destroy(srargs->this);
+
+    return NULL;
+}
+
 void ScriptRuntime_RunScript(ScriptRuntime *this, Script *script)
 {
-    run_script(script, script->Source, script->sourceLength, false);
-    Instance_Destroy(this);
+    ScriptRunnerArgs *args = malloc(sizeof(ScriptRunnerArgs));
+    pthread_t thread;
+
+    args->script = script;
+    args->source = script->Source;
+    args->sourceLength = script->sourceLength;
+    args->client = false;
+    args->this = this;
+
+    pthread_create(&thread, NULL, run_script_runner, args);
 }
 
 void ScriptRuntime_RunLocalScript(ScriptRuntime *this, LocalScript *localScript)
 {
-    run_script(localScript, localScript->script.Source, localScript->script.sourceLength, true);
-    Instance_Destroy(this);
+    ScriptRunnerArgs *args = malloc(sizeof(ScriptRunnerArgs));
+    pthread_t thread;
+
+    args->script = localScript;
+    args->source = localScript->script.Source;
+    args->sourceLength = localScript->script.sourceLength;
+    args->client = true;
+    args->this = this;
+
+    pthread_create(&thread, NULL, run_script_runner, args);
 }
 

@@ -24,15 +24,15 @@ static void run_scripts(Instance *inst, ServerScriptService *this)
 {
     if (!inst) return;
 
+    for (int i = 0; i < inst->childCount; i++)
+    {
+        run_scripts(inst->children[i], this);
+    }
+
     if (!strcmp(inst->ClassName, "Script"))
     {
         ScriptRuntime *scrRuntime = ScriptRuntime_new("ScriptRuntime", this);
         ScriptRuntime_RunScript(scrRuntime, inst);
-    }
-
-    for (int i = 0; i < inst->childCount; i++)
-    {
-        run_scripts(inst->children[i], this);
     }
 }
 
