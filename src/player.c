@@ -112,15 +112,17 @@ void Player_Move(Player *this, Vector3 walkDirection, bool relativeToCamera)
 {
     if (this->Character)
     {
-        if (relativeToCamera)
-        {
-            Camera cam = GetDataModel()->Workspace->CurrentCamera->camera;
-            Matrix lookMatrix = MatrixInvert(MatrixLookAt(cam.position, cam.target, cam.up));
-            Vector3 axis;
-            float angle;
-            QuaternionToAxisAngle(QuaternionFromMatrix(lookMatrix), &axis, &angle);
-            walkDirection = Vector3RotateByAxisAngle(walkDirection, axis, angle);
-        }
+        //if (relativeToCamera)
+        //{
+        //    Camera cam = GetDataModel()->Workspace->CurrentCamera->camera;
+        //    Matrix lookMatrix = MatrixInvert(MatrixLookAt(cam.position, cam.target, cam.up));
+        //    Vector3 axis;
+        //    float angle;
+        //    QuaternionToAxisAngle(QuaternionFromMatrix(lookMatrix), &axis, &angle);
+        //    walkDirection = Vector3RotateByAxisAngle(walkDirection, axis, angle);
+        //}
+        Camera *cam = &GetDataModel()->Workspace->CurrentCamera->camera;
+        cam->position = Vector3Add(cam->position, walkDirection);
         Model_TranslateBy(this->Character, walkDirection);
     }
 }
