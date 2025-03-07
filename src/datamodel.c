@@ -130,11 +130,11 @@ void DataModel_Draw(DataModel *this)
     {
         if (IsKeyDown(KEY_W))
         {
-            Player_Move(players->LocalPlayer, (Vector3){0, 0, 1}, true);
+            Player_Move(players->LocalPlayer, (Vector3){0, 0, -1}, true);
         }
         if (IsKeyDown(KEY_S))
         {
-            Player_Move(players->LocalPlayer, (Vector3){0, 0, -1}, true);
+            Player_Move(players->LocalPlayer, (Vector3){0, 0, 1}, true);
         }
         if (IsKeyDown(KEY_A))
         {
@@ -144,11 +144,22 @@ void DataModel_Draw(DataModel *this)
         {
             Player_Move(players->LocalPlayer, (Vector3){1, 0, 0}, true);
         }
+        if (IsKeyDown(KEY_SPACE))
+        {
+            Player_Move(players->LocalPlayer, (Vector3){0, 1, 0}, true);
+        }
+        if (IsKeyDown(KEY_LEFT_CONTROL))
+        {
+            Player_Move(players->LocalPlayer, (Vector3){0, -1, 0}, true);
+        }
     }
 
     if (IsKeyDown(KEY_LEFT_SHIFT))
     {
-        if (IsKeyPressed(KEY_F1)) showStatsMenu = !showStatsMenu;
+        if (IsKeyPressed(KEY_F1))
+        {
+            showStatsMenu = !showStatsMenu;
+        }
     }
 
     ClearBackground(SKYBLUE);
