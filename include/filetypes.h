@@ -9,4 +9,6 @@ void LoadPlaceRBXLX(const char *file);
 Instance **LoadModelRBXM(const char *file, int *mdlCount);
 void LoadPlaceRBXL(const char *file);
 
+Shader *LoadShadersRBXS(const char *file, int *shaderCount);
+
 #endif

@@ -32,6 +32,13 @@ void AttemptLoadFile(DataModel *game, const char *file)
 
     fclose(f);
 
+    if (TextIsEqual(GetFileExtension(file), ".pack"))
+    {
+        int shaderCount = 0;
+        Shader *shdrs = LoadShadersRBXS(file, &shaderCount);
+        exit(EXIT_SUCCESS);
+    }
+
     if (!strncmp(sig, "<roblox!", 8))
     {
         isBinary = true;

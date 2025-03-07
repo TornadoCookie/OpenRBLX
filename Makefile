@@ -181,6 +181,8 @@ rbxmx_SOURCES+=$(DISTDIR)/src/../lib/xml/src/xml.o
 rbxm_SOURCES+=$(DISTDIR)/src/filetypes/rbxm.o
 rbxm_SOURCES+=$(DISTDIR)/src/../lib/lz4/src/lz4.o
 
+rbxs_SOURCES+=$(DISTDIR)/src/filetypes/rbxs.o
+
 studio_SOURCES+=$(DISTDIR)/src/../studio/studio.o
 studio_SOURCES+=$(instance_SOURCES)
 studio_SOURCES+=$(rbxmx_SOURCES)
@@ -193,6 +195,7 @@ player_SOURCES+=$(DISTDIR)/src/../player/player.o
 player_SOURCES+=$(instance_SOURCES)
 player_SOURCES+=$(rbxmx_SOURCES)
 player_SOURCES+=$(rbxm_SOURCES)
+player_SOURCES+=$(rbxs_SOURCES)
 
 $(DISTDIR)/player$(EXEC_EXTENSION): $(player_SOURCES)
 	$(CC) -o $@ $^ $(LDFLAGS)
@@ -256,6 +259,7 @@ clean:
 	rm -f $(DISTDIR)/src/../lib/xml/src/xml.o
 	rm -f $(DISTDIR)/src/filetypes/rbxm.o
 	rm -f $(DISTDIR)/src/../lib/lz4/src/lz4.o
+	rm -f $(DISTDIR)/src/filetypes/rbxs.o
 	rm -f $(DISTDIR)/src/../studio/studio.o
 	rm -f $(DISTDIR)/studio$(EXEC_EXTENSION)
 	rm -f $(DISTDIR)/src/../player/player.o

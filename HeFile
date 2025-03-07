@@ -77,6 +77,9 @@ SourceGroup rbxm
 Source filetypes/rbxm.c
 Source ../lib/lz4/src/lz4.c
 
+SourceGroup rbxs
+Source filetypes/rbxs.c
+
 Program studio
 Source ../studio/studio.c
 UseSourceGroup instance
@@ -88,4 +91,5 @@ Source ../player/player.c
 UseSourceGroup instance
 UseSourceGroup rbxmx
 UseSourceGroup rbxm
+UseSourceGroup rbxs
 
