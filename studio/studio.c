@@ -96,14 +96,22 @@ static void load_studio_ui()
     uiState.explorerSelection = GetDataModel();
 }
 
-static void draw_explorer_window(Vector2 position, Vector2 scroll)
+static Vector2 draw_explorer_list(Instance *inst, Vector2 position, Vector2 scroll)
 {
     int childCount;
-    Instance **children = Instance_GetChildren(GetDataModel(), &childCount);
+    Instance **children = Instance_GetChildren(inst, &childCount);
     for (int i = 0; i < childCount; i++)
     {
-        GuiLabel((Rectangle){position.x, position.y + (i+1)*20 + RAYGUI_WINDOWBOX_STATUSBAR_HEIGHT, 100, 10}, children[i]->Name);
+        GuiLabel((Rectangle){position.x + 20, position.y + (i+1)*20 + RAYGUI_WINDOWBOX_STATUSBAR_HEIGHT + scroll.y, 100, 10}, children[i]->Name);
+        position = draw_explorer_list(children[i], (Vector2){position.x + 20, position.y + (i+1)*20}, scroll);
     }
+
+    return (Vector2){position.x - 20, position.y + childCount*20};
+}
+
+static void draw_explorer_window(Vector2 position, Vector2 scroll)
+{
+    draw_explorer_list(GetDataModel(), position, scroll);
 }
 
 static void draw_studio_ui()
@@ -111,7 +119,7 @@ static void draw_studio_ui()
     // status bar
     GuiSetStyle(DEFAULT, TEXT_ALIGNMENT, TEXT_ALIGN_LEFT);
     GuiStatusBar((Rectangle){ 0, (float)GetScreenHeight() - 20, (float)GetScreenWidth(), 20 }, uiState.status);
-    GuiSetStyle(DEFAULT, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
+    //GuiSetStyle(DEFAULT, TEXT_ALIGNMENT, TEXT_ALIGN_CENTER);
 
     // top bar
     GuiComboBox((Rectangle){0, 0, 60, 20}, uiState.topBarText, &uiState.topbarActive);
@@ -127,6 +135,70 @@ static void draw_studio_ui()
     // explorer window
     GuiWindowFloating(&uiState.explorerWindowState, draw_explorer_window, uiState.explorerWindowState.size, "Explorer");
 }
+
+void AttemptLoadFile(DataModel *game, const char *file)
+{
+    FILE *f = fopen(file, "rb");
+    char sig[8];
+    bool isModel = !strncmp(GetFileExtension(file), ".rbxm", 5);
+    bool isBinary = false;
+
+    fread(sig, 1, 8, f);
+
+    fclose(f);
+
+    if (TextIsEqual(GetFileExtension(file), ".pack"))
+    {
+        int shaderCount = 0;
+        //Shader *shdrs = LoadShadersRBXS(file, &shaderCount);
+        exit(EXIT_SUCCESS);
+    }
+
+    if (!strncmp(sig, "<roblox!", 8))
+    {
+        isBinary = true;
+    }
+
+    if (isModel)
+    {
+        int mdlCount;
+        Instance **mdl;
+
+        if (isBinary)
+        {
+            mdl = LoadModelRBXM(file, &mdlCount);
+        }
+        else
+        {
+            mdl = LoadModelRBXMX(file, &mdlCount);
+        }
+
+        for (int i = 0; i < mdlCount; i++)
+        {
+            Instance_SetParent(mdl[i], game->Workspace);
+        }
+    }
+    else
+    {
+        if (isBinary)
+        {
+            int mdlCount;
+            Instance **mdl;
+
+            mdl = LoadModelRBXM(file, &mdlCount);
+
+            for (int i = 0; i < mdlCount; i++)
+            {
+                Instance_SetParent(mdl[i], game);
+            }
+        }
+        else
+        {
+            LoadPlaceRBXLX(file);
+        }
+    }
+}
+
 
 int main()
 {
@@ -162,21 +234,7 @@ int main()
             else
             {
                 const char *x = TextFormat("%s/%s", uiState.windowFileDialogState.dirPathText, uiState.windowFileDialogState.fileNameText);
-                if (IsFileExtension(uiState.windowFileDialogState.fileNameText, ".rbxmx"))
-                {
-                    int objCount;
-                    Instance **objs = LoadModelRBXMX(x, &objCount);
-
-                    for (int i = 0; i < objCount; i++)
-                    {
-                        if (!objs[i]) continue;
-                        Instance_SetParent(objs[i], datamodel->Workspace);
-                    }
-                }
-                else if (IsFileExtension(uiState.windowFileDialogState.fileNameText, ".rbxmx"))
-                {
-                    LoadPlaceRBXLX(x);
-                }
+                AttemptLoadFile(datamodel, x);
             }
         }
     }
