@@ -67,6 +67,8 @@ Source starterplayerscripts.c
 Source starterplayer.c
 Source scriptruntime.c
 Source playerscripts.c
+Source accessory.c
+Source accoutrement.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c
