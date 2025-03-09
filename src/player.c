@@ -5,7 +5,20 @@
 #include <string.h>
 #include "scriptruntime.h"
 #include "starterplayerscripts.h"
+#include "startercharacterscripts.h"
 #include "playerscripts.h"
+
+static void replicate_scripts(Instance *src, Instance *dest)
+{
+    int childCount;
+    Instance **children = Instance_GetChildren(src, &childCount);
+    for (int i = 0; i < childCount; i++)
+    {
+        printf("%s\n", children[i]->ClassName);
+        Instance *clone = Instance_Clone(children[i]);
+        Instance_SetParent(clone, dest);
+    }
+}
 
 Player *Player_new(const char *className, Instance *parent)
 {
@@ -28,13 +41,7 @@ Player *Player_new(const char *className, Instance *parent)
     if (starterPlayerScripts)
     {
         PlayerScripts *playerScripts = PlayerScripts_new("PlayerScripts", newInst);
-        children = Instance_GetChildren(starterPlayerScripts, &childCount);
-        for (int i = 0; i < childCount; i++)
-        {
-            printf("%s\n", children[i]->ClassName);
-            Instance *clone = Instance_Clone(children[i]);
-            Instance_SetParent(clone, playerScripts);
-        }
+        replicate_scripts(starterPlayerScripts, playerScripts);
     }
 
     return newInst;
@@ -102,6 +109,11 @@ void Player_LoadCharacter(Player *this)
     mdl->PrimaryPart = head;
 
     // StarterCharacterScripts
+    StarterCharacterScripts *starterCharacterScripts = Instance_FindFirstChildOfClass(ServiceProvider_GetService(GetDataModel(), "StarterPlayer"), "StarterCharacterScripts");
+    if (starterCharacterScripts)
+    {
+        replicate_scripts(starterCharacterScripts, mdl);
+    }
 
     this->Character = mdl;
 

@@ -159,6 +159,7 @@ instance_SOURCES+=$(DISTDIR)/src/scriptruntime.o
 instance_SOURCES+=$(DISTDIR)/src/playerscripts.o
 instance_SOURCES+=$(DISTDIR)/src/accessory.o
 instance_SOURCES+=$(DISTDIR)/src/accoutrement.o
+instance_SOURCES+=$(DISTDIR)/src/startercharacterscripts.o
 
 rbxmx_SOURCES+=$(DISTDIR)/src/filetypes/rbxlx.o
 rbxmx_SOURCES+=$(DISTDIR)/src/filetypes/rbxmx.o
@@ -242,6 +243,7 @@ clean:
 	rm -f $(DISTDIR)/src/playerscripts.o
 	rm -f $(DISTDIR)/src/accessory.o
 	rm -f $(DISTDIR)/src/accoutrement.o
+	rm -f $(DISTDIR)/src/startercharacterscripts.o
 	rm -f $(DISTDIR)/src/filetypes/rbxlx.o
 	rm -f $(DISTDIR)/src/filetypes/rbxmx.o
 	rm -f $(DISTDIR)/src/../lib/xml/src/xml.o

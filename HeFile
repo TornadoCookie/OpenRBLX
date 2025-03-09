@@ -70,6 +70,7 @@ Source scriptruntime.c
 Source playerscripts.c
 Source accessory.c
 Source accoutrement.c
+Source startercharacterscripts.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c
