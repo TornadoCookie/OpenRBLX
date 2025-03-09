@@ -4,6 +4,7 @@ ExecExtension -debug
 LibExtension -debug.so
 Compiler gcc
 RaylibLdFlag -lraylib
+ExtraLDFlag -rdynamic
 
 Platform win64
 IsRelease

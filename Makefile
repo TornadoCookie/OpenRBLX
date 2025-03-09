@@ -17,6 +17,7 @@ CFLAGS+=-g
 CFLAGS+=-D DEBUG
 CFLAGS+=-D EXEC_EXTENSION=\"-debug\"
 CFLAGS+=-D LIB_EXTENSION=\"-debug.so\"
+LDFLAGS+=-rdynamic
 endif
 
 ifeq ($(PLATFORM), win64)
