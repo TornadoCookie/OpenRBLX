@@ -98,45 +98,12 @@ static void load_studio_ui()
 
 static void draw_explorer_window(Vector2 position, Vector2 scroll)
 {
-    char *text = NULL;
     int childCount;
-    Instance **children;
-    bool hasTextBefore = false;
-
-    if (uiState.explorerSelection && uiState.explorerSelection->Parent)
+    Instance **children = Instance_GetChildren(GetDataModel(), &childCount);
+    for (int i = 0; i < childCount; i++)
     {
-        const char *text1 = TextFormat("Up (%s);", uiState.explorerSelection->Parent->Name);
-        text = malloc(strlen(text1) + 1);
-        strcpy(text, text1);
-        hasTextBefore = true;
+        GuiLabel((Rectangle){position.x, position.y + (i+1)*20 + RAYGUI_WINDOWBOX_STATUSBAR_HEIGHT, 100, 10}, children[i]->Name);
     }
-
-    children = Instance_GetChildren(uiState.explorerSelection, &childCount);
-
-    LOAD_STRING_INTO_SEMICOLON_SEPARATED(childCount, children[i]->Name, text);
-
-    int prevActive = uiState.explorerWindowActive;
-    GuiListView((Rectangle){position.x, position.y + RAYGUI_WINDOWBOX_STATUSBAR_HEIGHT, uiState.explorerWindowState.size.x - RAYGUI_PANEL_BORDER_WIDTH, uiState.explorerWindowState.size.y - RAYGUI_PANEL_BORDER_WIDTH - RAYGUI_WINDOWBOX_STATUSBAR_HEIGHT}, text, &scroll.y, &uiState.explorerWindowActive);
-
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && prevActive != -1 && uiState.explorerWindowActive == -1)
-    {
-        //double click
-        if (uiState.explorerSelection == GetDataModel())
-        {
-            uiState.explorerSelection = children[uiState.explorerWindowActive];
-        }
-        else if (uiState.explorerWindowActive == 0)
-        {
-            uiState.explorerSelection = uiState.explorerSelection->Parent;
-        }
-        else
-        {
-            uiState.explorerSelection = children[uiState.explorerWindowActive - 1];
-        }
-        uiState.explorerWindowActive = 0;
-    }
-
-    free(text);
 }
 
 static void draw_studio_ui()
@@ -163,7 +130,7 @@ static void draw_studio_ui()
 
 int main()
 {
-    InitWindow(640, 480, "OpenRBLX Studio");
+    InitWindow(1280, 720, "OpenRBLX Studio");
     SetTargetFPS(60);
     DataModel *datamodel = DataModel_new();
     SetExitKey(KEY_F1);
@@ -179,22 +146,7 @@ int main()
 
         if (uiState.windowFileDialogState.windowActive) GuiLock();
         draw_studio_ui();
-        if (IsKeyPressed(KEY_ESCAPE))
-        {
-            if (uiState.guiFocus)
-            {
-                GuiUnlock();
-                EnableCursor();
-                uiState.guiFocus = false;
-            }
-            else
-            {
-                GuiLock();
-                DisableCursor();
-                uiState.guiFocus = true;
-            }
-        }
-
+        
         GuiUnlock();
 
         GuiWindowFileDialog(&uiState.windowFileDialogState);

@@ -11,6 +11,8 @@ Players *Players_new(const char *className, Instance *parent)
 
     newInst->LocalPlayer = NULL;
 
+    newInst->instance.Name = "Players";
+
     return newInst;
 }
 
