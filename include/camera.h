@@ -1,8 +1,8 @@
 #ifndef _CAMERA_
 #define _CAMERA_
 
-#include "instance.h"
 #include <raylib.h>
+#include "instance.h"
 #include "cframe.h"
 
 typedef enum {

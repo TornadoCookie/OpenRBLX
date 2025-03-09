@@ -1,14 +1,44 @@
+#include <raylib.h>
 #include "instance.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <raylib.h>
 #include "debug.h"
-#include <dlfcn.h>
 #include "serialize.h"
 #include <time.h>
 
-DEFAULT_DEBUG_CHANNEL(instance)
+DEFAULT_DEBUG_CHANNEL(instance);
+
+#ifdef _WIN32
+#include <libloaderapi.h>
+
+static void *get_symbol_from_ourselves(const char *symbol)
+{
+    HMODULE ourselves = GetModuleHandleA(NULL);
+    void *ret = GetProcAddress(ourselves, symbol);
+    if (!ret) printf("GetProcAddress: %#x\n", GetLastError());
+
+    // We do not use FreeLibrary() to free this handle because
+    // that would cause us to unmap ourselves which would kill
+    // us!!!
+
+    return ret;
+}
+
+#else // Assume posix and therefore dlopen()
+#include <dlfcn.h>
+
+static void *get_symbol_from_ourselves(const char *symbol)
+{
+    void *ourselves = dlopen(NULL, RTLD_LAZY);
+    void *ret = dlsym(ourselves, symbol);
+    if (!ret) printf("dlerror: %s\n", dlerror());
+    dlclose(ourselves);
+
+    return ret;
+}
+
+#endif
 
 static int instanceCount;
 
@@ -315,16 +345,9 @@ Instance *Instance_dynNew(const char *className, Instance *parent)
 {
     //printf("Instance_dynNew(%s, %p)\n", className, parent);
 
-    void *ourselves = dlopen(NULL, RTLD_LAZY);
-
     Instance *(*constructor)(const char *, Instance *);
     const char *constructorName = TextFormat("%s_new", className);
-    constructor = dlsym(ourselves, constructorName);
-    if (!constructor)
-    {
-        printf("dlerror: %s\n", dlerror());
-    }
-    dlclose(ourselves);
+    constructor = get_symbol_from_ourselves(constructorName);
 
     if (!constructor)
     {
@@ -338,13 +361,9 @@ void Instance_Serialize(Instance *obj, SerializeInstance *inst)
 {
     //printf("Instance_Serialize(%p, %p)\n", obj, inst);
 
-    void *ourselves = dlopen(NULL, RTLD_LAZY);
-
     void (*serializer)(Instance*, SerializeInstance*);
     const char *serializerName = TextFormat("serialize_%s", obj->ClassName);
-    serializer = dlsym(ourselves, serializerName);
-    if (!serializer) printf("dlerror: %s\n", dlerror());
-    dlclose(ourselves);
+    serializer = get_symbol_from_ourselves(serializerName);
 
     if (!serializer)
     {

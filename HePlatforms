@@ -1,0 +1,17 @@
+Platform linux64-debug
+IsDebug
+ExecExtension -debug
+LibExtension -debug.so
+Compiler gcc
+RaylibLdFlag -lraylib
+
+Platform win64
+IsRelease
+ExecExtension .exe
+LibExtension .dll
+Compiler x86_64-w64-mingw32-gcc
+CxxCompiler x86_64-w64-mingw32-g++
+ExtraLDFlag -lws2_32
+ExtraLDFlag -static-libstdc++
+ExtraLDFlag -static-libgcc
+RaylibLdFlag -lraylibdll

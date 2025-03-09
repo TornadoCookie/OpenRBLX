@@ -19,6 +19,7 @@ ScriptRuntime *ScriptRuntime_new(const char *className, Instance *parent)
     return newInst;
 }
 
+#include "rlw32compat.h"
 #define LUA_IMPL
 #include "minilua.h"
 
@@ -96,6 +97,18 @@ static int luau_vector3__mul(lua_State *L)
     return 1;
 }
 
+static int luau_vector3__add(lua_State *L)
+{
+    Vector3 v2 = luau_tovector3(L, 2);
+    Vector3 v1 = luau_tovector3(L, 1);
+
+    Vector3 ret = Vector3Add(v1, v2);
+
+    luau_pushvector3(L, ret);
+
+    return 1;
+}
+
 static void luau_pushvector3(lua_State *L, Vector3 v)
 {
     lua_newtable(L);
@@ -104,6 +117,10 @@ static void luau_pushvector3(lua_State *L, Vector3 v)
 
     lua_pushstring(L, "__mul");
     lua_pushcfunction(L, luau_vector3__mul);
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "__add");
+    lua_pushcfunction(L, luau_vector3__add);
     lua_settable(L, -3);
 
     lua_setmetatable(L, -2);

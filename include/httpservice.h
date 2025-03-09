@@ -2,6 +2,8 @@
 #define _HTTPSERVICE_
 
 #include "instance.h"
+
+#include "rlw32compat.h"
 #include <curl/curl.h>
 #include "cJSON.h"
 
