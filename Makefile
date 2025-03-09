@@ -46,7 +46,7 @@ LDFLAGS+=-lcurl
 LDFLAGS+=-Wl,-rpath,lib/$(curl_NAME)/lib
 
 
-all: $(DISTDIR) $(DISTDIR)/src $(DISTDIR)/src/../lib/cJSON/src $(DISTDIR)/src/filetypes $(DISTDIR)/src/../lib/xml/src $(DISTDIR)/src/../lib/lz4/src $(DISTDIR)/src/../studio $(DISTDIR)/src/../player $(foreach prog, $(PROGRAMS), $(DISTDIR)/$(prog)$(EXEC_EXTENSION)) $(foreach lib, $(LIBRARIES), $(DISTDIR)/$(lib)$(LIB_EXTENSION) $(DISTDIR)/$(lib)$(LIB_EXTENSION_STATIC)) deps
+all: $(DISTDIR) $(DISTDIR)/src $(DISTDIR)/src/../lib/cJSON/src $(DISTDIR)/src/filetypes $(DISTDIR)/src/../lib/xml/src $(DISTDIR)/src/../lib/lz4/src $(DISTDIR)/src/../lib/zstd/src $(DISTDIR)/src/../studio $(DISTDIR)/src/../player $(foreach prog, $(PROGRAMS), $(DISTDIR)/$(prog)$(EXEC_EXTENSION)) $(foreach lib, $(LIBRARIES), $(DISTDIR)/$(lib)$(LIB_EXTENSION) $(DISTDIR)/$(lib)$(LIB_EXTENSION_STATIC)) deps
 
 ifneq ($(DISTDIR), .)
 deps:
@@ -72,6 +72,9 @@ $(DISTDIR)/src/../lib/xml/src:
 $(DISTDIR)/src/../lib/lz4/src:
 	mkdir -p $@
 
+$(DISTDIR)/src/../lib/zstd/src:
+	mkdir -p $@
+
 $(DISTDIR)/src/../studio:
 	mkdir -p $@
 
@@ -93,6 +96,8 @@ CFLAGS+=-Ilib/cJSON/src
 CFLAGS+=-Ilib/cJSON/include
 CFLAGS+=-Ilib/mini_gzip/src
 CFLAGS+=-Ilib/mini_gzip/include
+CFLAGS+=-Ilib/zstd/src
+CFLAGS+=-Ilib/zstd/include
 CFLAGS+=-D PLATFORM=\"$(PLATFORM)\"
 CFLAGS+=-Iinclude
 CFLAGS+=-Ilib/xml/include
@@ -160,6 +165,7 @@ instance_SOURCES+=$(DISTDIR)/src/playerscripts.o
 instance_SOURCES+=$(DISTDIR)/src/accessory.o
 instance_SOURCES+=$(DISTDIR)/src/accoutrement.o
 instance_SOURCES+=$(DISTDIR)/src/startercharacterscripts.o
+instance_SOURCES+=$(DISTDIR)/src/testservice.o
 
 rbxmx_SOURCES+=$(DISTDIR)/src/filetypes/rbxlx.o
 rbxmx_SOURCES+=$(DISTDIR)/src/filetypes/rbxmx.o
@@ -167,6 +173,7 @@ rbxmx_SOURCES+=$(DISTDIR)/src/../lib/xml/src/xml.o
 
 rbxm_SOURCES+=$(DISTDIR)/src/filetypes/rbxm.o
 rbxm_SOURCES+=$(DISTDIR)/src/../lib/lz4/src/lz4.o
+rbxm_SOURCES+=$(DISTDIR)/src/../lib/zstd/src/zstd_decompress.o
 
 rbxs_SOURCES+=$(DISTDIR)/src/filetypes/rbxs.o
 
@@ -244,11 +251,13 @@ clean:
 	rm -f $(DISTDIR)/src/accessory.o
 	rm -f $(DISTDIR)/src/accoutrement.o
 	rm -f $(DISTDIR)/src/startercharacterscripts.o
+	rm -f $(DISTDIR)/src/testservice.o
 	rm -f $(DISTDIR)/src/filetypes/rbxlx.o
 	rm -f $(DISTDIR)/src/filetypes/rbxmx.o
 	rm -f $(DISTDIR)/src/../lib/xml/src/xml.o
 	rm -f $(DISTDIR)/src/filetypes/rbxm.o
 	rm -f $(DISTDIR)/src/../lib/lz4/src/lz4.o
+	rm -f $(DISTDIR)/src/../lib/zstd/src/zstd_decompress.o
 	rm -f $(DISTDIR)/src/filetypes/rbxs.o
 	rm -f $(DISTDIR)/src/../studio/studio.o
 	rm -f $(DISTDIR)/studio$(EXEC_EXTENSION)

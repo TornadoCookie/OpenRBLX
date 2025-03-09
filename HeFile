@@ -14,6 +14,7 @@ Dependency lz4
 Dependency minilua
 Dependency cJSON
 Dependency mini_gzip
+Dependency zstd
 
 NativeDependency curl
 
@@ -71,6 +72,7 @@ Source playerscripts.c
 Source accessory.c
 Source accoutrement.c
 Source startercharacterscripts.c
+Source testservice.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c
@@ -80,6 +82,7 @@ Source ../lib/xml/src/xml.c
 SourceGroup rbxm
 Source filetypes/rbxm.c
 Source ../lib/lz4/src/lz4.c
+Source ../lib/zstd/src/zstd_decompress.c
 
 SourceGroup rbxs
 Source filetypes/rbxs.c
