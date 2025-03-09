@@ -65,8 +65,13 @@ void MeshPart_Draw(MeshPart *this)
         printf("Attempt to get MeshId %s\n", this->MeshId);
         this->mesh = MeshContentProvider_GetFileMesh(ServiceProvider_GetService(GetDataModel(), "MeshContentProvider"), this->MeshId);
         this->meshLoaded = true;
+
         this->material = LoadMaterialDefault();
-        this->material.maps[MATERIAL_MAP_DIFFUSE].texture = TextureContentProvider_LoadTextureAsset(ServiceProvider_GetService(GetDataModel(), "TextureContentProvider"), this->TextureID);
+        if (strlen(this->TextureID))
+        {
+            printf("Don't forget the texture too! (%s)\n", this->TextureID);
+            this->material.maps[MATERIAL_MAP_DIFFUSE].texture = TextureContentProvider_LoadTextureAsset(ServiceProvider_GetService(GetDataModel(), "TextureContentProvider"), this->TextureID);
+        }
         this->material.maps[MATERIAL_MAP_DIFFUSE].color = rl_from_color3(this->trianglemeshpart.basepart.Color, this->trianglemeshpart.basepart.Transparency);
         this->meshBoundingBox = GetMeshBoundingBox(this->mesh);
     }
@@ -75,9 +80,12 @@ void MeshPart_Draw(MeshPart *this)
 
         Vector3 size = Vector3Subtract(this->meshBoundingBox.max, this->meshBoundingBox.min);
         Vector3 cancel = Vector3Divide((Vector3){1, 1, 1}, size);
-        rlScalef(cancel.x, cancel.y, cancel.z);
 
-        DrawMesh(this->mesh, this->material, cf_size_to_matrix(this->trianglemeshpart.basepart.CFrame, this->trianglemeshpart.basepart.size));
+        rlMultMatrixf(MatrixToFloat(cf_size_to_matrix(this->trianglemeshpart.basepart.CFrame, this->trianglemeshpart.basepart.size)));
+        rlScalef(cancel.x, cancel.y, cancel.z);
+        
+
+        DrawMesh(this->mesh, this->material, MatrixIdentity());
 
     rlPopMatrix();
 }
