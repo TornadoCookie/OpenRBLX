@@ -5,6 +5,7 @@
 #include <raymath.h>
 #include <stdio.h>
 #include <rlgl.h>
+#include "accoutrement.h"
 
 DEFAULT_DEBUG_CHANNEL(meshpart)
 
@@ -76,12 +77,20 @@ void MeshPart_Draw(MeshPart *this)
         this->meshBoundingBox = GetMeshBoundingBox(this->mesh);
     }
 
+    Instance *parent = ((Instance*)this)->Parent;
+
     rlPushMatrix();
 
         Vector3 size = Vector3Subtract(this->meshBoundingBox.max, this->meshBoundingBox.min);
         Vector3 cancel = Vector3Divide((Vector3){1, 1, 1}, size);
 
-        rlMultMatrixf(MatrixToFloat(cf_size_to_matrix(this->trianglemeshpart.basepart.CFrame, this->trianglemeshpart.basepart.size)));
+        Matrix partMatrix = cf_size_to_matrix(this->trianglemeshpart.basepart.CFrame, this->trianglemeshpart.basepart.size);
+        if (!strcmp(parent->ClassName, "Accessory"))
+        {
+            Accoutrement *accoutrement = parent;
+            partMatrix = MatrixMultiply(cf_size_to_matrix(accoutrement->AttachmentPoint, (Vector3){1,1,1}), partMatrix);
+        }
+        rlMultMatrixf(MatrixToFloat(partMatrix));
         rlScalef(cancel.x, cancel.y, cancel.z);
         
 
