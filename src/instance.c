@@ -79,9 +79,17 @@ Instance *Instance_Clone(Instance *this)
     if (!this->archivable) return NULL;
 
     Instance *clone = malloc(this->DataCost);
-
     memcpy(clone, this, this->DataCost);
     //Instance_SetParent(clone, clone->Parent);
+
+    clone->childCount = 0;
+    clone->children = NULL;
+
+    for (int i = 0; i < this->childCount; i++)
+    {
+        Instance *childClone = Instance_Clone(this->children[i]);
+        Instance_SetParent(childClone, clone);
+    }
 
     return clone;
 }
