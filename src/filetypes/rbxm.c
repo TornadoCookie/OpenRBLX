@@ -8,7 +8,8 @@
 #include "serialize.h"
 #include "part.h"
 #include "script.h"
-#include <endian.h>
+//#include <endian.h>
+#include "zstd.h"
 
 #include "debug.h"
 
@@ -16,6 +17,7 @@ DEFAULT_DEBUG_CHANNEL(rbxm);
 
 // Resources:
 // https://github.com/rojo-rbx/rbx-dom/blob/master/docs/binary.md
+// https://github.com/MaximumADHD/Roblox-File-Format/blob/main/BinaryFormat/Chunks/SIGN.cs
 
 const unsigned char signature[] = {
     0x3C, 0x72, 0x6F, 0x62, 0x6C, 0x6F, 0x78, 0x21, 0x89, 0xFF, 0x0D, 0x0A, 0x1A, 0x0A,
@@ -72,6 +74,18 @@ typedef struct SharedStringChunk {
     uint32_t Length;
     SharedStringValue *values;
 } SharedStringChunk;
+
+typedef struct RbxSignature {
+    int32_t SignatureType;
+    int64_t PublicKeyId;
+    int32_t Length;
+    uint8_t *Value;
+} RbxSignature;
+
+typedef struct SignChunk {
+    int32_t NumSignatures;
+    RbxSignature *Signatures;
+} SignChunk;
 
 static void DecodeDifferenceInPlace(int32_t *data, int length)
 {
@@ -479,9 +493,11 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
                     printf("Error: mismatched compressed and uncompressed data sizes.\n");
                 }
             }
-            else if (!memcmp(chunkDataCompressed, (unsigned char [3]){0xB5, 0x2F, 0xFD}, 3))
+            else if (*(uint32_t*)chunkDataCompressed == 0xfd2fb528)
             {
-                printf("Unsupported compression type zstd.\n");
+                chunkData = malloc(chunk->UncompressedLength);
+                chunkDataOrig = chunkData;
+                ZSTD_decompress(chunkData, chunk->UncompressedLength, chunkDataCompressed, chunk->CompressedLength);
             }
             else
             {
@@ -608,16 +624,16 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
                     }
                 }
 
+                if (chunk.Parents[i] != -1 && (!child || !parent))
+                {
+                    printf("Unable to find instance. Instance will be parented to datamodel.\n");
+                }
+
                 if (!child) continue;
                 if (Instance_IsAncestorOf(child, parent) || Instance_IsDescendantOf(parent, child))
                 {
                     printf("This will cause an infinite loop. Parenting to datamodel.\n");
                     parent = NULL;
-                }
-
-                if (chunk.Parents[i] != -1 && (!child || !parent))
-                {
-                    printf("Unable to find instance. Instance will be parented to datamodel.\n");
                 }
 
                 if (chunk.Parents[i] == -1 || !parent)
@@ -660,11 +676,48 @@ Instance **LoadModelRBXM(const char *file, int *mdlCount)
 
             sstrChunk = chunk;
         }
+        else if (!strncmp(chunk->Signature, "SIGN", 4))
+        {
+            SignChunk chunk = { 0 };
+
+            chunk.NumSignatures = *(int32_t*)chunkData;
+            chunkData += sizeof(int32_t);
+
+            chunk.Signatures = malloc(sizeof(RbxSignature) * chunk.NumSignatures);
+
+            printf("%d Signatures\n", chunk.NumSignatures);
+
+            for (int i = 0; i < chunk.NumSignatures; i++)
+            {
+
+                printf("Signature %d:\n", i);
+                chunk.Signatures[i].SignatureType = *(int32_t*)chunkData;
+                chunkData += sizeof(int32_t);
+
+                chunk.Signatures[i].PublicKeyId = *(int64_t*)chunkData;
+                chunkData += sizeof(int64_t);
+
+                chunk.Signatures[i].Length = *(int32_t*)chunkData;
+                chunkData += sizeof(int32_t);
+
+                printf("SignatureType: %#x\n", chunk.Signatures[i].SignatureType);
+                printf("PublicKeyId: %#x\n", chunk.Signatures[i].PublicKeyId);
+                printf("Length: %#x\n", chunk.Signatures[i].Length);
+
+                chunk.Signatures[i].Value = malloc(chunk.Signatures[i].Length);
+                memcpy(chunk.Signatures[i].Value, chunkData, chunk.Signatures[i].Length);
+                chunkData += chunk.Signatures[i].Length;
+            }
+        }
         else
         {
             printf("error: Unknown signature.\n");
         }
         data += sizeof(Chunk) + chunk->CompressedLength;
+        if (!chunk->CompressedLength)
+        {
+            data += chunk->UncompressedLength;
+        }
         if (chunkDataOrig != chunkDataCompressed) free(chunkDataOrig);
     }
 
