@@ -1,6 +1,3 @@
 [submodule "res/rbx-test-files"]
 	path = res/rbx-test-files
     url = https://github.com/rojo-rbx/rbx-test-files/
-[submodule "lib/minilua"]
-    path = lib/minilua
-    url = https://github.com/edubart/minilua
