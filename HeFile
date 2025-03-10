@@ -7,18 +7,78 @@ ExtraCFlag -Iinclude
 ExtraCFlag -Ilib/xml/include
 ExtraCFlag -Wno-incompatible-pointer-types
 
+ExtraCFlag -Ilib/luau/VM/include
+ExtraCFlag -Ilib/luau/Compiler/include
+ExtraCFlag -Ilib/luau/Common/include
+ExtraCFlag -Ilib/luau/Ast/include
+
 ExtraLDFlag -lcurl
 
 Dependency xml
 Dependency lz4
-Dependency minilua
 Dependency cJSON
 Dependency mini_gzip
 Dependency zstd
 
 NativeDependency curl
 
+SourceGroup luau
+CxxSource ../lib/luau/VM/src/lapi.cpp
+CxxSource ../lib/luau/VM/src/laux.cpp
+CxxSource ../lib/luau/VM/src/lbaselib.cpp
+CxxSource ../lib/luau/VM/src/lbitlib.cpp
+CxxSource ../lib/luau/VM/src/lbuffer.cpp
+CxxSource ../lib/luau/VM/src/lbuflib.cpp
+CxxSource ../lib/luau/VM/src/lbuiltins.cpp
+CxxSource ../lib/luau/VM/src/lcorolib.cpp
+CxxSource ../lib/luau/VM/src/ldblib.cpp
+CxxSource ../lib/luau/VM/src/ldebug.cpp
+CxxSource ../lib/luau/VM/src/ldo.cpp
+CxxSource ../lib/luau/VM/src/lfunc.cpp
+CxxSource ../lib/luau/VM/src/lgc.cpp
+CxxSource ../lib/luau/VM/src/lgcdebug.cpp
+CxxSource ../lib/luau/VM/src/linit.cpp
+CxxSource ../lib/luau/VM/src/lmathlib.cpp
+CxxSource ../lib/luau/VM/src/lmem.cpp
+CxxSource ../lib/luau/VM/src/lnumprint.cpp
+CxxSource ../lib/luau/VM/src/lobject.cpp
+CxxSource ../lib/luau/VM/src/loslib.cpp
+CxxSource ../lib/luau/VM/src/lperf.cpp
+CxxSource ../lib/luau/VM/src/lstate.cpp
+CxxSource ../lib/luau/VM/src/lstring.cpp
+CxxSource ../lib/luau/VM/src/lstrlib.cpp
+CxxSource ../lib/luau/VM/src/ltable.cpp
+CxxSource ../lib/luau/VM/src/ltablib.cpp
+CxxSource ../lib/luau/VM/src/ltm.cpp
+CxxSource ../lib/luau/VM/src/ludata.cpp
+CxxSource ../lib/luau/VM/src/lutf8lib.cpp
+CxxSource ../lib/luau/VM/src/lveclib.cpp
+CxxSource ../lib/luau/VM/src/lvmexecute.cpp
+CxxSource ../lib/luau/VM/src/lvmload.cpp
+CxxSource ../lib/luau/VM/src/lvmutils.cpp
+CxxSource ../lib/luau/Compiler/src/BuiltinFolding.cpp
+CxxSource ../lib/luau/Compiler/src/Builtins.cpp
+CxxSource ../lib/luau/Compiler/src/BytecodeBuilder.cpp
+CxxSource ../lib/luau/Compiler/src/Compiler.cpp
+CxxSource ../lib/luau/Compiler/src/ConstantFolding.cpp
+CxxSource ../lib/luau/Compiler/src/CostModel.cpp
+CxxSource ../lib/luau/Compiler/src/lcode.cpp
+CxxSource ../lib/luau/Compiler/src/TableShape.cpp
+CxxSource ../lib/luau/Compiler/src/Types.cpp
+CxxSource ../lib/luau/Compiler/src/ValueTracking.cpp
+CxxSource ../lib/luau/Ast/src/Allocator.cpp
+CxxSource ../lib/luau/Ast/src/Ast.cpp
+CxxSource ../lib/luau/Ast/src/Confusables.cpp
+CxxSource ../lib/luau/Ast/src/Cst.cpp
+CxxSource ../lib/luau/Ast/src/Lexer.cpp
+CxxSource ../lib/luau/Ast/src/Location.cpp
+CxxSource ../lib/luau/Ast/src/Parser.cpp
+CxxSource ../lib/luau/Ast/src/StringUtils.cpp
+CxxSource ../lib/luau/Ast/src/TimeTrace.cpp
+Source scriptruntime.c
+
 SourceGroup instance
+UseSourceGroup luau
 Source datamodel.c
 Source instance.c
 Source rbxscriptsignal.c
@@ -67,7 +127,6 @@ Source modulescript.c
 Source localscript.c
 Source starterplayerscripts.c
 Source starterplayer.c
-Source scriptruntime.c
 Source playerscripts.c
 Source accessory.c
 Source accoutrement.c

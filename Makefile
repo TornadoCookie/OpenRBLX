@@ -46,7 +46,7 @@ LDFLAGS+=-lcurl
 LDFLAGS+=-Wl,-rpath,lib/$(curl_NAME)/lib
 
 
-all: $(DISTDIR) $(DISTDIR)/src $(DISTDIR)/src/../lib/cJSON/src $(DISTDIR)/src/filetypes $(DISTDIR)/src/../lib/xml/src $(DISTDIR)/src/../lib/lz4/src $(DISTDIR)/src/../lib/zstd/src $(DISTDIR)/src/../studio $(DISTDIR)/src/../player $(foreach prog, $(PROGRAMS), $(DISTDIR)/$(prog)$(EXEC_EXTENSION)) $(foreach lib, $(LIBRARIES), $(DISTDIR)/$(lib)$(LIB_EXTENSION) $(DISTDIR)/$(lib)$(LIB_EXTENSION_STATIC)) deps
+all: $(DISTDIR) $(DISTDIR)/src/../lib/luau/VM/src $(DISTDIR)/src/../lib/luau/Compiler/src $(DISTDIR)/src/../lib/luau/Ast/src $(DISTDIR)/src $(DISTDIR)/src/../lib/cJSON/src $(DISTDIR)/src/filetypes $(DISTDIR)/src/../lib/xml/src $(DISTDIR)/src/../lib/lz4/src $(DISTDIR)/src/../lib/zstd/src $(DISTDIR)/src/../studio $(DISTDIR)/src/../player $(foreach prog, $(PROGRAMS), $(DISTDIR)/$(prog)$(EXEC_EXTENSION)) $(foreach lib, $(LIBRARIES), $(DISTDIR)/$(lib)$(LIB_EXTENSION) $(DISTDIR)/$(lib)$(LIB_EXTENSION_STATIC)) deps
 
 ifneq ($(DISTDIR), .)
 deps:
@@ -56,6 +56,15 @@ deps:
 else
 deps:
 endif
+
+$(DISTDIR)/src/../lib/luau/VM/src:
+	mkdir -p $@
+
+$(DISTDIR)/src/../lib/luau/Compiler/src:
+	mkdir -p $@
+
+$(DISTDIR)/src/../lib/luau/Ast/src:
+	mkdir -p $@
 
 $(DISTDIR)/src:
 	mkdir -p $@
@@ -90,8 +99,6 @@ CFLAGS+=-Ilib/xml/src
 CFLAGS+=-Ilib/xml/include
 CFLAGS+=-Ilib/lz4/src
 CFLAGS+=-Ilib/lz4/include
-CFLAGS+=-Ilib/minilua/src
-CFLAGS+=-Ilib/minilua/include
 CFLAGS+=-Ilib/cJSON/src
 CFLAGS+=-Ilib/cJSON/include
 CFLAGS+=-Ilib/mini_gzip/src
@@ -102,6 +109,10 @@ CFLAGS+=-D PLATFORM=\"$(PLATFORM)\"
 CFLAGS+=-Iinclude
 CFLAGS+=-Ilib/xml/include
 CFLAGS+=-Wno-incompatible-pointer-types
+CFLAGS+=-Ilib/luau/VM/include
+CFLAGS+=-Ilib/luau/Compiler/include
+CFLAGS+=-Ilib/luau/Common/include
+CFLAGS+=-Ilib/luau/Ast/include
 
 LDFLAGS+=-lcurl
 
@@ -111,6 +122,60 @@ LDFLAGS+=-lm
 LDFLAGS+=-Llib/$(RAYLIB_NAME)/lib
 LDFLAGS+=$(RAYLIB_DLL)
 LDFLAGS+=-Wl,-rpath,lib/$(RAYLIB_NAME)/lib
+
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lapi.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/laux.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lbaselib.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lbitlib.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lbuffer.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lbuflib.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lbuiltins.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lcorolib.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/ldblib.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/ldebug.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/ldo.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lfunc.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lgc.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lgcdebug.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/linit.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lmathlib.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lmem.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lnumprint.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lobject.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/loslib.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lperf.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lstate.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lstring.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lstrlib.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/ltable.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/ltablib.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/ltm.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/ludata.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lutf8lib.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lveclib.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lvmexecute.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lvmload.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/VM/src/lvmutils.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Compiler/src/BuiltinFolding.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Compiler/src/Builtins.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Compiler/src/BytecodeBuilder.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Compiler/src/Compiler.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Compiler/src/ConstantFolding.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Compiler/src/CostModel.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Compiler/src/lcode.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Compiler/src/TableShape.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Compiler/src/Types.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Compiler/src/ValueTracking.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Ast/src/Allocator.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Ast/src/Ast.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Ast/src/Confusables.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Ast/src/Cst.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Ast/src/Lexer.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Ast/src/Location.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Ast/src/Parser.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Ast/src/StringUtils.o
+luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Ast/src/TimeTrace.o
+luau_SOURCES+=$(DISTDIR)/src/scriptruntime.o
 
 instance_SOURCES+=$(DISTDIR)/src/datamodel.o
 instance_SOURCES+=$(DISTDIR)/src/instance.o
@@ -160,12 +225,13 @@ instance_SOURCES+=$(DISTDIR)/src/modulescript.o
 instance_SOURCES+=$(DISTDIR)/src/localscript.o
 instance_SOURCES+=$(DISTDIR)/src/starterplayerscripts.o
 instance_SOURCES+=$(DISTDIR)/src/starterplayer.o
-instance_SOURCES+=$(DISTDIR)/src/scriptruntime.o
 instance_SOURCES+=$(DISTDIR)/src/playerscripts.o
 instance_SOURCES+=$(DISTDIR)/src/accessory.o
 instance_SOURCES+=$(DISTDIR)/src/accoutrement.o
 instance_SOURCES+=$(DISTDIR)/src/startercharacterscripts.o
 instance_SOURCES+=$(DISTDIR)/src/testservice.o
+instance_CXX_SOURCES+=$(luau_CXX_SOURCES)
+instance_SOURCES+=$(luau_SOURCES)
 
 rbxmx_SOURCES+=$(DISTDIR)/src/filetypes/rbxlx.o
 rbxmx_SOURCES+=$(DISTDIR)/src/filetypes/rbxmx.o
@@ -178,26 +244,89 @@ rbxm_SOURCES+=$(DISTDIR)/src/../lib/zstd/src/zstd_decompress.o
 rbxs_SOURCES+=$(DISTDIR)/src/filetypes/rbxs.o
 
 studio_SOURCES+=$(DISTDIR)/src/../studio/studio.o
+studio_CXX_SOURCES+=$(instance_CXX_SOURCES)
 studio_SOURCES+=$(instance_SOURCES)
+studio_CXX_SOURCES+=$(rbxmx_CXX_SOURCES)
 studio_SOURCES+=$(rbxmx_SOURCES)
+studio_CXX_SOURCES+=$(rbxm_CXX_SOURCES)
 studio_SOURCES+=$(rbxm_SOURCES)
 
-$(DISTDIR)/studio$(EXEC_EXTENSION): $(studio_SOURCES)
-	$(CC) -o $@ $^ $(LDFLAGS)
+$(DISTDIR)/studio$(EXEC_EXTENSION): $(studio_SOURCES) $(studio_CXX_SOURCES)
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
 player_SOURCES+=$(DISTDIR)/src/../player/player.o
+player_CXX_SOURCES+=$(instance_CXX_SOURCES)
 player_SOURCES+=$(instance_SOURCES)
+player_CXX_SOURCES+=$(rbxmx_CXX_SOURCES)
 player_SOURCES+=$(rbxmx_SOURCES)
+player_CXX_SOURCES+=$(rbxm_CXX_SOURCES)
 player_SOURCES+=$(rbxm_SOURCES)
+player_CXX_SOURCES+=$(rbxs_CXX_SOURCES)
 player_SOURCES+=$(rbxs_SOURCES)
 
-$(DISTDIR)/player$(EXEC_EXTENSION): $(player_SOURCES)
-	$(CC) -o $@ $^ $(LDFLAGS)
+$(DISTDIR)/player$(EXEC_EXTENSION): $(player_SOURCES) $(player_CXX_SOURCES)
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
 $(DISTDIR)/%.o: %.c
 	$(CC) -c $^ $(CFLAGS) -o $@
 
+$(DISTDIR)/%.o: %.cpp
+	$(CXX) -c $^ $(CFLAGS) -o $@
+
 clean:
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lapi.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/laux.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lbaselib.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lbitlib.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lbuffer.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lbuflib.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lbuiltins.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lcorolib.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/ldblib.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/ldebug.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/ldo.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lfunc.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lgc.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lgcdebug.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/linit.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lmathlib.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lmem.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lnumprint.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lobject.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/loslib.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lperf.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lstate.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lstring.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lstrlib.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/ltable.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/ltablib.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/ltm.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/ludata.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lutf8lib.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lveclib.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lvmexecute.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lvmload.o
+	rm -f $(DISTDIR)/src/../lib/luau/VM/src/lvmutils.o
+	rm -f $(DISTDIR)/src/../lib/luau/Compiler/src/BuiltinFolding.o
+	rm -f $(DISTDIR)/src/../lib/luau/Compiler/src/Builtins.o
+	rm -f $(DISTDIR)/src/../lib/luau/Compiler/src/BytecodeBuilder.o
+	rm -f $(DISTDIR)/src/../lib/luau/Compiler/src/Compiler.o
+	rm -f $(DISTDIR)/src/../lib/luau/Compiler/src/ConstantFolding.o
+	rm -f $(DISTDIR)/src/../lib/luau/Compiler/src/CostModel.o
+	rm -f $(DISTDIR)/src/../lib/luau/Compiler/src/lcode.o
+	rm -f $(DISTDIR)/src/../lib/luau/Compiler/src/TableShape.o
+	rm -f $(DISTDIR)/src/../lib/luau/Compiler/src/Types.o
+	rm -f $(DISTDIR)/src/../lib/luau/Compiler/src/ValueTracking.o
+	rm -f $(DISTDIR)/src/../lib/luau/Ast/src/Allocator.o
+	rm -f $(DISTDIR)/src/../lib/luau/Ast/src/Ast.o
+	rm -f $(DISTDIR)/src/../lib/luau/Ast/src/Confusables.o
+	rm -f $(DISTDIR)/src/../lib/luau/Ast/src/Cst.o
+	rm -f $(DISTDIR)/src/../lib/luau/Ast/src/Lexer.o
+	rm -f $(DISTDIR)/src/../lib/luau/Ast/src/Location.o
+	rm -f $(DISTDIR)/src/../lib/luau/Ast/src/Parser.o
+	rm -f $(DISTDIR)/src/../lib/luau/Ast/src/StringUtils.o
+	rm -f $(DISTDIR)/src/../lib/luau/Ast/src/TimeTrace.o
+	rm -f $(DISTDIR)/src/scriptruntime.o
 	rm -f $(DISTDIR)/src/datamodel.o
 	rm -f $(DISTDIR)/src/instance.o
 	rm -f $(DISTDIR)/src/rbxscriptsignal.o
@@ -246,7 +375,6 @@ clean:
 	rm -f $(DISTDIR)/src/localscript.o
 	rm -f $(DISTDIR)/src/starterplayerscripts.o
 	rm -f $(DISTDIR)/src/starterplayer.o
-	rm -f $(DISTDIR)/src/scriptruntime.o
 	rm -f $(DISTDIR)/src/playerscripts.o
 	rm -f $(DISTDIR)/src/accessory.o
 	rm -f $(DISTDIR)/src/accoutrement.o

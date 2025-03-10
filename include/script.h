@@ -8,6 +8,7 @@ typedef struct Script {
 
     const char *Source;
     int sourceLength;
+    bool isBytecode;
 } Script;
 
 Script *Script_new(const char *className, Instance *parent);

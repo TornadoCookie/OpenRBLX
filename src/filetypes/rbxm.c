@@ -183,6 +183,7 @@ static void *parse_values(PropertiesChunk chunk, InstanceChunk instChunk, unsign
 
     switch (chunk.ValueType)
     {
+        case 0x1D: // Bytecode value **FALLTHROUGH**
         case 0x01: // String value
         {
             return (void*)-1;
@@ -354,7 +355,7 @@ static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChu
                 (!strcmp(s.name, "Color") && !strncmp(chunk.Name, "Color3uint8", chunk.nameLength)))
             {
                 serialized = true;
-                if (chunk.ValueType == 0x01)
+                if (chunk.ValueType == 0x01 || chunk.ValueType == 0x1D)
                 {
                     char **val = s.val;
                     unsigned char *strData;
@@ -377,6 +378,10 @@ static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChu
                     if (Instance_IsA(inst, "Script") && !strcmp(s.name, "Source"))
                     {
                         ((Script*)inst)->sourceLength = length;
+                        if (chunk.ValueType == 0x1D)
+                        {
+                            ((Script*)inst)->isBytecode = true;
+                        }
                     }
                 }
                 else

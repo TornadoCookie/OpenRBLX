@@ -1,6 +1,7 @@
 #include <raylib.h>
 #include "datamodel.h"
 #include "filetypes.h"
+#include "scriptruntime.h"
 
 #define DEBUG_IMPL
 #include "debug.h"
@@ -199,6 +200,35 @@ void AttemptLoadFile(DataModel *game, const char *file)
     }
 }
 
+static void detail_tree(int level, Instance *inst)
+{
+    for (int i = 0; i < level; i++) printf("\t");
+    printf("%s %s\n", inst->ClassName, inst->Name);
+
+    for (int i = 0; i < inst->childCount; i++)
+    {
+        detail_tree(level+1, inst->children[i]);
+    }
+}
+
+static void load_plugins()
+{
+    int mdlCount = 0;
+    Instance **explorerPlugin_s = LoadModelRBXM("studioRoot/BuiltInStandalonePlugins/Optimized_Embedded_Signature/ExplorerPlugin.rbxm", &mdlCount);
+
+    printf("%d mdls\n", mdlCount);
+
+    for (int i = 0; i < mdlCount; i++)
+    {
+        printf("mdl %d:\n", i);
+        detail_tree(0, explorerPlugin_s[i]);
+    }
+
+    ScriptRuntime *scrt = ScriptRuntime_new("ScriptRuntime", NULL);
+    ScriptRuntime_RunScript(scrt, explorerPlugin_s[0]);
+
+    exit(EXIT_SUCCESS);
+}
 
 int main()
 {
@@ -208,6 +238,8 @@ int main()
     SetExitKey(KEY_F1);
 
     load_studio_ui();
+
+    load_plugins();
 
     uiState.status = "Ready.";
 
