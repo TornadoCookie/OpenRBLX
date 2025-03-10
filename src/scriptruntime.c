@@ -552,7 +552,7 @@ int32_t se24_32(uint32_t x)
 }
 
 // Adapted from Luau/Bytecode.h documentation
-static void disassemblecode(uint32_t *code, int codeSize)
+static void disassemblecode(uint32_t *code, int codeSize) 
 {
     for (int i = 0; i < codeSize; i++)
     {
@@ -582,7 +582,7 @@ static void disassemblecode(uint32_t *code, int codeSize)
             } break;
             case LOP_LOADNIL: // 2
             {
-                printf("LOADNIL %d\n", a);
+                printf("R%d = nil\n", a);
             } break;
             case LOP_LOADB: // 3
             {
@@ -598,7 +598,7 @@ static void disassemblecode(uint32_t *code, int codeSize)
             } break;
             case LOP_MOVE: // 6
             {
-                printf("MOVE %d %d\n", a, b);
+                printf("R%d = R%d\n", a, b);
             } break;
             case LOP_GETGLOBAL: // 7
             {
@@ -624,14 +624,34 @@ static void disassemblecode(uint32_t *code, int codeSize)
             } break;
             case LOP_GETIMPORT: // 12
             {
-                printf("GETIMPORT %d %d %#x\n", a, d, aux);
+                int pcount = aux >> 30;
+                int p3 = aux & 1023;
+                int p2 = (aux >> 10) & 1023;
+                int p1 = (aux >> 20) & 1023;
+        
+                printf("R%d = asliteral(", a);
+
+                if (pcount > 0)
+                {
+                    printf("K%d", p1);
+                    if (pcount > 1)
+                    {
+                        printf(".K%d", p2);
+                        if (pcount > 2)
+                        {
+                            printf(".K%d", p3);
+                        }
+                    }
+                }
+                printf(")\n");
+
                 i++;
             } break;
             //LOP_GETTABLE   13
             //LOP_SETTABLE   14
             case LOP_GETTABLEKS: // 15
             {
-                printf("GETTABLEKS %d %d %d %#x\n", a, b, c, aux);
+                printf("R%d = R%d[K%d]\n", a, b, aux);
                 i++;
             } break;
             case LOP_SETTABLEKS: // 16
@@ -649,33 +669,97 @@ static void disassemblecode(uint32_t *code, int codeSize)
             } break;
             case LOP_CALL: // 21
             {
-                printf("CALL %d %d %d\n", a, b, c);
+                if (b == 2)
+                {
+                    printf("R%d = ", a);
+                }
+                printf("R%d(", a);
+                for (int j = a+1; j < a+b-1; j++)
+                {
+                    printf("R%d", j);
+                    if (j != a+b-2)
+                    {
+                        printf(", ");
+                    }
+                }
+                printf(") -> %d rets\n", c-1);
             } break;
-            //LOP_RETURN     22
+            case LOP_RETURN: // 22
+            {
+                if (b == 1)
+                {
+                    printf("return\n");
+                }
+                else
+                {
+                    printf("RETURN %d %d\n", a, b);
+                }
+            } break;
             //LOP_JUMP       23
             //LOP_JUMPBACK   24
-            //LOP_JUMPIF     25
-            //LOP_JUMPIFNOT  26
-            //LOP_JUMPIFEQ   27
+            case LOP_JUMPIF: // 25
+            {
+                printf("if R%d: go to %#x\n", a, i+d+1);
+            } break;
+            case LOP_JUMPIFNOT: // 26
+            {
+                printf("if not R%d: go to %#x\n", a, i+d+1);
+            } break;
+            case LOP_JUMPIFEQ: // 27
+            {
+                printf("JUMPIFEQ %d %d %d\n", a, d, aux);
+                i++;
+            } break;
             //LOP_JUMPIFLE   28
             //LOP_JUMPIFLT   29
             //LOP_JUMPIFNOTEQ 30
             //LOP_JUMPIFNOTLE 31
             //LOP_JUMPIFNOTLT 32
-            //LOP_ADDK       33
-            //LOP_SUBK       34
-            //LOP_MULK       35
-            //LOP_DIVK       36
-            //LOP_MODK       37
-            //LOP_POWK       38
-            //LOP_AND        39
-            //LOP_OR         40
-            //LOP_ANDK       41
-            //LOP_ORK        42
-            //LOP_CONCAT     43
-            //LOP_NOT        44
-            //LOP_MINUS      45
-            //LOP_LENGTH     46
+            //LOP_ADD        33
+            //LOP_SUB        34
+            //LOP_MUL        35
+            //LOP_DIV        36
+            //LOP_MOD        37
+            //LOP_POW        38
+            //LOP_ADDK       39
+            //LOP_SUBK       40
+            //LOP_MULK       41
+            //LOP_DIVK       42
+            //LOP_MODK       43
+            //LOP_POWK       44
+            //LOP_AND        45
+            //LOP_OR         46
+            //LOP_ANDK       47
+            //LOP_ORK        48
+            //LOP_CONCAT     49
+            //LOP_NOT        50
+            //LOP_MINUS      51
+            //LOP_LENGTH     52
+            //LOP_NEWTABLE   53
+            //LOP_DUPTABLE   54
+            //LOP_SETLIST    55
+            //LOP_FORNPREP   56
+            //LOP_FORNLOOP   57
+            //LOP_FORGLOOP   58
+            //LOP_FORGPREP_INEXT 59
+            //LOP_FASTCALL3  60
+            //LOP_FORGPREP_NEXT 61
+            //LOP_NATIVECALL 62
+            //LOP_GETVARARGS 63
+            //LOP_DUPCLOSURE 64
+            case LOP_PREPVARARGS: // 65
+            {
+                printf("PREPVARARGS %d\n", a);
+            } break;
+            //LOP_LOADKX     66
+            //LOP_JUMPX      67
+            //LOP_FASTCALL   68
+            //LOP_COVERAGE   69
+            //LOP_CAPTURE    70
+            case LOP_SUBRK: // 71
+            {
+                printf("SUBRK %d %d %d\n", a, b, c);
+            } break;
             default:
             {
                 printf("UNKNOWN (%d)\n", opcode);
