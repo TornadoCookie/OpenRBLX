@@ -1,3 +1,6 @@
 [submodule "res/rbx-test-files"]
 	path = res/rbx-test-files
     url = https://github.com/rojo-rbx/rbx-test-files/
+[submodule "lib/luau"]
+	path = lib/luau
+	url = https://github.com/luau-lang/luau
