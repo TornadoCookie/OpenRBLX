@@ -551,8 +551,32 @@ int32_t se24_32(uint32_t x)
     return x;
 }
 
+typedef struct LuauConstant {
+    int type;
+    void *val;
+} LuauConstant;
+
+static void print_constant(LuauConstant *constants, int i, bool putquotes)
+{
+    if (constants[i].type == LBC_CONSTANT_STRING)
+    {
+        if (putquotes)
+        {
+            printf("\"%s\"", constants[i].val);
+        }
+        else
+        {
+            printf("%s", constants[i].val);
+        }
+    }
+    else
+    {
+        printf("K%d", constants[i].type, i);
+    }
+}
+
 // Adapted from Luau/Bytecode.h documentation
-static void disassemblecode(uint32_t *code, int codeSize) 
+static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constants) 
 {
     for (int i = 0; i < codeSize; i++)
     {
@@ -594,7 +618,9 @@ static void disassemblecode(uint32_t *code, int codeSize)
             } break;
             case LOP_LOADK: // 5
             {
-                printf("LOADK %d %d\n", a, d);
+                printf("R%d = ", a);
+                print_constant(constants, d, true);
+                printf("\n");
             } break;
             case LOP_MOVE: // 6
             {
@@ -629,21 +655,23 @@ static void disassemblecode(uint32_t *code, int codeSize)
                 int p2 = (aux >> 10) & 1023;
                 int p1 = (aux >> 20) & 1023;
         
-                printf("R%d = asliteral(", a);
+                printf("R%d = ", a);
 
                 if (pcount > 0)
                 {
-                    printf("K%d", p1);
+                    print_constant(constants, p1, false);
                     if (pcount > 1)
                     {
-                        printf(".K%d", p2);
+                        printf(".");
+                        print_constant(constants, p2, false);
                         if (pcount > 2)
                         {
-                            printf(".K%d", p3);
+                            printf(".");
+                            print_constant(constants, p3, false);
                         }
                     }
                 }
-                printf(")\n");
+                printf("\n");
 
                 i++;
             } break;
@@ -651,7 +679,9 @@ static void disassemblecode(uint32_t *code, int codeSize)
             //LOP_SETTABLE   14
             case LOP_GETTABLEKS: // 15
             {
-                printf("R%d = R%d[K%d]\n", a, b, aux);
+                printf("R%d = R%d[", a, b, aux);
+                print_constant(constants, aux, true);
+                printf("]\n");
                 i++;
             } break;
             case LOP_SETTABLEKS: // 16
@@ -664,20 +694,22 @@ static void disassemblecode(uint32_t *code, int codeSize)
             //LOP_NEWCLOSURE 19
             case LOP_NAMECALL: // 20
             {
-                printf("NAMECALL %d %d %d %#x\n", a, b, c, aux);
+                printf("R%d = R%d, R%d = R%d[", a+1, b, a, b, aux);
+                print_constant(constants, aux, true);
+                printf("]\n");
                 i++;
             } break;
             case LOP_CALL: // 21
             {
-                if (b == 2)
+                if (c == 2)
                 {
                     printf("R%d = ", a);
                 }
                 printf("R%d(", a);
-                for (int j = a+1; j < a+b-1; j++)
+                for (int j = a+1; j < a+b; j++)
                 {
                     printf("R%d", j);
-                    if (j != a+b-2)
+                    if (j != a+b-1)
                     {
                         printf(", ");
                     }
@@ -707,7 +739,7 @@ static void disassemblecode(uint32_t *code, int codeSize)
             } break;
             case LOP_JUMPIFEQ: // 27
             {
-                printf("JUMPIFEQ %d %d %d\n", a, d, aux);
+                printf("if R%d == R%d: go to %#x\n", a, aux, i+d+1);
                 i++;
             } break;
             //LOP_JUMPIFLE   28
@@ -865,12 +897,16 @@ static void disassemble(uint8_t *data, int dataSize)
         int sizecode = readVarInt(&data);
         printf("Sizecode: %d\n", sizecode);
 
-        disassemblecode(data, sizecode);
+        void *code = data;
+
+        
 
         data += 4*sizecode;
     
         int sizek = readVarInt(&data);
         printf("Sizek: %d\n", sizek);
+
+        LuauConstant *constants = malloc(sizek * sizeof(LuauConstant));
 
         for (int j = 0; j < sizek; j++)
         {
@@ -878,6 +914,8 @@ static void disassemble(uint8_t *data, int dataSize)
             data++;
 
             printf("Constant %d: ", j);
+
+            constants[j].type = type;
 
             switch (type)
             {
@@ -890,6 +928,7 @@ static void disassemble(uint8_t *data, int dataSize)
                     int strId = readVarInt(&data) - 1;
                     printf("str %d ", strId);
                     printf("\"%s\"\n", strings[strId]);
+                    constants[j].val = strings[strId];
                 } break;
                 case LBC_CONSTANT_IMPORT:
                 {
@@ -924,6 +963,8 @@ static void disassemble(uint8_t *data, int dataSize)
             printf("TODO Sizep\n");
             return;
         }
+
+        disassemblecode(code, sizecode, constants);
 
         int linedefined = readVarInt(&data);
         printf("linedefined: %d\n", linedefined);
@@ -985,20 +1026,17 @@ static void run_script(Script *script, const char *source, int sourceLength, boo
     if (!script->isBytecode)
         free(bytecode);
     
-    if (result == 0)
+    if (result != 0)
     {
+        printf("There was a problem: %d\n", result);
         goto end;
     }
     luaL_sandbox(L);
-    lua_singlestep(L, 1);
-    lua_callbacks(L)->debugstep = scrt_debugstep;
-    lua_callbacks(L)->interrupt = scrt_interrupt;
-    lua_call(L, 0, 0);
-    //if (lua_pcall(L, 0, 0, 0))
-    //{
-    //    printf("Error: %s\n", lua_tostring(L, -1));
-    //    goto end;
-    //}
+    if (lua_pcall(L, 0, 0, 0))
+    {
+        printf("Error: %s\n", lua_tostring(L, -1));
+        goto end;
+    }
     
     printf("worked.\n");
 
@@ -1008,7 +1046,6 @@ end:
     if (script->isBytecode)
     {
         printf("[%d bytes of bytecode]\n", sourceLength);
-        disassemble(source, sourceLength);
     }
     else
     {
