@@ -1,8 +1,13 @@
 #include "scriptruntime.h"
 #include "basepart.h"
 #include "datamodel.h"
+#include "modulescript.h"
 
 #include <pthread.h>
+
+#include <string.h>
+#include <stdio.h>
+
 #include "debug.h"
 
 DEFAULT_DEBUG_CHANNEL(scriptruntime);
@@ -58,6 +63,7 @@ static int luau_tick(lua_State *L)
 static int luau_Instance_FindFirstChild(lua_State *L);
 static void luau_pushinstance(lua_State *L, Instance *inst);
 static void luau_pushvector3(lua_State *L, Vector3 v);
+
 
 static Vector3 luau_tovector3(lua_State *L, int idx)
 {
@@ -172,14 +178,22 @@ static void luau_pushcframe(lua_State *L, CFrame cf)
     lua_settable(L, -3);
 }
 
-static int luau_Instance__index(lua_State *L)
+static Instance *luau_toinstance(lua_State *L, int i)
 {
+    if (i < 0) i--;
     lua_pushstring(L, "__inst_ptr");
-    lua_rawget(L, 1);
+    lua_rawget(L, i);
     Instance *inst = lua_touserdata(L, -1);
     lua_pop(L, 1);
 
-    const char *name = lua_tostring(L, 2);
+    return inst;
+}
+
+static int luau_Instance__index(lua_State *L)
+{
+    Instance *inst = luau_toinstance(L, 1);
+    const char *name = lua_tostring(L, 2); 
+
     Instance *child = Instance_FindFirstChild(inst, name, false);
 
     if (child)
@@ -214,7 +228,7 @@ static int luau_Instance__index(lua_State *L)
         }
     }
 
-    lua_pushstring(L, TextFormat("Instance %s has no child or property %s\n", inst->ClassName, name));
+    lua_pushstring(L, TextFormat("Instance %s (name %s) has no child or property %s\n", inst->ClassName, inst->Name, name));
     lua_error(L);
 
     lua_pushnil(L);
@@ -230,12 +244,8 @@ static int luau_Instance_FindFirstChild(lua_State *L)
     }
 
     // Instance is at 1
-    const char *name = lua_tostring(L, 2);
-
-    lua_pushstring(L, "__inst_ptr");
-    lua_rawget(L, 1);
-
-    Instance *inst = lua_touserdata(L, -1);
+    Instance *inst = luau_toinstance(L, 1);
+    const char *name = lua_tostring(L, 2); 
 
     Instance *ret = Instance_FindFirstChild(inst, name, lua_gettop(L) == 4 ? lua_toboolean(L, 3) : false);
 
@@ -244,7 +254,31 @@ static int luau_Instance_FindFirstChild(lua_State *L)
         return 0;
     }
 
-    lua_newtable(L);
+    luau_pushinstance(L, ret);
+
+    return 1;
+}
+
+static int luau_Instance_FindFirstAncestor(lua_State *L)
+{
+    if (lua_gettop(L) < 2)
+    {
+        lua_pushstring(L, "Expected 2 or more arguments.");
+        lua_error(L);
+    }
+
+    // Instance is at 1
+    Instance *inst = luau_toinstance(L, 1);
+    const char *name = lua_tostring(L, 2);
+
+    Instance *ret = Instance_FindFirstAncestor(inst, name);
+
+    if (!ret)
+    {
+        return 0;
+    }
+
+    luau_pushinstance(L, ret);
 
     return 1;
 }
@@ -257,10 +291,7 @@ static int luau_Instance_GetChildren(lua_State *L)
         lua_error(L);
     }
 
-    lua_pushstring(L, "__inst_ptr");
-    lua_rawget(L, 1);
-
-    Instance *inst = lua_touserdata(L, -1);
+    Instance *inst = luau_toinstance(L, 1); 
 
     lua_newtable(L);
 
@@ -282,10 +313,7 @@ static int luau_Instance_Clone(lua_State *L)
         lua_error(L);
     }
 
-    lua_pushstring(L, "__inst_ptr");
-    lua_rawget(L, 1);
-
-    Instance *inst = lua_touserdata(L, -1);
+    Instance *inst = luau_toinstance(L, 1); 
 
     luau_pushinstance(L, Instance_Clone(inst));
 
@@ -301,8 +329,7 @@ static int luau_Instance_WaitForChild(lua_State *L)
         lua_error(L);
     }
 
-    lua_pushstring(L, "__inst_ptr");
-    lua_rawget(L, 1);
+    Instance *inst = luau_toinstance(L, 1); 
 
     const char *childName = luaL_checkstring(L, 2);
     double timeOut = 0.0;
@@ -310,8 +337,6 @@ static int luau_Instance_WaitForChild(lua_State *L)
     {
         timeOut = luaL_checknumber(L, 3);
     }
-
-    Instance *inst = lua_touserdata(L, -1);
 
     luau_pushinstance(L, Instance_WaitForChild(inst, childName, timeOut));
 
@@ -327,15 +352,8 @@ static int luau_Instance_IsDescendantOf(lua_State *L)
         lua_error(L);
     }
 
-    lua_pushstring(L, "__inst_ptr");
-    lua_rawget(L, 1);
-
-    Instance *inst = lua_touserdata(L, -1);
-
-    lua_pushstring(L, "__inst_ptr");
-    lua_rawget(L, 2);
-
-    Instance *ancestor = lua_touserdata(L, -1);
+    Instance *inst = luau_toinstance(L, 1);
+    Instance *ancestor = luau_toinstance(L, 2);
 
     lua_pushboolean(L, Instance_IsDescendantOf(inst, ancestor));
 
@@ -344,16 +362,38 @@ static int luau_Instance_IsDescendantOf(lua_State *L)
 
 static int luau_ServiceProvider_GetService(lua_State *L)
 {
-    lua_pushstring(L, "__inst_ptr");
-    lua_gettable(L, 1);
-
-    ServiceProvider *serviceprovider = lua_touserdata(L, -1);
+    ServiceProvider *serviceProvider = luau_toinstance(L, 1); 
     const char *serviceName = lua_tostring(L, 2);
 
-    Instance *service = ServiceProvider_GetService(serviceprovider, serviceName);
+    Instance *service = ServiceProvider_GetService(serviceProvider, serviceName);
 
     luau_pushinstance(L, service);
 
+    return 1;
+}
+
+static int luau_DataModel_GetFastFlag(lua_State *L)
+{
+    DataModel *game = luau_toinstance(L, 1); 
+    const char *name = lua_tostring(L, 2);
+
+    bool flag = DataModel_GetFastFlag(game, name);
+
+    lua_pushboolean(L, flag);
+    
+    return 1;
+}
+
+static int luau_DataModel_DefineFastFlag(lua_State *L)
+{
+    DataModel *game = luau_toinstance(L, 1); 
+    const char *name = lua_tostring(L, 2);
+    bool defaultValue = lua_toboolean(L, 3);
+
+    bool flag = DataModel_DefineFastFlag(game, name, defaultValue);
+
+    lua_pushboolean(L, flag);
+    
     return 1;
 }
 
@@ -383,6 +423,10 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
     lua_pushcfunction(L, luau_Instance_FindFirstChild, "Instance:findFirstChild");
     lua_settable(L, -3);
 
+    lua_pushstring(L, "FindFirstAncestor");
+    lua_pushcfunction(L, luau_Instance_FindFirstAncestor, "Instance:FindFirstAncestor");
+    lua_settable(L, -3);
+
     lua_pushstring(L, "GetChildren");
     lua_pushcfunction(L, luau_Instance_GetChildren, "Instance:GetChildren");
     lua_settable(L, -3);
@@ -402,7 +446,7 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
     lua_pushstring(L, "IsDescendantOf");
     lua_pushcfunction(L, luau_Instance_IsDescendantOf, "Instance:IsDescendantOf");
     lua_settable(L, -3);
-    
+
     lua_pushstring(L, "__inst_ptr");
     lua_pushlightuserdata(L, inst);
     lua_settable(L, -3);
@@ -412,6 +456,17 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
         lua_pushstring(L, "GetService");
         lua_pushcfunction(L, luau_ServiceProvider_GetService, "ServiceProvider:GetService");
         lua_settable(L, -3);
+
+        if (Instance_IsA(inst, "DataModel"))
+        {
+            lua_pushstring(L, "GetFastFlag");
+            lua_pushcfunction(L, luau_DataModel_GetFastFlag, "DataModel:GetFastFlag");
+            lua_settable(L, -3);
+
+            lua_pushstring(L, "DefineFastFlag");
+            lua_pushcfunction(L, luau_DataModel_DefineFastFlag, "DataModel:DefineFastFlag");
+            lua_settable(L, -3);
+        }
     }
 }
 
@@ -432,9 +487,119 @@ static int luau_Vector3_new(lua_State *L)
     return 1;
 }
 
+static void disassemble(uint8_t *data, int dataSize);
+
+static void luaL_desandbox(lua_State *L)
+{
+    // set all libraries to rw
+    lua_pushnil(L);
+    while (lua_next(L, LUA_GLOBALSINDEX) != 0)
+    {
+        if (lua_istable(L, -1))
+            lua_setreadonly(L, -1, false);
+
+        lua_pop(L, 1);
+    }
+
+    // set all builtin metatables to rw
+    lua_pushliteral(L, "");
+    if (lua_getmetatable(L, -1))
+    {
+        lua_setreadonly(L, -1, false);
+        lua_pop(L, 2);
+    }
+    else
+    {
+        lua_pop(L, 1);
+    }
+
+    // set globals to rw and deactivate safeenv since the env is now mutable
+    lua_setreadonly(L, LUA_GLOBALSINDEX, false);
+    lua_setsafeenv(L, LUA_GLOBALSINDEX, false);
+}
+
+static int luau_require(lua_State *L)
+{
+    Instance *inst = luau_toinstance(L, 1);
+
+    printf("require(%s)\n", inst->Name);
+
+    if (!strcmp(inst->ClassName, "ModuleScript"))
+    {
+        ModuleScript *mscript = inst;
+
+        size_t bytecodesize = 0;
+        char *bytecode;
+        struct lua_CompileOptions compopts = { 0 };
+
+        // Set the script global
+        lua_getglobal(L, "script");
+        Script *callingScript = luau_toinstance(L, -1);
+        lua_pop(L, 1);
+        luau_pushinstance(L, mscript);
+
+        luaL_desandbox(L);
+        lua_setglobal(L, "script");
+        luaL_sandbox(L);
+
+        compopts.debugLevel = 2;
+        if (mscript->isBytecode)
+        {
+            bytecode = mscript->Source;
+            bytecodesize = mscript->sourceLength;
+        }
+        else
+        {
+            bytecode = luau_compile(mscript->Source, mscript->sourceLength, &compopts, &bytecodesize);
+        }
+
+        int result = luau_load(L, inst->Name, bytecode, bytecodesize, 0); 
+        if (result != 0)
+        {
+            printf("There was a problem: %s\n", lua_tostring(L, -1));
+            goto err;
+        }
+        if (lua_pcall(L, 0, 1, 0))
+        {
+            printf("Requested module experienced an error while loading: Error: %s\n", lua_tostring(L, -1));
+            goto err;
+        } 
+
+        luau_pushinstance(L, callingScript);
+
+        luaL_desandbox(L);
+        lua_setglobal(L, "script");
+        luaL_sandbox(L);
+
+        printf("ran modulescript\n");
+    }
+    goto end;
+
+err:
+    
+
+end:
+    if (((ModuleScript*)inst)->isBytecode)
+    {
+        printf("%s ", inst->Name);
+        disassemble(((ModuleScript*)inst)->Source, ((ModuleScript*)inst)->sourceLength);
+    }
+    else
+    {
+        printf("Source: %s\n", ((ModuleScript*)inst)->Source);
+    }
+
+    //lua_pushnil(L);
+    return 1;
+}
+
 static void init_lua_state(lua_State *L, Script *script)
 {
     //luaL_openlibs(L);
+    
+    // Lua global functions
+    lua_pushcfunction(L, luau_require, "require");
+    lua_setglobal(L, "require");
 
     // Roblox global functions
     lua_pushcfunction(L, luau_wait, "wait");
@@ -470,7 +635,10 @@ static void init_lua_state(lua_State *L, Script *script)
 
 static void scrt_debugstep(lua_State *L, lua_Debug *ar)
 {
-    printf("%s:%s:%d\n", ar->what, ar->name, ar->currentline);
+    if (ar->what)
+    {
+        printf("%s:%d\n", ar->what, ar->currentline);
+    }
 }
 
 static void scrt_interrupt(lua_State *L, int gc)
@@ -514,7 +682,14 @@ static void remapUserdataTypes(char *data, size_t size, uint32_t count)
     printf("upval Count: %d\n", upvalCount);
     if (upvalCount)
     {
-        printf("TODO upvalCount\n");
+        uint8_t *types = data;
+        for (int i = 0; i < upvalCount; i++)
+        {
+            uint32_t index = ((uint32_t)types[i]) - LBC_TYPE_TAGGED_USERDATA_BASE;
+
+            printf("upval %d: %d\n", i, index);
+        }
+        data += upvalCount;
     }
 
     printf("local Count: %d\n", localCount);
@@ -537,6 +712,7 @@ static void remapUserdataTypes(char *data, size_t size, uint32_t count)
 static char *readString(uint8_t **data, char **strings)
 {
     int id = readVarInt(data);
+    printf("rs %d\n", id);
     if (id == 0) return NULL;
     return strings[id - 1];
 }
@@ -676,7 +852,10 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
                 i++;
             } break;
             //LOP_GETTABLE   13
-            //LOP_SETTABLE   14
+            case LOP_SETTABLE: // 14
+            {
+                printf("R%d[R%d] = R%d\n", b, c, a);
+            } break;
             case LOP_GETTABLEKS: // 15
             {
                 printf("R%d = R%d[", a, b, aux);
@@ -686,7 +865,9 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
             } break;
             case LOP_SETTABLEKS: // 16
             {
-                printf("SETTABLEKS %d %d %d %#x\n", a, b, c, aux);
+                printf("R%d[", b);
+                print_constant(constants, aux, true);
+                printf("] = R%d\n", a);
                 i++;
             } break;
             //LOP_GETTABLEN  17
@@ -701,11 +882,19 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
             } break;
             case LOP_CALL: // 21
             {
-                if (c == 2)
+                if (c == 0)
+                {
+                    printf("... = ");
+                }
+                else if (c == 2)
                 {
                     printf("R%d = ", a);
                 }
                 printf("R%d(", a);
+                if (b == 0)
+                {
+                    printf("...");
+                }
                 for (int j = a+1; j < a+b; j++)
                 {
                     printf("R%d", j);
@@ -721,6 +910,16 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
                 if (b == 1)
                 {
                     printf("return\n");
+                }
+                else if (b > 0)
+                {
+                    printf("return ");
+                    for (int j = a; j < a+b-1; j++)
+                    {
+                        printf("R%d", j);
+                        if (j != a+b-2) printf(", ");
+                    }
+                    printf("\n");
                 }
                 else
                 {
@@ -767,18 +966,47 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
             //LOP_NOT        50
             //LOP_MINUS      51
             //LOP_LENGTH     52
-            //LOP_NEWTABLE   53
-            //LOP_DUPTABLE   54
+            case LOP_NEWTABLE: // 53
+            {
+                printf("R%d = {}, arrsz=%d, tsz=%d\n", a, aux, b);
+                i++;
+            } break;
+            case LOP_DUPTABLE: // 54
+            {
+                printf("R%d = ", a);
+                print_constant(constants, d, true);
+                printf("\n");
+            } break;
             //LOP_SETLIST    55
             //LOP_FORNPREP   56
             //LOP_FORNLOOP   57
-            //LOP_FORGLOOP   58
+            case LOP_FORGLOOP: // 58
+            {
+                printf("(FORGLOOP) ");
+                for (int j = a+3; j < a+3+(aux&0xff); j++)
+                {
+                    printf("R%d", j);
+                    if (j != a+2+(aux&0xff))
+                        printf(", ");
+                }
+                printf(" = R%d(R%d, R%d), goto %#x\n", a, a+1, a+2, i+d+1);
+                i++;
+            } break;
             //LOP_FORGPREP_INEXT 59
             //LOP_FASTCALL3  60
-            //LOP_FORGPREP_NEXT 61
+            case LOP_FORGPREP_NEXT: // 61
+            {
+                printf("R%d = nil, R%d = nil, go to FORGLOOP\n", a+3, a+4);
+            } break;
             //LOP_NATIVECALL 62
-            //LOP_GETVARARGS 63
-            //LOP_DUPCLOSURE 64
+            case LOP_GETVARARGS: // 63
+            {
+                printf("GETVARARGS %d %d\n", a, b);
+            } break;
+            case LOP_DUPCLOSURE: // 64
+            {
+                printf("R%d = K%d (closure)\n", a, d);
+            } break;
             case LOP_PREPVARARGS: // 65
             {
                 printf("PREPVARARGS %d\n", a);
@@ -787,10 +1015,36 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
             //LOP_JUMPX      67
             //LOP_FASTCALL   68
             //LOP_COVERAGE   69
-            //LOP_CAPTURE    70
+            case LOP_CAPTURE: // 70
+            {
+                printf("CAPTURE %d %d\n", a, b);
+            } break;
             case LOP_SUBRK: // 71
             {
                 printf("SUBRK %d %d %d\n", a, b, c);
+            } break;
+            //LOP_DIVRK       72
+            //LOP_FASTCALL1   73
+            //LOP_FASTCALL2   74
+            //LOP_FASTCALL2K  75
+            //LOP_FORGPREP    76
+            //LOP_JUMPXEQKNIL 77
+            //LOP_JUMPXEQKB   78
+            //LOP_JUMPXEQKN   79
+            case LOP_JUMPXEQKS: // 80
+            {
+                printf("if R%d ", a);
+                if (aux & 0xffff0000)
+                {
+                    printf("~= ");
+                }
+                else
+                {
+                    printf("== ");
+                }
+                print_constant(constants, aux & 0x0000ffff, true);
+                printf(": go to %#x\n", i+d);
+                i++;
             } break;
             default:
             {
@@ -941,11 +1195,16 @@ static void disassemble(uint8_t *data, int dataSize)
                 {
                     int keys = readVarInt(&data);
                     printf("tbl, len %d\n", keys);
-                    for (int i = 0; i < keys; i++)
+                    for (int k = 0; k < keys; k++)
                     {
                         int key = readVarInt(&data);
-                        printf("[%d] = [constant %d]\n", j, key);
+                        printf("[%d] = [constant %d]\n", k, key);
                     }
+                } break;
+                case LBC_CONSTANT_CLOSURE:
+                {
+                    uint32_t fid = readVarInt(&data);
+                    printf("closure %d\n", fid);
                 } break;
                 default:
                 {
@@ -960,8 +1219,11 @@ static void disassemble(uint8_t *data, int dataSize)
 
         if (sizep)
         {
+            for (int j = 0; j < sizep; j++)
+            {
+                readVarInt(&data);
+            }
             printf("TODO Sizep\n");
-            return;
         }
 
         disassemblecode(code, sizecode, constants);
@@ -970,15 +1232,24 @@ static void disassemble(uint8_t *data, int dataSize)
         printf("linedefined: %d\n", linedefined);
 
         char *debugname = readString(&data, strings);
-        printf("debugname: %s\n", debugname);
+        //printf("debugname: %s\n", debugname);
 
         uint8_t lineinfo = *(uint8_t*)data;
         data++;
 
         if (lineinfo)
         {
+            uint8_t linegaplog2 = *(uint8_t*)data;
+            data++;
+
+            int intervals = ((sizecode - 1) >> linegaplog2) + 1;
+            int absoffset = (sizecode + 3) & ~3;
+
+            const int sizelineinfo = absoffset + intervals * sizeof(int);
+
+            data += sizecode + intervals*4;
+
             printf("TODO lineinfo\n");
-            return;
         }
 
         uint8_t debuginfo = *(uint8_t*)data;
@@ -990,8 +1261,7 @@ static void disassemble(uint8_t *data, int dataSize)
         }
     }
 
-    uint32_t mainid = *(uint32_t*)data;
-    data += sizeof(uint32_t);
+    uint32_t mainid = readVarInt(&data);
 
     printf("Entrypoint proto: %d\n", mainid);
 }
@@ -1019,7 +1289,7 @@ static void run_script(Script *script, const char *source, int sourceLength, boo
 
         compopts.debugLevel = 2;
 
-        luau_compile(source, sourceLength, &compopts, &bytecodesize);
+        bytecode = luau_compile(source, sourceLength, &compopts, &bytecodesize);
     }
     int result = luau_load(L, ((Instance*)script)->Name, bytecode, bytecodesize, 0);
     
@@ -1032,6 +1302,8 @@ static void run_script(Script *script, const char *source, int sourceLength, boo
         goto end;
     }
     luaL_sandbox(L);
+    //lua_callbacks(L)->debugstep = scrt_debugstep;
+    //lua_singlestep(L, 1);
     if (lua_pcall(L, 0, 0, 0))
     {
         printf("Error: %s\n", lua_tostring(L, -1));
@@ -1046,6 +1318,7 @@ end:
     if (script->isBytecode)
     {
         printf("[%d bytes of bytecode]\n", sourceLength);
+        disassemble(source, sourceLength);
     }
     else
     {

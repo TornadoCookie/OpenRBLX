@@ -8,6 +8,8 @@ typedef struct ModuleScript {
 
     const char *Source; // ProtectedString but C should treat it as just a string
                         // and can control access by scripts
+    int sourceLength;
+    bool isBytecode;
 } ModuleScript;
 
 ModuleScript *ModuleScript_new(const char *className, Instance *parent);

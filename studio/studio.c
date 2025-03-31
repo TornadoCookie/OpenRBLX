@@ -2,6 +2,7 @@
 #include "datamodel.h"
 #include "filetypes.h"
 #include "scriptruntime.h"
+#include "folder.h"
 
 #define DEBUG_IMPL
 #include "debug.h"
@@ -216,13 +217,9 @@ static void load_plugins()
     int mdlCount = 0;
     Instance **explorerPlugin_s = LoadModelRBXM("studioRoot/BuiltInStandalonePlugins/Optimized_Embedded_Signature/ExplorerPlugin.rbxm", &mdlCount);
 
-    printf("%d mdls\n", mdlCount);
+    Instance_SetParent(explorerPlugin_s[0], explorerPlugin_s[1]);
 
-    for (int i = 0; i < mdlCount; i++)
-    {
-        printf("mdl %d:\n", i);
-        detail_tree(0, explorerPlugin_s[i]);
-    }
+    detail_tree(0, explorerPlugin_s[1]);
 
     ScriptRuntime *scrt = ScriptRuntime_new("ScriptRuntime", NULL);
     ScriptRuntime_RunScript(scrt, explorerPlugin_s[0]);

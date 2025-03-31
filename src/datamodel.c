@@ -93,6 +93,25 @@ void DataModel_Shutdown(DataModel *this)
     RBXScriptSignal_Fire(this->serviceprovider.Close, NULL);
 }
 
+bool DataModel_GetFastFlag(DataModel *this, const char *name)
+{
+    if (!strcmp(name, "NewExplorer"))
+    {
+        return true; // make a new explorer
+    }
+    else
+    {
+        FIXME("unknown fflag %s\n", name);
+        return false;
+    }
+}
+
+bool DataModel_DefineFastFlag(DataModel *this, const char *name, bool defaultValue)
+{
+    FIXME("this %p, name %s, defaultValue %d stub!\n", this, name, defaultValue);
+    return DataModel_GetFastFlag(this, name);
+}
+
 static void draw_recursive(Instance *inst)
 {
     if (!inst) return;

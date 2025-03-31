@@ -10,6 +10,7 @@
 #include "script.h"
 //#include <endian.h>
 #include "zstd.h"
+#include "modulescript.h"
 
 #include "debug.h"
 
@@ -375,12 +376,24 @@ static void apply_property_chunk_to_instances(PropertiesChunk chunk, InstanceChu
                     *val = malloc(length + 1);
                     memcpy(*val, strData, length);
                     (*val)[length] = 0;
-                    if (Instance_IsA(inst, "Script") && !strcmp(s.name, "Source"))
+                    if (!strcmp(s.name, "Source"))
                     {
-                        ((Script*)inst)->sourceLength = length;
-                        if (chunk.ValueType == 0x1D)
+                        if (Instance_IsA(inst, "Script"))
                         {
-                            ((Script*)inst)->isBytecode = true;
+
+                            ((Script*)inst)->sourceLength = length;
+                            if (chunk.ValueType == 0x1D)
+                            {
+                                ((Script*)inst)->isBytecode = true;
+                            }
+                        }
+                        if (Instance_IsA(inst, "ModuleScript"))
+                        {
+                            ((ModuleScript*)inst)->sourceLength = length;
+                            if (chunk.ValueType == 0x1D)
+                            {
+                                ((ModuleScript*)inst)->isBytecode = true;
+                            }
                         }
                     }
                 }

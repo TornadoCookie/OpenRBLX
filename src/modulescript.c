@@ -8,6 +8,8 @@ ModuleScript *ModuleScript_new(const char *className, Instance *parent)
     newInst = realloc(newInst, sizeof(*newInst));
 
     newInst->Source = NULL;
+    newInst->sourceLength = 0;
+    newInst->isBytecode = false;
 
     return newInst;
 }

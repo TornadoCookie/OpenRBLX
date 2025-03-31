@@ -191,7 +191,7 @@ bool ClassName_IsA(const char *className1, const char *className)
     else if (!strcmp(className, "Model")) return ClassName_IsA(className1, "WorldRoot");
     else if (!strcmp(className, "WorldRoot")) return ClassName_IsA(className1, "Workspace");
 
-    else if (!strcmp(className, "LuaSourceContainer")) return ClassName_IsA(className1, "BaseScript");
+    else if (!strcmp(className, "LuaSourceContainer")) return ClassName_IsA(className1, "BaseScript") || ClassName_IsA(className1, "ModuleScript");
     else if (!strcmp(className, "BaseScript")) return ClassName_IsA(className1, "Script");
 
     else if (!strcmp(className, "DataModelMesh")) return ClassName_IsA(className1, "FileMesh") || ClassName_IsA(className1, "BevelMesh");
@@ -310,6 +310,13 @@ Instance *Instance_FindFirstChildOfClass(Instance *this, const char *className)
     }
 
     return NULL;
+}
+
+Instance *Instance_FindFirstAncestor(Instance *this, const char *name)
+{
+    if (!this->Parent) return NULL;
+    if (!strcmp(this->Parent->Name, name)) return this->Parent;
+    return Instance_FindFirstAncestor(this->Parent, name);
 }
 
 void Instance_SetArchivable(Instance *this, bool archivable) 
