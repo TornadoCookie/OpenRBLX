@@ -212,27 +212,60 @@ static int luau_Instance__index(lua_State *L)
         luau_pushinstance(L, inst->Parent);
         return 1;
     }
-
-    if (Instance_IsA(inst, "BasePart"))
+    else if (!strcmp(name, "ClassName"))
     {
-        BasePart *basepart = inst;
-        if (!strcmp(name, "CFrame"))
+        lua_pushstring(L, inst->ClassName);
+        return 1;
+    }
+
+    SerializeInstance sInst = { 0 };
+    Instance_Serialize(inst, &sInst);
+
+    for (int i = 0; i < sInst.serializationCount; i++)
+    {
+        if (!strcmp(name, sInst.serializations[i].name))
         {
-            luau_pushcframe(L, basepart->CFrame);
-            return 1;
-        }
-        else if (!strcmp(name, "Position"))
-        {
-            luau_pushvector3(L, basepart->Position);
-            return 1;
+            int type = sInst.serializations[i].type;
+            void *val = sInst.serializations[i].val;
+
+            switch (type)
+            {
+                case Serialize_string:
+                {
+                    lua_pushstring(L, *(char**)val);
+                    return 1;
+                } break;
+                default:
+                {
+                    luaL_error(L, "No lua type serializer for %d\n", type);
+                } break;
+            }
         }
     }
+
+    free(sInst.serializations);
 
     lua_pushstring(L, TextFormat("Instance %s (name %s) has no child or property %s\n", inst->ClassName, inst->Name, name));
     lua_error(L);
 
     lua_pushnil(L);
     return 1;
+}
+
+static int luau_Instance__newindex(lua_State *L)
+{
+    Instance *inst = luau_toinstance(L, 1);
+    const char *key = lua_tostring(L, 2);
+
+    if (!inst)
+    {
+        printf("attempt to newindex nil with %s\n", key);
+        return 0;
+    }
+
+    printf("__newindex %s %s %s\n", inst->ClassName, inst->Name, key);
+
+    return 0;
 }
 
 static int luau_Instance_FindFirstChild(lua_State *L)
@@ -272,6 +305,30 @@ static int luau_Instance_FindFirstAncestor(lua_State *L)
     const char *name = lua_tostring(L, 2);
 
     Instance *ret = Instance_FindFirstAncestor(inst, name);
+
+    if (!ret)
+    {
+        return 0;
+    }
+
+    luau_pushinstance(L, ret);
+
+    return 1;
+}
+
+static int luau_Instance_FindFirstAncestorWhichIsA(lua_State *L)
+{
+    if (lua_gettop(L) < 2)
+    {
+        lua_pushstring(L, "Expected 2 or more arguments.");
+        lua_error(L);
+    }
+
+    // Instance is at 1
+    Instance *inst = luau_toinstance(L, 1);
+    const char *name = lua_tostring(L, 2);
+
+    Instance *ret = Instance_FindFirstAncestorWhichIsA(inst, name);
 
     if (!ret)
     {
@@ -367,6 +424,11 @@ static int luau_ServiceProvider_GetService(lua_State *L)
 
     Instance *service = ServiceProvider_GetService(serviceProvider, serviceName);
 
+    if (!service)
+    {
+        luaL_error(L, "No such service %s\n", serviceName);
+    }
+
     luau_pushinstance(L, service);
 
     return 1;
@@ -407,14 +469,6 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
 
     lua_newtable(L);
 
-    lua_newtable(L);
-
-    lua_pushstring(L, "__index");
-    lua_pushcfunction(L, luau_Instance__index, "Instance:__index");
-    lua_settable(L, -3);
-
-    lua_setmetatable(L, -2);
-
     lua_pushstring(L, "FindFirstChild");
     lua_pushcfunction(L, luau_Instance_FindFirstChild, "Instance:FindFirstChild");
     lua_settable(L, -3);
@@ -425,6 +479,10 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
 
     lua_pushstring(L, "FindFirstAncestor");
     lua_pushcfunction(L, luau_Instance_FindFirstAncestor, "Instance:FindFirstAncestor");
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "FindFirstAncestorWhichIsA");
+    lua_pushcfunction(L, luau_Instance_FindFirstAncestorWhichIsA, "Instance:FindFirstAncestorWhichIsA");
     lua_settable(L, -3);
 
     lua_pushstring(L, "GetChildren");
@@ -468,6 +526,18 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
             lua_settable(L, -3);
         }
     }
+
+    lua_newtable(L);
+
+    lua_pushstring(L, "__index");
+    lua_pushcfunction(L, luau_Instance__index, "Instance:__index");
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "__newindex");
+    lua_pushcfunction(L, luau_Instance__newindex, "Instance:__newindex");
+    lua_settable(L, -3);
+
+    lua_setmetatable(L, -2);
 }
 
 static int luau_Vector3_new(lua_State *L)
@@ -522,7 +592,7 @@ static int luau_require(lua_State *L)
 {
     Instance *inst = luau_toinstance(L, 1);
 
-    printf("require(%s)\n", inst->Name);
+    //printf("require(%s)\n", inst->Name);
 
     if (!strcmp(inst->ClassName, "ModuleScript"))
     {
@@ -571,14 +641,11 @@ static int luau_require(lua_State *L)
         lua_setglobal(L, "script");
         luaL_sandbox(L);
 
-        printf("ran modulescript\n");
+        //printf("ran modulescript\n");
     }
     goto end;
 
 err:
-    
-
-end:
     if (((ModuleScript*)inst)->isBytecode)
     {
         printf("%s ", inst->Name);
@@ -588,6 +655,9 @@ end:
     {
         printf("Source: %s\n", ((ModuleScript*)inst)->Source);
     }
+
+end:
+    
 
     //lua_pushnil(L);
     return 1;
@@ -730,10 +800,17 @@ int32_t se24_32(uint32_t x)
 typedef struct LuauConstant {
     int type;
     void *val;
+    int constantCount;
 } LuauConstant;
 
-static void print_constant(LuauConstant *constants, int i, bool putquotes)
+static void print_constant(LuauConstant *constants, unsigned int i, bool putquotes)
 {
+    if (constants->constantCount < i)
+    {
+        printf("KInvalid_%d", i);
+        return;
+    }
+
     if (constants[i].type == LBC_CONSTANT_STRING)
     {
         if (putquotes)
@@ -786,11 +863,19 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
             } break;
             case LOP_LOADB: // 3
             {
-                printf("LOADB %d %d %d\n", a, b, c);
+                printf("R%d = %s", a, b?"true":"false");
+                if (c)
+                {
+                    printf(", goto %#x\n", i+c);
+                }
+                else
+                {
+                    printf("\n");
+                }
             } break;
             case LOP_LOADN: // 4
             {
-                printf("LOADN %d %d\n", a, d);
+                printf("R%d = %d\n", a, d);
             } break;
             case LOP_LOADK: // 5
             {
@@ -814,7 +899,7 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
             } break;
             case LOP_GETUPVAL: // 9
             {
-                printf("GETUPVAL %d %d\n", a, b);
+                printf("R%d = upval %d\n", a, b);
             } break;
             case LOP_SETUPVAL: // 10
             {
@@ -872,7 +957,10 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
             } break;
             //LOP_GETTABLEN  17
             //LOP_SETTABLEN  18
-            //LOP_NEWCLOSURE 19
+            case LOP_NEWCLOSURE: // 19
+            {
+                printf("R%d = new closure from %d\n", a, d);
+            } break;
             case LOP_NAMECALL: // 20
             {
                 printf("R%d = R%d, R%d = R%d[", a+1, b, a, b, aux);
@@ -975,7 +1063,7 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
             {
                 printf("R%d = ", a);
                 print_constant(constants, d, true);
-                printf("\n");
+                printf("(duptable)\n");
             } break;
             //LOP_SETLIST    55
             //LOP_FORNPREP   56
@@ -1161,6 +1249,7 @@ static void disassemble(uint8_t *data, int dataSize)
         printf("Sizek: %d\n", sizek);
 
         LuauConstant *constants = malloc(sizek * sizeof(LuauConstant));
+        if (sizek) constants->constantCount = sizek;
 
         for (int j = 0; j < sizek; j++)
         {
@@ -1301,6 +1390,7 @@ static void run_script(Script *script, const char *source, int sourceLength, boo
         printf("There was a problem: %d\n", result);
         goto end;
     }
+    luaL_openlibs(L);
     luaL_sandbox(L);
     //lua_callbacks(L)->debugstep = scrt_debugstep;
     //lua_singlestep(L, 1);
