@@ -2,6 +2,7 @@
 #include "basepart.h"
 #include "datamodel.h"
 #include "modulescript.h"
+#include "plugin.h"
 
 #include <pthread.h>
 
@@ -459,6 +460,60 @@ static int luau_DataModel_DefineFastFlag(lua_State *L)
     return 1;
 }
 
+static RBXScriptSignal *luau_toevent(lua_State *L, int i)
+{
+    if (i < 0) i--;
+    lua_pushstring(L, "__evt_ptr");
+    lua_rawget(L, i);
+    RBXScriptSignal *event = lua_touserdata(L, -1);
+    lua_pop(L, 1);
+
+    return event;
+}
+
+static int luau_RBXScriptSignal_Connect(lua_State *L)
+{
+    RBXScriptSignal *event = luau_toevent(L, 1);
+
+    FIXME("event %p\n", event);
+}
+
+static int luau_pushevent(lua_State *L, RBXScriptSignal *event)
+{
+    lua_newtable(L);
+
+    lua_pushstring(L, "Connect");
+    lua_pushcfunction(L, luau_RBXScriptSignal_Connect, "RBXScriptSignal:Connect");
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "__evt_ptr");
+    lua_pushlightuserdata(L, event);
+    lua_settable(L, -3);
+
+    return 1;
+}
+
+static int luau_Plugin_GetPluginComponent(lua_State *L)
+{
+    const char *name = lua_tostring(L, 2);
+
+    if (!strcmp(name, "PlaceManager"))
+    {
+        lua_newtable(L);
+        
+        RBXScriptSignal *PlaceDocPanelShown = RBXScriptSignal_new();
+        lua_pushstring(L, "PlaceDocPanelShown");
+        luau_pushevent(L, PlaceDocPanelShown);
+        lua_settable(L, -3);
+        
+        return 1;
+    }
+
+    FIXME("name %s\n", name);
+
+    return 0;
+}
+
 static void luau_pushinstance(lua_State *L, Instance *inst)
 {
     if (!inst)
@@ -525,6 +580,13 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
             lua_pushcfunction(L, luau_DataModel_DefineFastFlag, "DataModel:DefineFastFlag");
             lua_settable(L, -3);
         }
+    }
+
+    if (!strcmp(inst->ClassName, "Plugin"))
+    {
+        lua_pushstring(L, "GetPluginComponent");
+        lua_pushcfunction(L, luau_Plugin_GetPluginComponent, "Plugin:GetPluginComponent");
+        lua_settable(L, -3);
     }
 
     lua_newtable(L);
@@ -663,7 +725,78 @@ end:
     return 1;
 }
 
-static void init_lua_state(lua_State *L, Script *script)
+static int luau_Enums_GetEnums(lua_State *L)
+{
+
+#define enum_start(n) lua_pushstring(L, #n); lua_newtable(L);
+#define enum_val(n, v) lua_pushstring(L, #n); lua_pushinteger(L, v); lua_settable(L, -3);
+#define enum_end() lua_settable(L, -3);
+    lua_newtable(L);
+
+    enum_start(ZIndexBehavior);
+    enum_val(Global, 0);
+    enum_val(Sibling, 1);
+    enum_end();
+
+    enum_start(InitialDockState);
+    enum_val(Top, 0);
+    enum_val(Bottom, 1);
+    enum_val(Left, 2);
+    enum_val(Right, 3);
+    enum_val(Float, 4);
+    enum_end();
+
+#undef enum_end
+#undef enum_val
+#undef enum_start
+
+    return 1;
+}
+
+static int luau_Enums__index(lua_State *L)
+{
+    const char *key = lua_tostring(L, 2);
+
+    luau_Enums_GetEnums(L);
+    lua_pushstring(L, key);
+    lua_gettable(L, -2);
+
+    if (lua_isnil(L, -1))
+    {
+        FIXME("key %s\n", key);
+    }
+
+    return 1;
+}
+
+static int luau_DockWidgetPluginGuiInfo_new(lua_State *L)
+{
+    int InitialDockState = lua_tointeger(L, 1);
+    bool InitialEnabled = lua_toboolean(L, 2);
+    bool InitialEnabledShouldOverrideRestore = lua_toboolean(L, 3);
+    float FloatingXSize = lua_tonumber(L, 4);
+    float FloatingYSize = lua_tonumber(L, 5);
+    float MinWidth = lua_tonumber(L, 6);
+    float MinHeight = lua_tonumber(L, 7);
+
+    lua_newtable(L);
+
+#define set(n, T) lua_pushstring(L, #n); lua_push##T(L, n); lua_settable(L, -3);
+
+    set(InitialDockState, integer);
+    set(InitialEnabled, boolean);
+    set(InitialEnabledShouldOverrideRestore, boolean);
+    set(FloatingXSize, number);
+    set(FloatingYSize, number);
+    set(MinWidth, number);
+    set(MinHeight, number);
+
+#undef set
+
+    return 1;
+}
+
+static void init_lua_state(lua_State *L, Script *script, bool client, bool plugin)
 {
     //luaL_openlibs(L);
     
@@ -688,7 +821,32 @@ static void init_lua_state(lua_State *L, Script *script)
     luau_pushinstance(L, GetDataModel());
     lua_setglobal(L, "game");
 
+    if (plugin)
+    {
+        Plugin *plugin = Plugin_new("Plugin", NULL);
+
+        luau_pushinstance(L, plugin);
+        lua_setglobal(L, "plugin");
+    }
+
+    // Global data types
+    lua_newtable(L);
+
+    lua_pushstring(L, "GetEnums");
+    lua_pushcfunction(L, luau_Enums_GetEnums, "Enums:GetEnums");
+    lua_settable(L, -3);
+
+    lua_newtable(L);
+    lua_pushstring(L, "__index");
+    lua_pushcfunction(L, luau_Enums__index, "Enums:__index");
+    lua_settable(L, -3);
+    
+    lua_setmetatable(L, -2);
+
+    lua_setglobal(L, "Enum");
+
     // Data type constructors
+    // Vector3
     lua_newtable(L);
 
     lua_pushstring(L, "new");
@@ -697,9 +855,19 @@ static void init_lua_state(lua_State *L, Script *script)
 
     lua_setglobal(L, "Vector3");
 
+    // CFrame
     lua_newtable(L);
 
     lua_setglobal(L, "CFrame");
+
+    // DockWidgetPluginGuiInfo
+    lua_newtable(L);
+
+    lua_pushstring(L, "new");
+    lua_pushcfunction(L, luau_DockWidgetPluginGuiInfo_new, "DockWidgetPluginGuiInfo.new");
+    lua_settable(L, -3);
+
+    lua_setglobal(L, "DockWidgetPluginGuiInfo");
     
 }
 
@@ -1355,11 +1523,11 @@ static void disassemble(uint8_t *data, int dataSize)
     printf("Entrypoint proto: %d\n", mainid);
 }
 
-static void run_script(Script *script, const char *source, int sourceLength, bool client)
+static void run_script(Script *script, const char *source, int sourceLength, bool client, bool plugin)
 {
     lua_State *L = luaL_newstate();
 
-    init_lua_state(L, script);
+    init_lua_state(L, script, client, plugin);
 
     printf("Running script source [%s]\n", ((Instance*)script)->Name);
 
@@ -1422,6 +1590,7 @@ typedef struct ScriptRunnerArgs {
     const char *source;
     int sourceLength;
     bool client;
+    bool plugin;
     ScriptRuntime *this;
 } ScriptRunnerArgs;
 
@@ -1429,14 +1598,14 @@ void *run_script_runner(void *args)
 {
     ScriptRunnerArgs *srargs = args;
 
-    run_script(srargs->script, srargs->source, srargs->sourceLength, srargs->client);
+    run_script(srargs->script, srargs->source, srargs->sourceLength, srargs->client, srargs->plugin);
 
     Instance_Destroy(srargs->this);
 
     return NULL;
 }
 
-void ScriptRuntime_RunScript(ScriptRuntime *this, Script *script)
+static void ScriptRuntime_RunScriptInternal(ScriptRuntime *this, Script *script, bool plugin)
 {
     ScriptRunnerArgs *args = malloc(sizeof(ScriptRunnerArgs));
     pthread_t thread;
@@ -1445,9 +1614,20 @@ void ScriptRuntime_RunScript(ScriptRuntime *this, Script *script)
     args->source = script->Source;
     args->sourceLength = script->sourceLength;
     args->client = false;
+    args->plugin = plugin;
     args->this = this;
 
     pthread_create(&thread, NULL, run_script_runner, args);
+}
+
+void ScriptRuntime_RunScript(ScriptRuntime *this, Script *script)
+{
+    ScriptRuntime_RunScriptInternal(this, script, false);
+}
+
+void ScriptRuntime_RunPluginScript(ScriptRuntime *this, Script *script)
+{
+    ScriptRuntime_RunScriptInternal(this, script, true);
 }
 
 void ScriptRuntime_RunLocalScript(ScriptRuntime *this, LocalScript *localScript)

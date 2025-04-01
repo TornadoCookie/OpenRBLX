@@ -2,6 +2,7 @@
 #include "serverscriptservice.h"
 #include "datamodel.h"
 #include "players.h"
+#include "testservice.h"
 
 #include "debug.h"
 
@@ -34,6 +35,13 @@ void RunService_Run(RunService *this)
     if (localPlayer)
     {
         Player_RunScripts(localPlayer);
+    }
+
+    TestService *testService = ServiceProvider_GetService(GetDataModel(), "TestService");
+
+    if (testService->AutoRuns)
+    {
+        TestService_Run(testService);
     }
 
     this->running = true;

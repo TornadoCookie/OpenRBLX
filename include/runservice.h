@@ -19,4 +19,6 @@ void RunService_Reset(RunService *this);
 void RunService_Pause(RunService *this);
 bool RunService_IsRunning(RunService *this);
 
+bool RunService_IsStudio(RunService *this);
+
 #endif

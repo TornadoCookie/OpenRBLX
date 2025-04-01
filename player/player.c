@@ -84,6 +84,11 @@ void AttemptLoadFile(DataModel *game, const char *file)
     }
 }
 
+bool RunService_IsStudio(RunService *this)
+{
+    return false;
+}
+
 int main(int argc, char **argv)
 {
     char *gameToLoad = NULL;

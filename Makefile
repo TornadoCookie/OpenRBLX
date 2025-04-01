@@ -46,7 +46,7 @@ LDFLAGS+=-lcurl
 LDFLAGS+=-Wl,-rpath,lib/$(curl_NAME)/lib
 
 
-all: $(DISTDIR) $(DISTDIR)/src/../lib/luau/VM/src $(DISTDIR)/src/../lib/luau/Compiler/src $(DISTDIR)/src/../lib/luau/Ast/src $(DISTDIR)/src $(DISTDIR)/src/../lib/cJSON/src $(DISTDIR)/src/filetypes $(DISTDIR)/src/../lib/xml/src $(DISTDIR)/src/../lib/lz4/src $(DISTDIR)/src/../lib/zstd/src $(DISTDIR)/src/../studio $(DISTDIR)/src/../player $(foreach prog, $(PROGRAMS), $(DISTDIR)/$(prog)$(EXEC_EXTENSION)) $(foreach lib, $(LIBRARIES), $(DISTDIR)/$(lib)$(LIB_EXTENSION) $(DISTDIR)/$(lib)$(LIB_EXTENSION_STATIC)) deps
+all: $(DISTDIR) $(DISTDIR)/src/../lib/luau/VM/src $(DISTDIR)/src/../lib/luau/Compiler/src $(DISTDIR)/src/../lib/luau/Ast/src $(DISTDIR)/src $(DISTDIR)/src/../lib/cJSON/src $(DISTDIR)/src/filetypes $(DISTDIR)/src/../lib/xml/src $(DISTDIR)/src/../lib/lz4/src $(DISTDIR)/src/../lib/zstd/src $(DISTDIR)/src/../studio/classes $(DISTDIR)/src/../studio $(DISTDIR)/src/../player $(foreach prog, $(PROGRAMS), $(DISTDIR)/$(prog)$(EXEC_EXTENSION)) $(foreach lib, $(LIBRARIES), $(DISTDIR)/$(lib)$(LIB_EXTENSION) $(DISTDIR)/$(lib)$(LIB_EXTENSION_STATIC)) deps
 
 ifneq ($(DISTDIR), .)
 deps:
@@ -58,7 +58,7 @@ deps:
 endif
 
 
-$(DISTDIR)/src/../lib/luau/VM/src $(DISTDIR)/src/../lib/luau/Compiler/src $(DISTDIR)/src/../lib/luau/Ast/src $(DISTDIR)/src $(DISTDIR)/src/../lib/cJSON/src $(DISTDIR)/src/filetypes $(DISTDIR)/src/../lib/xml/src $(DISTDIR)/src/../lib/lz4/src $(DISTDIR)/src/../lib/zstd/src $(DISTDIR)/src/../studio $(DISTDIR)/src/../player:
+$(DISTDIR)/src/../lib/luau/VM/src $(DISTDIR)/src/../lib/luau/Compiler/src $(DISTDIR)/src/../lib/luau/Ast/src $(DISTDIR)/src $(DISTDIR)/src/../lib/cJSON/src $(DISTDIR)/src/filetypes $(DISTDIR)/src/../lib/xml/src $(DISTDIR)/src/../lib/lz4/src $(DISTDIR)/src/../lib/zstd/src $(DISTDIR)/src/../studio/classes $(DISTDIR)/src/../studio $(DISTDIR)/src/../player:
 	mkdir -p $@
 
 $(DISTDIR):
@@ -202,6 +202,7 @@ instance_SOURCES+=$(DISTDIR)/src/accoutrement.o
 instance_SOURCES+=$(DISTDIR)/src/startercharacterscripts.o
 instance_SOURCES+=$(DISTDIR)/src/testservice.o
 instance_SOURCES+=$(DISTDIR)/src/localizationtable.o
+instance_SOURCES+=$(DISTDIR)/src/plugin.o
 instance_CXX_SOURCES+=$(luau_CXX_SOURCES)
 instance_SOURCES+=$(luau_SOURCES)
 
@@ -215,6 +216,8 @@ rbxm_SOURCES+=$(DISTDIR)/src/../lib/zstd/src/zstd_decompress.o
 
 rbxs_SOURCES+=$(DISTDIR)/src/filetypes/rbxs.o
 
+studioclasses_SOURCES+=$(DISTDIR)/src/../studio/classes/studioservice.o
+
 studio_SOURCES+=$(DISTDIR)/src/../studio/studio.o
 studio_CXX_SOURCES+=$(instance_CXX_SOURCES)
 studio_SOURCES+=$(instance_SOURCES)
@@ -222,6 +225,8 @@ studio_CXX_SOURCES+=$(rbxmx_CXX_SOURCES)
 studio_SOURCES+=$(rbxmx_SOURCES)
 studio_CXX_SOURCES+=$(rbxm_CXX_SOURCES)
 studio_SOURCES+=$(rbxm_SOURCES)
+studio_CXX_SOURCES+=$(studioclasses_CXX_SOURCES)
+studio_SOURCES+=$(studioclasses_SOURCES)
 
 $(DISTDIR)/studio$(EXEC_EXTENSION): $(studio_SOURCES) $(studio_CXX_SOURCES)
 	$(CXX) -o $@ $^ $(LDFLAGS)
@@ -353,6 +358,7 @@ clean:
 	rm -f $(DISTDIR)/src/startercharacterscripts.o
 	rm -f $(DISTDIR)/src/testservice.o
 	rm -f $(DISTDIR)/src/localizationtable.o
+	rm -f $(DISTDIR)/src/plugin.o
 	rm -f $(DISTDIR)/src/filetypes/rbxlx.o
 	rm -f $(DISTDIR)/src/filetypes/rbxmx.o
 	rm -f $(DISTDIR)/src/../lib/xml/src/xml.o
@@ -360,6 +366,7 @@ clean:
 	rm -f $(DISTDIR)/src/../lib/lz4/src/lz4.o
 	rm -f $(DISTDIR)/src/../lib/zstd/src/zstd_decompress.o
 	rm -f $(DISTDIR)/src/filetypes/rbxs.o
+	rm -f $(DISTDIR)/src/../studio/classes/studioservice.o
 	rm -f $(DISTDIR)/src/../studio/studio.o
 	rm -f $(DISTDIR)/studio$(EXEC_EXTENSION)
 	rm -f $(DISTDIR)/src/../player/player.o

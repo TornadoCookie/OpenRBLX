@@ -3,6 +3,7 @@
 #include "filetypes.h"
 #include "scriptruntime.h"
 #include "folder.h"
+#include "runservice.h"
 
 #define DEBUG_IMPL
 #include "debug.h"
@@ -222,9 +223,14 @@ static void load_plugins()
     detail_tree(0, explorerPlugin_s[1]);
 
     ScriptRuntime *scrt = ScriptRuntime_new("ScriptRuntime", NULL);
-    ScriptRuntime_RunScript(scrt, explorerPlugin_s[0]);
+    ScriptRuntime_RunPluginScript(scrt, explorerPlugin_s[0]);
 
     exit(EXIT_SUCCESS);
+}
+
+bool RunService_IsStudio(RunService *this)
+{
+    return true;
 }
 
 int main()

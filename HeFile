@@ -133,6 +133,7 @@ Source accoutrement.c
 Source startercharacterscripts.c
 Source testservice.c
 Source localizationtable.c
+Source plugin.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c
@@ -147,11 +148,15 @@ Source ../lib/zstd/src/zstd_decompress.c
 SourceGroup rbxs
 Source filetypes/rbxs.c
 
+SourceGroup studioclasses
+Source ../studio/classes/studioservice.c
+
 Program studio
 Source ../studio/studio.c
 UseSourceGroup instance
 UseSourceGroup rbxmx
 UseSourceGroup rbxm
+UseSourceGroup studioclasses
 
 Program player
 Source ../player/player.c
