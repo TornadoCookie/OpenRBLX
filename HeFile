@@ -132,6 +132,7 @@ Source accessory.c
 Source accoutrement.c
 Source startercharacterscripts.c
 Source testservice.c
+Source localizationtable.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c

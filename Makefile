@@ -57,37 +57,8 @@ else
 deps:
 endif
 
-$(DISTDIR)/src/../lib/luau/VM/src:
-	mkdir -p $@
 
-$(DISTDIR)/src/../lib/luau/Compiler/src:
-	mkdir -p $@
-
-$(DISTDIR)/src/../lib/luau/Ast/src:
-	mkdir -p $@
-
-$(DISTDIR)/src:
-	mkdir -p $@
-
-$(DISTDIR)/src/../lib/cJSON/src:
-	mkdir -p $@
-
-$(DISTDIR)/src/filetypes:
-	mkdir -p $@
-
-$(DISTDIR)/src/../lib/xml/src:
-	mkdir -p $@
-
-$(DISTDIR)/src/../lib/lz4/src:
-	mkdir -p $@
-
-$(DISTDIR)/src/../lib/zstd/src:
-	mkdir -p $@
-
-$(DISTDIR)/src/../studio:
-	mkdir -p $@
-
-$(DISTDIR)/src/../player:
+$(DISTDIR)/src/../lib/luau/VM/src $(DISTDIR)/src/../lib/luau/Compiler/src $(DISTDIR)/src/../lib/luau/Ast/src $(DISTDIR)/src $(DISTDIR)/src/../lib/cJSON/src $(DISTDIR)/src/filetypes $(DISTDIR)/src/../lib/xml/src $(DISTDIR)/src/../lib/lz4/src $(DISTDIR)/src/../lib/zstd/src $(DISTDIR)/src/../studio $(DISTDIR)/src/../player:
 	mkdir -p $@
 
 $(DISTDIR):
@@ -230,6 +201,7 @@ instance_SOURCES+=$(DISTDIR)/src/accessory.o
 instance_SOURCES+=$(DISTDIR)/src/accoutrement.o
 instance_SOURCES+=$(DISTDIR)/src/startercharacterscripts.o
 instance_SOURCES+=$(DISTDIR)/src/testservice.o
+instance_SOURCES+=$(DISTDIR)/src/localizationtable.o
 instance_CXX_SOURCES+=$(luau_CXX_SOURCES)
 instance_SOURCES+=$(luau_SOURCES)
 
@@ -380,6 +352,7 @@ clean:
 	rm -f $(DISTDIR)/src/accoutrement.o
 	rm -f $(DISTDIR)/src/startercharacterscripts.o
 	rm -f $(DISTDIR)/src/testservice.o
+	rm -f $(DISTDIR)/src/localizationtable.o
 	rm -f $(DISTDIR)/src/filetypes/rbxlx.o
 	rm -f $(DISTDIR)/src/filetypes/rbxmx.o
 	rm -f $(DISTDIR)/src/../lib/xml/src/xml.o
