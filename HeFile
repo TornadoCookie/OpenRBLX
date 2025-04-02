@@ -76,6 +76,7 @@ CxxSource ../lib/luau/Ast/src/Parser.cpp
 CxxSource ../lib/luau/Ast/src/StringUtils.cpp
 CxxSource ../lib/luau/Ast/src/TimeTrace.cpp
 Source scriptruntime.c
+Source luau/disassembler.c
 
 SourceGroup instance
 UseSourceGroup luau

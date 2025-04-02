@@ -51,13 +51,13 @@ bool Camera_Zoom(Camera_Instance *this, float distance)
 
 void Camera_Process(Camera_Instance *this)
 {
-    FIXME("this %p stub!, %f\n", this, this->camera.position.y);
+    //FIXME("this %p stub!, %f\n", this, this->camera.position.y);
     Players *players = ServiceProvider_GetService(GetDataModel(), "Players");
 
     if (players->LocalPlayer && players->LocalPlayer->Character)
     {
         this->camera.target = players->LocalPlayer->Character->PrimaryPart->Position;
-        FIXME("Target on position: %s\n", debugstr_vector3(this->camera.target));
+        //FIXME("Target on position: %s\n", debugstr_vector3(this->camera.target));
         _UpdateCamera(&this->camera, CAMERA_THIRD_PERSON);
     }
     else

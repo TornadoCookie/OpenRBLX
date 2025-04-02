@@ -4,6 +4,7 @@
 #include "scriptruntime.h"
 #include "folder.h"
 #include "runservice.h"
+#include "plugin.h"
 
 #define DEBUG_IMPL
 #include "debug.h"
@@ -216,15 +217,19 @@ static void detail_tree(int level, Instance *inst)
 static void load_plugins()
 {
     int mdlCount = 0;
-    Instance **explorerPlugin_s = LoadModelRBXM("studioRoot/BuiltInStandalonePlugins/Optimized_Embedded_Signature/ExplorerPlugin.rbxm", &mdlCount);
+    Instance **explorerPlugin_s = LoadModelRBXM("studioRoot/BuiltInStandalonePlugins/Optimized_Embedded_Signature/StartPage.rbxm", &mdlCount);
 
     Instance_SetParent(explorerPlugin_s[0], explorerPlugin_s[1]);
 
     detail_tree(0, explorerPlugin_s[1]);
 
-    ScriptRuntime *scrt = ScriptRuntime_new("ScriptRuntime", NULL);
-    ScriptRuntime_RunPluginScript(scrt, explorerPlugin_s[0]);
+    Plugin *plugin = Plugin_new("Plugin", NULL);
+    Instance_SetParent(explorerPlugin_s[1], plugin);
 
+    ScriptRuntime *scrt = ScriptRuntime_new("ScriptRuntime", NULL);
+    ScriptRuntime_RunPluginScript(scrt, explorerPlugin_s[0], plugin);
+
+    sleep(1);
     exit(EXIT_SUCCESS);
 }
 
