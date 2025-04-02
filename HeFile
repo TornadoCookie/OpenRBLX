@@ -135,6 +135,8 @@ Source startercharacterscripts.c
 Source testservice.c
 Source localizationtable.c
 Source plugin.c
+Source baseplayergui.c
+Source coregui.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c

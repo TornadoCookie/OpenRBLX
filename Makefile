@@ -204,6 +204,8 @@ instance_SOURCES+=$(DISTDIR)/src/startercharacterscripts.o
 instance_SOURCES+=$(DISTDIR)/src/testservice.o
 instance_SOURCES+=$(DISTDIR)/src/localizationtable.o
 instance_SOURCES+=$(DISTDIR)/src/plugin.o
+instance_SOURCES+=$(DISTDIR)/src/baseplayergui.o
+instance_SOURCES+=$(DISTDIR)/src/coregui.o
 instance_CXX_SOURCES+=$(luau_CXX_SOURCES)
 instance_SOURCES+=$(luau_SOURCES)
 
@@ -361,6 +363,8 @@ clean:
 	rm -f $(DISTDIR)/src/testservice.o
 	rm -f $(DISTDIR)/src/localizationtable.o
 	rm -f $(DISTDIR)/src/plugin.o
+	rm -f $(DISTDIR)/src/baseplayergui.o
+	rm -f $(DISTDIR)/src/coregui.o
 	rm -f $(DISTDIR)/src/filetypes/rbxlx.o
 	rm -f $(DISTDIR)/src/filetypes/rbxmx.o
 	rm -f $(DISTDIR)/src/../lib/xml/src/xml.o
