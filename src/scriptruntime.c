@@ -31,7 +31,13 @@ ScriptRuntime *ScriptRuntime_new(const char *className, Instance *parent)
 #include "lualib.h"
 
 // _G should not be readonly (eek)
-#define luaL_sandbox(L) {luaL_sandbox(L);lua_setreadonly(L, LUA_GLOBALSINDEX, false);}
+#define luaL_sandbox(L) { \
+    luaL_sandbox(L); \
+    lua_setreadonly(L, LUA_GLOBALSINDEX, false); \
+    lua_getglobal(L, "__OpenRblx_require_cache"); \
+    lua_setreadonly(L, -1, false); \
+    lua_pop(L, 1); \
+}
 
 //static time_t time_initialized;
 
@@ -477,6 +483,18 @@ static int luau_DataModel_GetFastFlag(lua_State *L)
     return 1;
 }
 
+static int luau_DataModel_GetFastInt(lua_State *L)
+{
+    DataModel *game = luau_toinstance(L, 1); 
+    const char *name = lua_tostring(L, 2);
+
+    int fint = DataModel_GetFastInt(game, name);
+
+    lua_pushinteger(L, fint);
+    
+    return 1;
+}
+
 static int luau_DataModel_DefineFastFlag(lua_State *L)
 {
     DataModel *game = luau_toinstance(L, 1); 
@@ -486,6 +504,19 @@ static int luau_DataModel_DefineFastFlag(lua_State *L)
     bool flag = DataModel_DefineFastFlag(game, name, defaultValue);
 
     lua_pushboolean(L, flag);
+    
+    return 1;
+}
+
+static int luau_DataModel_DefineFastInt(lua_State *L)
+{
+    DataModel *game = luau_toinstance(L, 1); 
+    const char *name = lua_tostring(L, 2);
+    int defaultValue = lua_tointeger(L, 3);
+
+    int flag = DataModel_DefineFastInt(game, name, defaultValue);
+
+    lua_pushinteger(L, flag);
     
     return 1;
 }
@@ -626,6 +657,12 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
             lua_pushstring(L, "DefineFastFlag");
             lua_pushcfunction(L, luau_DataModel_DefineFastFlag, "DataModel:DefineFastFlag");
             lua_settable(L, -3);
+
+            lua_pushcfunction(L, luau_DataModel_GetFastInt, "DataModel:GetFastInt");
+            lua_setfield(L, -2, "GetFastInt");
+
+            lua_pushcfunction(L, luau_DataModel_DefineFastInt, "DataModel:DefineFastInt");
+            lua_setfield(L, -2, "DefineFastInt");
         }
     }
 
@@ -748,10 +785,11 @@ static int luau_require(lua_State *L)
             goto err;
         } 
 
-        luau_pushinstance(L, callingScript);
-
         luaL_desandbox(L);
+
+        luau_pushinstance(L, callingScript);
         lua_setglobal(L, "script");
+
         luaL_sandbox(L);
 
         //printf("ran modulescript\n");
@@ -761,6 +799,19 @@ static int luau_require(lua_State *L)
 err:
     if (((ModuleScript*)inst)->isBytecode)
     {
+        lua_Debug ar;
+
+        for (int i = 0; lua_getinfo(L, i, "sln", &ar); i++)
+        {
+            printf("%d: %s", i, ar.what);
+
+            if (strcmp(ar.what, "C"))
+            {
+                printf("source %s, line %d, function %s", ar.short_src, ar.currentline, ar.name);
+            }
+            printf("\n");
+        }
+
         printf("%s ", inst->Name);
         disassemble(((ModuleScript*)inst)->Source, ((ModuleScript*)inst)->sourceLength);
     }
@@ -774,6 +825,36 @@ end:
 
     //lua_pushnil(L);
     return 1;
+}
+
+static int luau_require_cached(lua_State *L)
+{
+    Instance *inst = luau_toinstance(L, 1);
+
+    lua_getglobal(L, "__OpenRblx_require_cache");
+    
+    char *fullName = Instance_GetFullName(inst);
+
+    lua_pushstring(L, fullName);
+    lua_gettable(L, -2);
+
+    if (lua_isnil(L, -1))
+    {
+        //FIXME("Found cache for %s\n", fullName);
+        lua_pop(L, 1);
+       
+        luau_require(L);
+
+        lua_pushstring(L, fullName);
+        lua_pushvalue(L, -2);
+        lua_settable(L, -4);
+
+        return 1;
+    }
+    else
+    {
+        return 1;
+    }
 }
 
 static int luau_Enums_GetEnums(lua_State *L)
@@ -847,14 +928,110 @@ static int luau_DockWidgetPluginGuiInfo_new(lua_State *L)
     return 1;
 }
 
-static int luau_pcall(lua_State *L)
+static int luau_pcall(lua_State* L)
 {
-    int nargs = lua_gettop(L) - 1;
+    int nargs = lua_gettop(L);
 
-    FIXME("pcall %p\n", L);
+    printf("pcall with %d args\n", nargs);
 
-    lua_pcall(L, nargs, LUA_MULTRET, 0);
-    return LUA_MULTRET;
+    lua_getglobal(L, "__pcall");
+    lua_insert(L, 1);
+    
+    lua_call(L, nargs, LUA_MULTRET);
+
+    if (lua_gettop(L) > 1 && !lua_toboolean(L, -2))
+    {
+        FIXME("pcall failed: %s\n", lua_tostring(L, -1));
+        
+        lua_getglobal(L, "script");
+        Instance *i = luau_toinstance(L, -1);
+        lua_pop(L, 1);
+
+        if (!strcmp(i->ClassName, "Script"))
+        {
+            Script *sc = i;
+            printf("%s ", i->Name);
+            
+            if (sc->isBytecode)
+            {
+                disassemble(sc->Source, sc->sourceLength);
+            }
+            else
+            {
+                printf("Source: %s\n", sc->Source);
+            }
+        }
+        else if (!strcmp(i->ClassName, "ModuleScript"))
+        {
+            ModuleScript *sc = i;
+            printf("%s ", i->Name);
+            
+            if (sc->isBytecode)
+            {
+                disassemble(sc->Source, sc->sourceLength);
+            }
+            else
+            {
+                printf("Source: %s\n", sc->Source);
+            }
+        }
+        
+    }
+
+    return lua_gettop(L);
+}
+
+static int luau_xpcall(lua_State* L)
+{
+    int nargs = lua_gettop(L);
+
+    printf("pcall with %d args\n", nargs);
+
+    lua_getglobal(L, "__xpcall");
+    lua_insert(L, 1);
+    
+    lua_call(L, nargs, LUA_MULTRET);
+
+    if (!lua_toboolean(L, -2))
+    {
+        FIXME("pcall failed: %s\n", lua_tostring(L, -1));
+        
+        lua_getglobal(L, "script");
+        Instance *i = luau_toinstance(L, -1);
+        lua_pop(L, 1);
+
+        if (!strcmp(i->ClassName, "Script"))
+        {
+            Script *sc = i;
+            printf("%s ", i->Name);
+            
+            if (sc->isBytecode)
+            {
+                disassemble(sc->Source, sc->sourceLength);
+            }
+            else
+            {
+                printf("Source: %s\n", sc->Source);
+            }
+        }
+        else if (!strcmp(i->ClassName, "ModuleScript"))
+        {
+            ModuleScript *sc = i;
+            printf("%s ", i->Name);
+            
+            if (sc->isBytecode)
+            {
+                disassemble(sc->Source, sc->sourceLength);
+            }
+            else
+            {
+                printf("Source: %s\n", sc->Source);
+            }
+        }
+        
+    }
+
+    return lua_gettop(L);
 }
 
 static int luau_globals__index(lua_State *L)
@@ -877,16 +1054,36 @@ static int luau_warn(lua_State *L)
     printf("\n");
 }
 
+static int luau_Instance_new(lua_State *L)
+{
+    const char *className = lua_tostring(L, 1);
+    Instance *parent = luau_toinstance(L, 2);
+
+    Instance *newInst = Instance_dynNew(className, parent);
+
+    luau_pushinstance(L, newInst);
+    return 1;
+}
+
 static void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plugin *pluginObj)
 {
     //luaL_openlibs(L);
     
     // Lua global functions
-    lua_pushcfunction(L, luau_require, "require");
+    lua_pushcfunction(L, luau_require_cached, "require");
     lua_setglobal(L, "require");
+
+    lua_getglobal(L, "pcall");
+    lua_setglobal(L, "__pcall");
+
+    lua_getglobal(L, "xpcall");
+    lua_setglobal(L, "__xpcall");
 
     lua_pushcfunction(L, luau_pcall, "pcall");
     lua_setglobal(L, "pcall");
+
+    lua_pushcfunction(L, luau_xpcall, "xpcall");
+    lua_setglobal(L, "xpcall");
 
     // Roblox global functions
     lua_pushcfunction(L, luau_wait, "wait");
@@ -950,6 +1147,14 @@ static void init_lua_state(lua_State *L, Script *script, bool client, bool plugi
 
     lua_setglobal(L, "CFrame");
 
+    // Instance
+    lua_newtable(L);
+
+    lua_pushcfunction(L, luau_Instance_new, "Instance.new");
+    lua_setfield(L, -2, "new");
+
+    lua_setglobal(L, "Instance");
+
     // DockWidgetPluginGuiInfo
     lua_newtable(L);
 
@@ -972,6 +1177,19 @@ static void init_lua_state(lua_State *L, Script *script, bool client, bool plugi
 
     lua_pushboolean(L, true);
     lua_setglobal(L, "__DEV__");
+
+    // debug
+    //lua_getglobal(L, "debug");
+
+    //lua_pushstring(L, "loadmodule");
+    //lua_pushcfunction(L, luau_require, "debug.loadmodule"); //TODO this right?
+    //lua_settable(L, -3);
+
+    //lua_setglobal(L, "debug");
+
+    // OpenRblx internal globals
+    lua_newtable(L);
+    lua_setglobal(L, "__OpenRblx_require_cache");
     
 }
 
@@ -979,6 +1197,7 @@ static void run_script(Script *script, const char *source, int sourceLength, boo
 {
     lua_State *L = luaL_newstate();
 
+    luaL_openlibs(L);
     init_lua_state(L, script, client, plugin, pluginObj);
 
     printf("Running script source [%s]\n", ((Instance*)script)->Name);
@@ -1010,7 +1229,6 @@ static void run_script(Script *script, const char *source, int sourceLength, boo
         printf("There was a problem: %s\n", lua_tostring(L, -1));
         goto end;
     }
-    luaL_openlibs(L);
     luaL_sandbox(L);
     //lua_callbacks(L)->debugstep = scrt_debugstep;
     //lua_singlestep(L, 1);

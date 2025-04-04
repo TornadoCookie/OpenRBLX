@@ -37,7 +37,10 @@ void DataModel_Load(DataModel *this, const char *url);
 void DataModel_Shutdown(DataModel *this);
 
 bool DataModel_GetFastFlag(DataModel *this, const char *name);
+int DataModel_GetFastInt(DataModel *this, const char *name);
+
 bool DataModel_DefineFastFlag(DataModel *this, const char *name, bool defaultValue);
+int DataModel_DefineFastInt(DataModel *this, const char *name, int defaultValue);
 
 void DataModel_Draw(DataModel *this);
 

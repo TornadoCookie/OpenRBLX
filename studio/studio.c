@@ -6,6 +6,8 @@
 #include "runservice.h"
 #include "plugin.h"
 
+#include "studio/corepackages.h"
+
 #define DEBUG_IMPL
 #include "debug.h"
 
@@ -229,8 +231,12 @@ static void load_plugins()
     ScriptRuntime *scrt = ScriptRuntime_new("ScriptRuntime", NULL);
     ScriptRuntime_RunPluginScript(scrt, explorerPlugin_s[0], plugin);
 
-    sleep(1);
-    exit(EXIT_SUCCESS);
+    pthread_exit(NULL);
+}
+
+static void load_corescripts(DataModel *game)
+{
+    CorePackages_new("CorePackages", game);
 }
 
 bool RunService_IsStudio(RunService *this)

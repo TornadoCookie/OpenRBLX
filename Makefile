@@ -84,6 +84,7 @@ CFLAGS+=-Ilib/luau/VM/include
 CFLAGS+=-Ilib/luau/Compiler/include
 CFLAGS+=-Ilib/luau/Common/include
 CFLAGS+=-Ilib/luau/Ast/include
+CFLAGS+=-Ilib/luau/VM/src
 
 LDFLAGS+=-lcurl
 
@@ -220,6 +221,7 @@ rbxm_SOURCES+=$(DISTDIR)/src/../lib/zstd/src/zstd_decompress.o
 rbxs_SOURCES+=$(DISTDIR)/src/filetypes/rbxs.o
 
 studioclasses_SOURCES+=$(DISTDIR)/src/../studio/classes/studioservice.o
+studioclasses_SOURCES+=$(DISTDIR)/src/../studio/classes/corepackages.o
 
 studio_SOURCES+=$(DISTDIR)/src/../studio/studio.o
 studio_CXX_SOURCES+=$(instance_CXX_SOURCES)
@@ -373,6 +375,7 @@ clean:
 	rm -f $(DISTDIR)/src/../lib/zstd/src/zstd_decompress.o
 	rm -f $(DISTDIR)/src/filetypes/rbxs.o
 	rm -f $(DISTDIR)/src/../studio/classes/studioservice.o
+	rm -f $(DISTDIR)/src/../studio/classes/corepackages.o
 	rm -f $(DISTDIR)/src/../studio/studio.o
 	rm -f $(DISTDIR)/studio$(EXEC_EXTENSION)
 	rm -f $(DISTDIR)/src/../player/player.o

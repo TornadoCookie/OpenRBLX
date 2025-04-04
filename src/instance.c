@@ -131,25 +131,25 @@ static void memcpy_reverse(unsigned char *restrict dst, const unsigned char *res
 
 char *Instance_GetFullName(Instance *this)
 {
-    char *fullName = NULL;
-    int fullNameLength = 0;
-    int prevFullNameLength = 0;
-
-    while (this->Parent != NULL)
+    if (!this)
     {
-        bool hasDot = true;
-        fullNameLength += strlen(this->Name);
-        if (fullName != NULL)
-        {
-            fullNameLength++;
-            hasDot = false;
-        }
-        fullName = realloc(fullName, fullNameLength);
-        memcpy_reverse(fullName + fullNameLength - prevFullNameLength, fullName, prevFullNameLength);
-        snprintf(fullName, strlen(this->Name) + 1, "%s%s", this->Name, hasDot ? "." : "");
-        prevFullNameLength = fullNameLength;
-        this = this->Parent;
+        return NULL;
     }
+
+    char *parentFullName = Instance_GetFullName(this->Parent); 
+    
+    if (!parentFullName)
+    {
+        return strdup(this->Name);
+    }
+
+    int parentFullNameLen = strlen(parentFullName);
+    char *fullName = realloc(parentFullName, parentFullNameLen + 1 + strlen(this->Name) + 1);
+
+    fullName[parentFullNameLen] = '.';
+    memcpy(fullName + parentFullNameLen + 1, this->Name, strlen(this->Name));
+
+    fullName[parentFullNameLen + strlen(this->Name) + 1] = 0;
 
     return fullName;
 }

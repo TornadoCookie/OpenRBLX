@@ -253,7 +253,10 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
 
                 i++;
             } break;
-            //LOP_GETTABLE   13
+            case LOP_GETTABLE: // 13
+            {
+                printf("R%d = R%d[R%d]\n", a, b, c);
+            } break;
             case LOP_SETTABLE: // 14
             {
                 printf("R%d[R%d] = R%d\n", b, c, a);
@@ -706,7 +709,7 @@ void disassemble(uint8_t *data, int dataSize)
             {
                 lastoffset += *(uint8_t*)data;
                 data++;
-                //printf("lastoffset %d: %d\n", j, lastoffset);
+                printf("lastoffset %05x: %d\n", j, lastoffset+1);
             }
 
             int lastline = 0;
@@ -714,7 +717,7 @@ void disassemble(uint8_t *data, int dataSize)
             {
                 lastline += *(uint32_t*)data;
                 data += sizeof(uint32_t);
-                //printf("lastline %d: %d\n", j, lastline);
+                printf("lastline %d: %d\n", j, lastline);
             }
 
         }

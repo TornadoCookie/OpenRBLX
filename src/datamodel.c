@@ -12,6 +12,7 @@
 #include "runservice.h"
 #include <time.h>
 #include "players.h"
+#include "coregui.h"
 
 DEFAULT_DEBUG_CHANNEL(datamodel)
 
@@ -38,8 +39,11 @@ DataModel *DataModel_new(void)
     newInst->ItemChanged = RBXScriptSignal_new();
 
     newInst->JobId = "OpenRBLX";
+    newInst->serviceprovider.instance.Name = "game";
 
     newInst->Workspace = ServiceProvider_GetService(newInst, "Workspace");
+
+    CoreGui_new("CoreGui", newInst);
 
     rt = LoadRenderTexture(128, 128);
 
@@ -106,10 +110,23 @@ bool DataModel_GetFastFlag(DataModel *this, const char *name)
     }
 }
 
+int DataModel_GetFastInt(DataModel *this, const char *name)
+{
+    FIXME("unknown fint %s\n", name);
+
+    return 0;
+}
+
 bool DataModel_DefineFastFlag(DataModel *this, const char *name, bool defaultValue)
 {
     FIXME("this %p, name %s, defaultValue %d stub!\n", this, name, defaultValue);
     return DataModel_GetFastFlag(this, name);
+}
+
+int DataModel_DefineFastInt(DataModel *this, const char *name, int defaultValue)
+{
+    FIXME("this %p, name %s, defaultValue %d stub!\n", this, name, defaultValue);
+    return DataModel_GetFastInt(this, name);
 }
 
 static void draw_recursive(Instance *inst)

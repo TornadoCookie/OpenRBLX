@@ -12,6 +12,8 @@ ExtraCFlag -Ilib/luau/Compiler/include
 ExtraCFlag -Ilib/luau/Common/include
 ExtraCFlag -Ilib/luau/Ast/include
 
+ExtraCFlag -Ilib/luau/VM/src
+
 ExtraLDFlag -lcurl
 
 Dependency xml
@@ -153,6 +155,7 @@ Source filetypes/rbxs.c
 
 SourceGroup studioclasses
 Source ../studio/classes/studioservice.c
+Source ../studio/classes/corepackages.c
 
 Program studio
 Source ../studio/studio.c
