@@ -3,6 +3,7 @@
 #include "datamodel.h"
 #include "modulescript.h"
 #include "plugin.h"
+#include "udim2.h"
 
 #include <pthread.h>
 
@@ -303,7 +304,6 @@ static int luau_Instance__index(lua_State *L)
             {
                 case Serialize_string:
                 {
-                    printf("%s %s->%s = %s\n", inst->ClassName, inst->Name, name, *(char**)val);
                     lua_pushstring(L, *(char**)val);
                     return 1;
                 } break;
@@ -750,14 +750,13 @@ static int luau_Vector3_new(lua_State *L)
 
 static int luau_Vector2_new(lua_State *L)
 {
-    if (lua_gettop(L) != 2)
-    {
-        lua_pushstring(L, "Expected 2 arguments.\n");
-        lua_error(L);
-    }
+    float x = 0, y = 0;
 
-    lua_Number x = lua_tonumber(L, 1);
-    lua_Number y = lua_tonumber(L, 2);
+    if (lua_gettop(L) == 2)
+    {
+        x = lua_tonumber(L, 1);
+        y = lua_tonumber(L, 2);
+    }
 
     luau_pushvector2(L, (Vector2){x, y});
 
@@ -955,6 +954,61 @@ static int luau_Enums_GetEnums(lua_State *L)
     enum_val(SourceSansBold, 4);
     enum_end();
 
+    enum_start(HorizontalAlignment);
+    enum_val(Center, 0);
+    enum_val(Left, 1);
+    enum_val(Right, 2);
+    enum_end();
+
+    enum_start(VerticalAlignment);
+    enum_val(Center, 0);
+    enum_val(Top, 1);
+    enum_val(Bottom, 2);
+    enum_end();
+
+    enum_start(ScrollBarInset);
+    enum_val(None, 0);
+    enum_val(ScrollBar, 1);
+    enum_val(Always, 2);
+    enum_end();
+
+    enum_start(TextXAlignment);
+    enum_val(Left, 0);
+    enum_val(Right, 1);
+    enum_val(Center, 2);
+    enum_end();
+
+    enum_start(TextYAlignment);
+    enum_val(Top, 0);
+    enum_val(Center, 1);
+    enum_val(Bottom, 2);
+    enum_end();
+
+    enum_start(ScaleType);
+    enum_val(Stretch, 0);
+    enum_val(Slice, 1);
+    enum_val(Tile, 2);
+    enum_val(Fit, 3);
+    enum_val(Crop, 4);
+    enum_end();
+
+    enum_start(FillDirection);
+    enum_val(Horizontal, 0);
+    enum_val(Vertical, 1);
+    enum_end();
+
+    enum_start(TextTruncate);
+    enum_val(None, 0);
+    enum_val(AtEnd, 1);
+    enum_val(SplitWord, 2);
+    enum_end();
+
+    enum_start(ScrollingDirection);
+    enum_val(X, 1);
+    enum_val(Y, 2);
+    enum_val(XY, 4);
+    enum_end();
+
 #undef enum_end
 #undef enum_val
 #undef enum_start
@@ -1147,6 +1201,44 @@ static int luau_Instance_new(lua_State *L)
     return 1;
 }
 
+
+static Color3 luau_tocolor3(lua_State *L, int idx)
+{
+    Color3 ret;
+
+    lua_getfield(L, idx, "R");
+    ret.R = lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    lua_getfield(L, idx, "G");
+    ret.G = lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    lua_getfield(L, idx, "B");
+    ret.B = lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    return ret;
+}
+
+static void luau_pushcolor3(lua_State *L, Color3 c);
+
+static int luau_Color3_Lerp(lua_State *L)
+{
+    Color3 c1 = luau_tocolor3(L, 1);
+    Color3 c2 = luau_tocolor3(L, 2);
+    float t = lua_tonumber(L, 3);
+
+    Color3 ret = {
+        Lerp(c1.R, c2.R, t),
+        Lerp(c1.G, c2.G, t),
+        Lerp(c1.B, c2.B, t)
+    };
+
+    luau_pushcolor3(L, ret);
+    return 1;
+}
+
 static void luau_pushcolor3(lua_State *L, Color3 c)
 {
     lua_newtable(L);
@@ -1159,6 +1251,21 @@ static void luau_pushcolor3(lua_State *L, Color3 c)
 
     lua_pushnumber(L, c.B);
     lua_setfield(L, -2, "B");
+
+    lua_pushcfunction(L, luau_Color3_Lerp, "Color3:lerp");
+    lua_setfield(L, -2, "lerp");
+}
+
+static int luau_Color3_new(lua_State *L)
+{
+    float r = lua_tonumber(L, 1);
+    float g = lua_tonumber(L, 2);
+    float b = lua_tonumber(L, 3);
+
+    Color3 col = {r, g, b};
+
+    luau_pushcolor3(L, col);
+    return 1;
 }
 
 static int luau_Color3_fromRGB(lua_State *L)
@@ -1166,6 +1273,21 @@ static int luau_Color3_fromRGB(lua_State *L)
     float r = lua_tonumber(L, 1);
     float g = lua_tonumber(L, 2);
     float b = lua_tonumber(L, 3);
+
+    Color3 col = {r/255, g/255, b/255};
+
+    luau_pushcolor3(L, col);
+    return 1;
+}
+
+static int luau_Color3_fromHex(lua_State *L)
+{
+    const char *hexstr = lua_tostring(L, 1);
+    uint32_t hex = strtoul(hexstr+1, NULL, 16);
+
+    float r = (hex>>16)&0xFF;
+    float g = (hex>>8)&0xFF;
+    float b = (hex>>0)&0xFF;
 
     Color3 col = {r/255, g/255, b/255};
 
@@ -1193,17 +1315,6 @@ static int luau_typeof(lua_State *L)
     lua_call(L, 1, 1);
 
     return 1;
-}
-
-static int luau_assert(lua_State *L)
-{
-    lua_pushboolean(L, false);
-    if (lua_equal(L, -1, 1))
-    {
-        FIXME("assertion failed: %s\n", lua_tostring(L, 2));
-    }
-
-    return 0;
 }
 
 static int luau_Rect__index(lua_State *L)
@@ -1273,6 +1384,148 @@ static int luau_Rect_new(lua_State *L)
     return 1;
 }
 
+static UDim luau_toudim(lua_State *L, int idx)
+{
+    UDim ret;
+
+    lua_getfield(L, idx, "Scale");
+    ret.Scale = lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    lua_getfield(L, idx, "Offset");
+    ret.Offset = lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    return ret;
+}
+
+static void luau_pushudim(lua_State *L, UDim udim)
+{
+    lua_newtable(L);
+    
+    lua_pushnumber(L, udim.Scale);
+    lua_setfield(L, -2, "Scale");
+
+    lua_pushnumber(L, udim.Offset);
+    lua_setfield(L, -2, "Offset");
+}
+
+static int luau_UDim_new(lua_State *L)
+{
+    float scale = lua_tonumber(L, 1);
+    float offset = lua_tonumber(L, 2);
+
+    luau_pushudim(L, (UDim){scale, offset});   
+
+    return 1;
+}
+
+static UDim2 luau_toudim2(lua_State *L, int idx)
+{
+    UDim2 ret;
+
+    lua_getfield(L, idx, "X");
+    ret.X = luau_toudim(L, -1);
+    lua_pop(L, 1);
+
+    lua_getfield(L, idx, "Y");
+    ret.Y = luau_toudim(L, -1);
+    lua_pop(L, 1);
+
+    lua_getfield(L, idx, "Width");
+    ret.Width = luau_toudim(L, -1);
+    lua_pop(L, 1);
+
+    lua_getfield(L, idx, "Height");
+    ret.Height = luau_toudim(L, -1);
+    lua_pop(L, 1);
+
+    return ret;
+}
+
+static void luau_pushudim2(lua_State *L, UDim2 udim2);
+
+static int luau_UDim2__sub(lua_State *L)
+{
+    UDim2 u1 = luau_toudim2(L, 1);
+    UDim2 u2 = luau_toudim2(L, 2);
+    UDim2 ret;
+
+    ret.X.Scale = u1.X.Scale - u2.X.Scale;
+    ret.X.Offset = u1.X.Offset - u2.X.Offset;
+    ret.Y.Scale = u1.Y.Scale - u2.Y.Scale;
+    ret.Y.Offset = u1.Y.Offset - u2.Y.Offset;
+    ret.Width.Scale = u1.Width.Scale - u2.Width.Scale;
+    ret.Width.Offset = u1.Width.Offset - u2.Width.Offset;
+    ret.Height.Scale = u1.Height.Scale - u2.Height.Scale;
+    ret.Height.Offset = u1.Height.Offset - u2.Height.Offset;
+
+    luau_pushudim2(L, ret);
+    return 1;
+}
+
+static void luau_pushudim2(lua_State *L, UDim2 udim2)
+{
+    lua_newtable(L);
+
+    lua_newtable(L);
+
+    lua_pushcfunction(L, luau_UDim2__sub, "UDim2.__sub");
+    lua_setfield(L, -2, "__sub");
+
+    lua_setmetatable(L, -2);
+
+    luau_pushudim(L, udim2.X);
+    lua_setfield(L, -2, "X");
+
+    luau_pushudim(L, udim2.Y);
+    lua_setfield(L, -2, "Y");
+
+    luau_pushudim(L, udim2.Width);
+    lua_setfield(L, -2, "Width");
+
+    luau_pushudim(L, udim2.Height);
+    lua_setfield(L, -2, "Height");
+}
+
+static int luau_UDim2_fromScale(lua_State *L)
+{
+    UDim2 udim2 = {0};
+
+    udim2.X.Scale = lua_tonumber(L, 1);
+    udim2.Y.Scale = lua_tonumber(L, 2);
+
+    luau_pushudim2(L, udim2);
+    return 1;
+}
+
+static int luau_UDim2_fromOffset(lua_State *L)
+{
+    UDim2 udim2 = {0};
+
+    udim2.X.Offset = lua_tonumber(L, 1);
+    udim2.Y.Offset = lua_tonumber(L, 2);
+
+    luau_pushudim2(L, udim2);
+    return 1;
+}
+
+static int luau_UDim2_new(lua_State *L)
+{
+    UDim2 udim2 = {0};
+
+    if (lua_gettop(L) == 4)
+    {
+        udim2.X.Scale = lua_tonumber(L, 1);
+        udim2.X.Offset = lua_tonumber(L, 2);
+        udim2.Y.Scale = lua_tonumber(L, 3);
+        udim2.Y.Offset = lua_tonumber(L, 4);
+    }
+
+    luau_pushudim2(L, udim2);
+    return 1;
+}
+
 static void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plugin *pluginObj)
 {
     //luaL_openlibs(L);
@@ -1298,9 +1551,6 @@ static void init_lua_state(lua_State *L, Script *script, bool client, bool plugi
 
     lua_pushcfunction(L, luau_typeof, "typeof");
     lua_setglobal(L, "typeof");
-
-    lua_pushcfunction(L, luau_assert, "assert");
-    lua_setglobal(L, "assert");
 
     // Roblox global functions
     lua_pushcfunction(L, luau_wait, "wait");
@@ -1372,8 +1622,14 @@ static void init_lua_state(lua_State *L, Script *script, bool client, bool plugi
     // Color3
     lua_newtable(L);
 
+    lua_pushcfunction(L, luau_Color3_new, "Color3.new");
+    lua_setfield(L, -2, "new");
+
     lua_pushcfunction(L, luau_Color3_fromRGB, "Color3.fromRGB");
     lua_setfield(L, -2, "fromRGB");
+
+    lua_pushcfunction(L, luau_Color3_fromHex, "Color3.fromHex");
+    lua_setfield(L, -2, "fromHex");
 
     lua_setglobal(L, "Color3");
 
@@ -1400,6 +1656,20 @@ static void init_lua_state(lua_State *L, Script *script, bool client, bool plugi
     lua_setfield(L, -2, "new");
 
     lua_setglobal(L, "UDim");
+
+    // UDim2
+    lua_newtable(L);
+
+    lua_pushcfunction(L, luau_UDim2_new, "UDim2.new");
+    lua_setfield(L, -2, "new");
+    
+    lua_pushcfunction(L, luau_UDim2_fromScale, "UDim2.fromScale");
+    lua_setfield(L, -2, "fromScale");
+
+    lua_pushcfunction(L, luau_UDim2_fromOffset, "UDim2.fromOffset");
+    lua_setfield(L, -2, "fromOffset");
+
+    lua_setglobal(L, "UDim2");
 
     // DockWidgetPluginGuiInfo
     lua_newtable(L);

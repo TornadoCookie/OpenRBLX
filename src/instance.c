@@ -192,7 +192,7 @@ bool ClassName_IsA(const char *className1, const char *className)
     else if (!strcmp(className, "WorldRoot")) return ClassName_IsA(className1, "Workspace");
 
     else if (!strcmp(className, "LuaSourceContainer")) return ClassName_IsA(className1, "BaseScript") || ClassName_IsA(className1, "ModuleScript");
-    else if (!strcmp(className, "BaseScript")) return ClassName_IsA(className1, "Script");
+    else if (!strcmp(className, "BaseScript")) return ClassName_IsA(className1, "Script") || ClassName_IsA(className1, "CoreScript");
     else if (!strcmp(className, "Script")) return ClassName_IsA(className1, "LocalScript");
 
     else if (!strcmp(className, "DataModelMesh")) return ClassName_IsA(className1, "FileMesh") || ClassName_IsA(className1, "BevelMesh");
@@ -202,6 +202,7 @@ bool ClassName_IsA(const char *className1, const char *className)
     else if (!strcmp(className, "FaceInstance")) return ClassName_IsA(className1, "Decal");
 
     else if (!strcmp(className, "ServiceProvider")) return ClassName_IsA(className1, "DataModel");
+    else if (!strcmp(className, "Part")) return ClassName_IsA(className1, "SpawnLocation");
     else FIXME("className1 %s, className %s\n", className1, className);
 
     return false;
