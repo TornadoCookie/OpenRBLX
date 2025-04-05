@@ -1009,6 +1009,24 @@ static int luau_Enums_GetEnums(lua_State *L)
     enum_val(XY, 4);
     enum_end();
 
+    enum_start(AutomaticSize);
+    enum_val(None, 0);
+    enum_val(X, 1);
+    enum_val(Y, 2);
+    enum_val(XY, 3);
+    enum_end();
+
+    enum_start(SortOrder);
+    enum_val(Name, 0);
+    enum_val(Custom, 1);
+    enum_val(LayoutOrder, 2);
+    enum_end();
+
+    enum_start(ApplyStrokeMode);
+    enum_val(Contextual, 0);
+    enum_val(Border, 1);
+    enum_end();
+
 #undef enum_end
 #undef enum_val
 #undef enum_start
