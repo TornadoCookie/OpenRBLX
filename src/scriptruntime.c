@@ -80,6 +80,8 @@ static Vector3 luau_tovector3(lua_State *L, int idx)
 {
     Vector3 ret = { 0 };
 
+    if (idx < 0) idx--;
+
     lua_pushstring(L, "X");
     lua_gettable(L, idx);
     ret.x = lua_tonumber(L, -1);
@@ -209,6 +211,51 @@ static void luau_pushcframe(lua_State *L, CFrame cf)
     lua_pushstring(L, "UpVector");
     luau_pushvector3(L, (Vector3){cf.R01, cf.R11, cf.R21});
     lua_settable(L, -3);
+}
+
+static int luau_CFrame_new(lua_State *L)
+{
+    CFrame ret = {0};
+
+    if (lua_gettop(L) == 1)
+    {
+        Vector3 pos = luau_tovector3(L, 1);
+        ret.X = pos.x;
+        ret.Y = pos.y;
+        ret.Z = pos.z;
+    }
+    else if (lua_gettop(L) == 2)
+    {
+        FIXME("lookat constructor %p\n", L);
+    }
+    else if (lua_gettop(L) == 3)
+    {
+        ret.X = lua_tonumber(L, 1);
+        ret.Y = lua_tonumber(L, 2);
+        ret.Z = lua_tonumber(L, 3);
+    }
+    else if (lua_gettop(L) == 7)
+    {
+        FIXME("quaternion constructor %p\n", L);
+    }
+    else if (lua_gettop(L) == 12)
+    {
+        ret.X = lua_tonumber(L, 1);
+        ret.Y = lua_tonumber(L, 2);
+        ret.Z = lua_tonumber(L, 3);
+        ret.R00 = lua_tonumber(L, 4);
+        ret.R01 = lua_tonumber(L, 5);
+        ret.R02 = lua_tonumber(L, 6);
+        ret.R10 = lua_tonumber(L, 7);
+        ret.R11 = lua_tonumber(L, 8);
+        ret.R12 = lua_tonumber(L, 9);
+        ret.R20 = lua_tonumber(L, 10);
+        ret.R21 = lua_tonumber(L, 11);
+        ret.R22 = lua_tonumber(L, 12);
+    }
+
+    luau_pushcframe(L, ret);
+    return 1;
 }
 
 static Instance *luau_toinstance(lua_State *L, int i)
@@ -538,6 +585,24 @@ static int luau_Instance_IsA(lua_State *L)
     return 1;
 }
 
+static int luau_Instance_SetAttribute(lua_State *L)
+{
+    const char *attributeName = lua_tostring(L, 2);
+
+    FIXME("attribute %s\n", attributeName);
+
+    return 0;
+}
+
+static int luau_Instance_GetAttribute(lua_State *L)
+{
+    const char *attributeName = lua_tostring(L, 2);
+
+    FIXME("attribute %s\n", attributeName);
+
+    return 0;
+}
+
 static int luau_ServiceProvider_GetService(lua_State *L)
 {
     ServiceProvider *serviceProvider = luau_toinstance(L, 1); 
@@ -682,6 +747,12 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
     lua_pushcfunction(L, luau_Instance_IsA, "Instance:IsA");
     lua_setfield(L, -2, "IsA");
 
+    lua_pushcfunction(L, luau_Instance_SetAttribute, "Instance:SetAttribute");
+    lua_setfield(L, -2, "SetAttribute");
+
+    lua_pushcfunction(L, luau_Instance_GetAttribute, "Instance:GetAttribute");
+    lua_setfield(L, -2, "GetAttribute");
+
     lua_pushlightuserdata(L, inst);
     lua_setfield(L, -2, "__inst_ptr");
 
@@ -733,17 +804,16 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
 
 static int luau_Vector3_new(lua_State *L)
 {
-    if (lua_gettop(L) != 3)
+    Vector3 ret = {0};
+
+    if (lua_gettop(L) == 3)
     {
-        lua_pushstring(L, "Expected 3 arguments.\n");
-        lua_error(L);
+        ret.x = lua_tonumber(L, 1);
+        ret.y = lua_tonumber(L, 2);
+        ret.z = lua_tonumber(L, 3);
     }
 
-    lua_Number x = lua_tonumber(L, 1);
-    lua_Number y = lua_tonumber(L, 2);
-    lua_Number z = lua_tonumber(L, 3);
-
-    luau_pushvector3(L, (Vector3){x, y, z});
+    luau_pushvector3(L, ret);
 
     return 1;
 }
@@ -1025,6 +1095,20 @@ static int luau_Enums_GetEnums(lua_State *L)
     enum_start(ApplyStrokeMode);
     enum_val(Contextual, 0);
     enum_val(Border, 1);
+    enum_end();
+
+    enum_start(EasingStyle);
+    enum_val(Linear, 0);
+    enum_val(Sine, 1);
+    enum_val(Back, 2);
+    enum_val(Quad, 3);
+    enum_val(Quart, 4);
+    enum_val(Quint, 5);
+    enum_val(Bounce, 6);
+    enum_val(Elastic, 7);
+    enum_val(Exponential, 8);
+    enum_val(Circular, 9);
+    enum_val(Cubic, 10);
     enum_end();
 
 #undef enum_end
@@ -1634,6 +1718,9 @@ static void init_lua_state(lua_State *L, Script *script, bool client, bool plugi
 
     // CFrame
     lua_newtable(L);
+
+    lua_pushcfunction(L, luau_CFrame_new, "CFrame.new");
+    lua_setfield(L, -2, "new");
 
     lua_setglobal(L, "CFrame");
 

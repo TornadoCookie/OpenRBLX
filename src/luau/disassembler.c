@@ -674,8 +674,16 @@ void disassemble(uint8_t *data, int dataSize)
                 {
                     int strId = readVarInt(&data) - 1;
                     printf("str %d ", strId);
-                    printf("\"%s\"\n", strings[strId]);
-                    constants[j].val = strings[strId];
+                    if (strId >= 0 && strId < stringCount)
+                    {
+                        printf("\"%s\"\n", strings[strId]);
+                        constants[j].val = strings[strId];
+                    }
+                    else
+                    {
+                        printf("\n");
+                        constants[j].val = NULL;
+                    }
                 } break;
                 case LBC_CONSTANT_IMPORT:
                 {
@@ -698,6 +706,18 @@ void disassemble(uint8_t *data, int dataSize)
                 {
                     uint32_t fid = readVarInt(&data);
                     printf("closure %d\n", fid);
+                } break;
+                case LBC_CONSTANT_VECTOR:
+                {
+                    float x = *(float*)data;
+                    data += sizeof(float);
+                    float y = *(float*)data;
+                    data += sizeof(float);
+                    float z = *(float*)data;
+                    data += sizeof(float);
+                    float w = *(float*)data;
+                    data += sizeof(float);
+                    printf("{%f, %f, %f, %f}\n", x, y, z, w);
                 } break;
                 default:
                 {
@@ -774,17 +794,17 @@ void disassemble(uint8_t *data, int dataSize)
 
             for (int j = 0; j < sizelocvars; j++)
             {
-                char *varname = readString(&data, strings);
+                readVarInt(&data);//char *varname = readString(&data, strings);
                 int startpc = readVarInt(&data);
                 int endpc = readVarInt(&data);
                 uint8_t reg = *(uint8_t*)data;
                 data++;
 
-                printf("locvar %d:\n", j);
-                printf("varname: %s\n", varname);
-                printf("startpc: %#x\n", startpc);
-                printf("endpc: %#x\n", endpc);
-                printf("reg: %d\n", reg);
+                //printf("locvar %d:\n", j);
+                //printf("varname: %s\n", varname);
+                //printf("startpc: %#x\n", startpc);
+                //printf("endpc: %#x\n", endpc);
+                //printf("reg: %d\n", reg);
             }
 
             int sizeupvalues = readVarInt(&data);
