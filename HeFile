@@ -147,6 +147,9 @@ Source contentprovider.c
 Source stylebase.c
 Source stylerule.c
 Source stylingservice.c
+Source tweenservice.c
+Source genericsettings.c
+Source globalsettings.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c

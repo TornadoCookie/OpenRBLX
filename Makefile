@@ -215,6 +215,9 @@ instance_SOURCES+=$(DISTDIR)/src/contentprovider.o
 instance_SOURCES+=$(DISTDIR)/src/stylebase.o
 instance_SOURCES+=$(DISTDIR)/src/stylerule.o
 instance_SOURCES+=$(DISTDIR)/src/stylingservice.o
+instance_SOURCES+=$(DISTDIR)/src/tweenservice.o
+instance_SOURCES+=$(DISTDIR)/src/genericsettings.o
+instance_SOURCES+=$(DISTDIR)/src/globalsettings.o
 instance_CXX_SOURCES+=$(luau_CXX_SOURCES)
 instance_SOURCES+=$(luau_SOURCES)
 
@@ -383,6 +386,9 @@ clean:
 	rm -f $(DISTDIR)/src/stylebase.o
 	rm -f $(DISTDIR)/src/stylerule.o
 	rm -f $(DISTDIR)/src/stylingservice.o
+	rm -f $(DISTDIR)/src/tweenservice.o
+	rm -f $(DISTDIR)/src/genericsettings.o
+	rm -f $(DISTDIR)/src/globalsettings.o
 	rm -f $(DISTDIR)/src/filetypes/rbxlx.o
 	rm -f $(DISTDIR)/src/filetypes/rbxmx.o
 	rm -f $(DISTDIR)/src/../lib/xml/src/xml.o

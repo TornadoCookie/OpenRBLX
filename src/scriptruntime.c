@@ -4,6 +4,7 @@
 #include "modulescript.h"
 #include "plugin.h"
 #include "udim2.h"
+#include "globalsettings.h"
 
 #include <pthread.h>
 
@@ -704,6 +705,16 @@ static int luau_Plugin_IsPlaceDocumentOpen(lua_State *L)
     return 1;
 }
 
+static int luau_GlobalSettings_GetFVariable(lua_State *L)
+{
+    GlobalSettings *settings = luau_toinstance(L, 1);
+    const char *name = lua_tostring(L, 1);
+
+    lua_pushstring(L, GlobalSettings_GetFVariable(settings, name));
+
+    return 1;
+}
+
 static void luau_pushinstance(lua_State *L, Instance *inst)
 {
     if (!inst)
@@ -777,6 +788,12 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
 
             lua_pushcfunction(L, luau_DataModel_DefineFastInt, "DataModel:DefineFastInt");
             lua_setfield(L, -2, "DefineFastInt");
+        }
+
+        if (!strcmp(inst->ClassName, "GlobalSettings"))
+        {
+            lua_pushcfunction(L, luau_GlobalSettings_GetFVariable, "GlobalSettings:GetFVariable");
+            lua_setfield(L, -2, "GetFVariable");
         }
     }
 
@@ -1628,6 +1645,12 @@ static int luau_UDim2_new(lua_State *L)
     return 1;
 }
 
+static int luau_settings(lua_State *L)
+{
+    luau_pushinstance(L, GetGlobalSettings());
+    return 1;
+}
+
 static void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plugin *pluginObj)
 {
     //luaL_openlibs(L);
@@ -1663,6 +1686,9 @@ static void init_lua_state(lua_State *L, Script *script, bool client, bool plugi
 
     lua_pushcfunction(L, luau_warn, "warn");
     lua_setglobal(L, "warn");
+
+    lua_pushcfunction(L, luau_settings, "settings");
+    lua_setglobal(L, "settings");
 
     // Global instances
     luau_pushinstance(L, GetDataModel()->Workspace);
