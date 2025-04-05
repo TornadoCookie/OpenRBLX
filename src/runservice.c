@@ -25,6 +25,14 @@ RunService *RunService_new(const char *className, Instance *parent)
     return newInst;
 }
 
+void serialize_RunService(RunService *this, SerializeInstance *inst)
+{
+    serialize_Instance(this, inst);
+
+    serialize_atomic(event, this, Heartbeat);
+    serialize_atomic(event, this, Stepped);
+}
+
 void RunService_Run(RunService *this)
 {
     ServerScriptService *sss = ServiceProvider_GetService(GetDataModel(), "ServerScriptService");

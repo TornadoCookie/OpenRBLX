@@ -17,6 +17,7 @@ typedef enum {
     Serialize_Color3,
     Serialize_Ref,
     Serialize_double,
+    Serialize_event
 } SerializationType;
 
 typedef struct Serialization {

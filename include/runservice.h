@@ -13,6 +13,7 @@ typedef struct RunService {
 } RunService;
 
 RunService *RunService_new(const char *className, Instance *parent);
+void serialize_RunService(RunService *runservice, SerializeInstance *inst);
 
 void RunService_Run(RunService *this);
 void RunService_Reset(RunService *this);

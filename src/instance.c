@@ -202,6 +202,7 @@ bool ClassName_IsA(const char *className1, const char *className)
     else if (!strcmp(className, "FaceInstance")) return ClassName_IsA(className1, "Decal");
 
     else if (!strcmp(className, "ServiceProvider")) return ClassName_IsA(className1, "DataModel");
+    else FIXME("className1 %s, className %s\n", className1, className);
 
     return false;
 }

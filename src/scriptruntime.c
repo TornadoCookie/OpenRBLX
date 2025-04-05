@@ -132,44 +132,47 @@ static void luau_pushvector3(lua_State *L, Vector3 v)
 
     lua_newtable(L);
 
-    lua_pushstring(L, "__mul");
     lua_pushcfunction(L, luau_vector3__mul, "Vector3:__mul");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "__mul");
 
-    lua_pushstring(L, "__add");
     lua_pushcfunction(L, luau_vector3__add, "Vector3:__add");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "__add");
 
     lua_setmetatable(L, -2);
 
-    lua_pushstring(L, "X");
     lua_pushnumber(L, v.x);
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "X");
 
-    lua_pushstring(L, "Y");
     lua_pushnumber(L, v.y);
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "Y");
 
-    lua_pushstring(L, "Z");
     lua_pushnumber(L, v.z);
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "Z");
+}
+
+static void luau_pushvector2(lua_State *L, Vector2 v)
+{
+    lua_newtable(L);
+
+    lua_pushnumber(L, v.x);
+    lua_setfield(L, -2, "X");
+
+    lua_pushnumber(L, v.y);
+    lua_setfield(L, -2, "Y");
 }
 
 static void luau_pushcframe(lua_State *L, CFrame cf)
 {
     lua_newtable(L);
 
-    lua_pushstring(L, "X");
     lua_pushnumber(L, cf.X);
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "X");
 
-    lua_pushstring(L, "Y");
     lua_pushnumber(L, cf.Y);
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "Y");
 
-    lua_pushstring(L, "Z");
     lua_pushnumber(L, cf.Z);
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "Z");
 
     lua_pushstring(L, "LookVector");
     luau_pushvector3(L, (Vector3){-cf.R02, -cf.R12, -cf.R22});
@@ -197,6 +200,39 @@ static Instance *luau_toinstance(lua_State *L, int i)
     lua_pop(L, 1);
 
     return inst;
+}
+
+static RBXScriptSignal *luau_toevent(lua_State *L, int i)
+{
+    if (i < 0) i--;
+    lua_pushstring(L, "__evt_ptr");
+    lua_rawget(L, i);
+    RBXScriptSignal *event = lua_touserdata(L, -1);
+    lua_pop(L, 1);
+
+    return event;
+}
+
+static int luau_RBXScriptSignal_Connect(lua_State *L)
+{
+    RBXScriptSignal *event = luau_toevent(L, 1);
+
+    FIXME("event %p\n", event);
+
+    return 0;
+}
+
+static int luau_pushevent(lua_State *L, RBXScriptSignal *event)
+{
+    lua_newtable(L);
+
+    lua_pushcfunction(L, luau_RBXScriptSignal_Connect, "RBXScriptSignal:Connect");
+    lua_setfield(L, -2, "Connect");
+
+    lua_pushlightuserdata(L, event);
+    lua_setfield(L, -2, "__evt_ptr");
+
+    return 1;
 }
 
 static int luau_Instance__index(lua_State *L)
@@ -243,6 +279,11 @@ static int luau_Instance__index(lua_State *L)
                 case Serialize_string:
                 {
                     lua_pushstring(L, *(char**)val);
+                    return 1;
+                } break;
+                case Serialize_event:
+                {
+                    luau_pushevent(L, *(RBXScriptSignal**)val);
                     return 1;
                 } break;
                 default:
@@ -454,6 +495,23 @@ static int luau_Instance_IsDescendantOf(lua_State *L)
     return 1;
 }
 
+static int luau_Instance_IsA(lua_State *L)
+{
+    int nargs = lua_gettop(L);
+    if (nargs != 2)
+    {
+        lua_pushstring(L, "Expected 2 arguments.\n");
+        lua_error(L);
+    }
+
+    Instance *inst = luau_toinstance(L, 1);
+    const char *className = lua_tostring(L, 2);
+
+    lua_pushboolean(L, Instance_IsA(inst, className));
+
+    return 1;
+}
+
 static int luau_ServiceProvider_GetService(lua_State *L)
 {
     ServiceProvider *serviceProvider = luau_toinstance(L, 1); 
@@ -521,40 +579,7 @@ static int luau_DataModel_DefineFastInt(lua_State *L)
     return 1;
 }
 
-static RBXScriptSignal *luau_toevent(lua_State *L, int i)
-{
-    if (i < 0) i--;
-    lua_pushstring(L, "__evt_ptr");
-    lua_rawget(L, i);
-    RBXScriptSignal *event = lua_touserdata(L, -1);
-    lua_pop(L, 1);
 
-    return event;
-}
-
-static int luau_RBXScriptSignal_Connect(lua_State *L)
-{
-    RBXScriptSignal *event = luau_toevent(L, 1);
-
-    FIXME("event %p\n", event);
-
-    return 0;
-}
-
-static int luau_pushevent(lua_State *L, RBXScriptSignal *event)
-{
-    lua_newtable(L);
-
-    lua_pushstring(L, "Connect");
-    lua_pushcfunction(L, luau_RBXScriptSignal_Connect, "RBXScriptSignal:Connect");
-    lua_settable(L, -3);
-
-    lua_pushstring(L, "__evt_ptr");
-    lua_pushlightuserdata(L, event);
-    lua_settable(L, -3);
-
-    return 1;
-}
 
 static int luau_Plugin_GetPluginComponent(lua_State *L)
 {
@@ -598,49 +623,41 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
 
     lua_newtable(L);
 
-    lua_pushstring(L, "FindFirstChild");
     lua_pushcfunction(L, luau_Instance_FindFirstChild, "Instance:FindFirstChild");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "FindFirstChild");
 
-    lua_pushstring(L, "findFirstChild");
     lua_pushcfunction(L, luau_Instance_FindFirstChild, "Instance:findFirstChild");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "findFirstChild");
 
-    lua_pushstring(L, "FindFirstAncestor");
     lua_pushcfunction(L, luau_Instance_FindFirstAncestor, "Instance:FindFirstAncestor");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "FindFirstAncestor");
 
-    lua_pushstring(L, "FindFirstAncestorWhichIsA");
     lua_pushcfunction(L, luau_Instance_FindFirstAncestorWhichIsA, "Instance:FindFirstAncestorWhichIsA");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "FindFirstAncestorWhichIsA");
 
-    lua_pushstring(L, "FindFirstChildWhichIsA");
     lua_pushcfunction(L, luau_Instance_FindFirstChildWhichIsA, "Instance:FindFirstChildWhichIsA");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "FindFirstChildWhichIsA");
 
-    lua_pushstring(L, "GetChildren");
     lua_pushcfunction(L, luau_Instance_GetChildren, "Instance:GetChildren");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "GetChildren");
 
-    lua_pushstring(L, "children");
     lua_pushcfunction(L, luau_Instance_GetChildren, "Instance:children");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "children");
 
-    lua_pushstring(L, "Clone");
     lua_pushcfunction(L, luau_Instance_Clone, "Instance:Clone");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "Clone");
 
-    lua_pushstring(L, "WaitForChild");
     lua_pushcfunction(L, luau_Instance_WaitForChild, "Instance:WaitForChild");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "WaitForChild");
 
-    lua_pushstring(L, "IsDescendantOf");
     lua_pushcfunction(L, luau_Instance_IsDescendantOf, "Instance:IsDescendantOf");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "IsDescendantOf");
 
-    lua_pushstring(L, "__inst_ptr");
+    lua_pushcfunction(L, luau_Instance_IsA, "Instance:IsA");
+    lua_setfield(L, -2, "IsA");
+
     lua_pushlightuserdata(L, inst);
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "__inst_ptr");
 
     if (Instance_IsA(inst, "ServiceProvider"))
     {
@@ -679,13 +696,11 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
 
     lua_newtable(L);
 
-    lua_pushstring(L, "__index");
     lua_pushcfunction(L, luau_Instance__index, "Instance:__index");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "__index");
 
-    lua_pushstring(L, "__newindex");
     lua_pushcfunction(L, luau_Instance__newindex, "Instance:__newindex");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "__newindex");
 
     lua_setmetatable(L, -2);
 }
@@ -703,6 +718,22 @@ static int luau_Vector3_new(lua_State *L)
     lua_Number z = lua_tonumber(L, 3);
 
     luau_pushvector3(L, (Vector3){x, y, z});
+
+    return 1;
+}
+
+static int luau_Vector2_new(lua_State *L)
+{
+    if (lua_gettop(L) != 2)
+    {
+        lua_pushstring(L, "Expected 2 arguments.\n");
+        lua_error(L);
+    }
+
+    lua_Number x = lua_tonumber(L, 1);
+    lua_Number y = lua_tonumber(L, 2);
+
+    luau_pushvector2(L, (Vector2){x, y});
 
     return 1;
 }
@@ -781,7 +812,7 @@ static int luau_require(lua_State *L)
         }
         if (lua_pcall(L, 0, 1, 0))
         {
-            printf("Requested module experienced an error while loading: Error: %s\n", lua_tostring(L, -1));
+            printf("Error: %s\n", lua_tostring(L, -1));
             goto err;
         } 
 
@@ -819,6 +850,8 @@ err:
     {
         printf("Source: %s\n", ((ModuleScript*)inst)->Source);
     }
+
+    luaL_error(L, "Requested module experienced an error while loading\n");
 
 end:
     
@@ -876,6 +909,14 @@ static int luau_Enums_GetEnums(lua_State *L)
     enum_val(Left, 2);
     enum_val(Right, 3);
     enum_val(Float, 4);
+    enum_end();
+
+    enum_start(Font);
+    enum_val(Legacy, 0);
+    enum_val(Arial, 1);
+    enum_val(ArialBold, 2);
+    enum_val(SourceSans, 3);
+    enum_val(SourceSansBold, 4);
     enum_end();
 
 #undef enum_end
@@ -1057,7 +1098,12 @@ static int luau_warn(lua_State *L)
 static int luau_Instance_new(lua_State *L)
 {
     const char *className = lua_tostring(L, 1);
-    Instance *parent = luau_toinstance(L, 2);
+    Instance *parent = NULL;
+
+    if (lua_istable(L, 2))
+    {
+        parent = luau_toinstance(L, 2);
+    }
 
     Instance *newInst = Instance_dynNew(className, parent);
 
@@ -1119,14 +1165,12 @@ static void init_lua_state(lua_State *L, Script *script, bool client, bool plugi
     // Global data types
     lua_newtable(L);
 
-    lua_pushstring(L, "GetEnums");
     lua_pushcfunction(L, luau_Enums_GetEnums, "Enums:GetEnums");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "GetEnums");
 
     lua_newtable(L);
-    lua_pushstring(L, "__index");
     lua_pushcfunction(L, luau_Enums__index, "Enums:__index");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "__index");
     
     lua_setmetatable(L, -2);
 
@@ -1136,11 +1180,18 @@ static void init_lua_state(lua_State *L, Script *script, bool client, bool plugi
     // Vector3
     lua_newtable(L);
 
-    lua_pushstring(L, "new");
     lua_pushcfunction(L, luau_Vector3_new, "Vector3.new");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "new");
 
     lua_setglobal(L, "Vector3");
+
+    // Vector2
+    lua_newtable(L);
+
+    lua_pushcfunction(L, luau_Vector2_new, "Vector2.new");
+    lua_setfield(L, -2, "new");
+
+    lua_setglobal(L, "Vector2");
 
     // CFrame
     lua_newtable(L);
@@ -1158,18 +1209,16 @@ static void init_lua_state(lua_State *L, Script *script, bool client, bool plugi
     // DockWidgetPluginGuiInfo
     lua_newtable(L);
 
-    lua_pushstring(L, "new");
     lua_pushcfunction(L, luau_DockWidgetPluginGuiInfo_new, "DockWidgetPluginGuiInfo.new");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "new");
 
     lua_setglobal(L, "DockWidgetPluginGuiInfo");
 
     //global index hook
     lua_newtable(L);
 
-    lua_pushstring(L, "__index");
     lua_pushcfunction(L, luau_globals__index, "_G.__index");
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "__index");
 
     lua_setmetatable(L, LUA_GLOBALSINDEX);
 
@@ -1232,7 +1281,7 @@ static void run_script(Script *script, const char *source, int sourceLength, boo
     luaL_sandbox(L);
     //lua_callbacks(L)->debugstep = scrt_debugstep;
     //lua_singlestep(L, 1);
-    if (lua_pcall(L, 0, 0, 0))
+    if (lua_pcall(L, 0, LUA_MULTRET, 0))
     {
         printf("Error: %s\n", lua_tostring(L, -1));
         goto end;
