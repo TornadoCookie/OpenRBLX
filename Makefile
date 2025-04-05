@@ -212,6 +212,8 @@ instance_SOURCES+=$(DISTDIR)/src/textservice.o
 instance_SOURCES+=$(DISTDIR)/src/guiservice.o
 instance_SOURCES+=$(DISTDIR)/src/rbxanalyticsservice.o
 instance_SOURCES+=$(DISTDIR)/src/contentprovider.o
+instance_SOURCES+=$(DISTDIR)/src/stylebase.o
+instance_SOURCES+=$(DISTDIR)/src/stylerule.o
 instance_CXX_SOURCES+=$(luau_CXX_SOURCES)
 instance_SOURCES+=$(luau_SOURCES)
 
@@ -377,6 +379,8 @@ clean:
 	rm -f $(DISTDIR)/src/guiservice.o
 	rm -f $(DISTDIR)/src/rbxanalyticsservice.o
 	rm -f $(DISTDIR)/src/contentprovider.o
+	rm -f $(DISTDIR)/src/stylebase.o
+	rm -f $(DISTDIR)/src/stylerule.o
 	rm -f $(DISTDIR)/src/filetypes/rbxlx.o
 	rm -f $(DISTDIR)/src/filetypes/rbxmx.o
 	rm -f $(DISTDIR)/src/../lib/xml/src/xml.o

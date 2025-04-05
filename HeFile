@@ -144,6 +144,8 @@ Source textservice.c
 Source guiservice.c
 Source rbxanalyticsservice.c
 Source contentprovider.c
+Source stylebase.c
+Source stylerule.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c

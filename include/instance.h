@@ -66,8 +66,14 @@ typedef struct EventArg_Instance_AncestryChanged {
     Instance *parent;
 } EventArg_Instance_AncestryChanged;
 
-#define INSTANCE_STUB_CONSTRUCTOR(T) \
-    T *newInst = Instance_new(className, parent); \
+#define INSTANCE_STUB_CONSTRUCTOR_BASE(T, B) \
+    T *newInst = B##_new(className, parent); \
+    ((Instance*)newInst)->DataCost = sizeof(*newInst); \
+    newInst = realloc(newInst, sizeof(*newInst)); \
+    return newInst;
+
+#define INSTANCE_STUB_CONSTRUCTOR(T, B) \
+    T *newInst = B##_new(className, parent); \
     ((Instance*)newInst)->DataCost = sizeof(*newInst); \
     newInst = realloc(newInst, sizeof(*newInst)); \
     if (parent) Instance_SetParent(newInst, parent); \
