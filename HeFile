@@ -146,6 +146,7 @@ Source rbxanalyticsservice.c
 Source contentprovider.c
 Source stylebase.c
 Source stylerule.c
+Source stylingservice.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c
