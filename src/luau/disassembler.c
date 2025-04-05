@@ -354,7 +354,11 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
             } break;
             //LOP_JUMPIFLE   28
             //LOP_JUMPIFLT   29
-            //LOP_JUMPIFNOTEQ 30
+            case LOP_JUMPIFNOTEQ: // 30
+            {
+                printf("if R%d ~= R%d: go to %#x\n", a, aux, d);
+                i++;
+            } break;
             //LOP_JUMPIFNOTLE 31
             //LOP_JUMPIFNOTLT 32
             //LOP_ADD        33
@@ -364,7 +368,12 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
             //LOP_MOD        37
             //LOP_POW        38
             //LOP_ADDK       39
-            //LOP_SUBK       40
+            case LOP_SUBK: // 40
+            {
+                printf("R%d = R%d - ", a, b);
+                print_constant(constants, c, true);
+                printf("\n");
+            } break;
             //LOP_MULK       41
             //LOP_DIVK       42
             //LOP_MODK       43
@@ -372,8 +381,21 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
             //LOP_AND        45
             //LOP_OR         46
             //LOP_ANDK       47
-            //LOP_ORK        48
-            //LOP_CONCAT     49
+            case LOP_ORK: // 48
+            {
+                printf("ORK %d %d %d\n", a, b, c);
+            } break;
+            case LOP_CONCAT: // 49
+            {
+                printf("R%d = ", a);
+                for (int j = b; j <= c; j++)
+                {
+                    printf("R%d", j);
+                    if (j != c)
+                        printf(" .. ");
+                }
+                printf("\n");
+            } break;
             //LOP_NOT        50
             //LOP_MINUS      51
             //LOP_LENGTH     52
@@ -424,7 +446,10 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
             } break;
             //LOP_LOADKX     66
             //LOP_JUMPX      67
-            //LOP_FASTCALL   68
+            case LOP_FASTCALL: // 68
+            {
+                printf("FASTCALL %d %d\n", a, c);
+            } break;
             //LOP_COVERAGE   69
             case LOP_CAPTURE: // 70
             {
@@ -452,11 +477,23 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
                 printf("FASTCALL2 %d %d %d %d\n", a, b, c, aux);
                 i++;
             } break;
-            //LOP_FASTCALL2K  75
+            case LOP_FASTCALL2K: // 75
+            {
+                printf("FASTCALL2K %d %d %d %d\n", a, b, c, aux);
+                i++;
+            } break;
             //LOP_FORGPREP    76
-            //LOP_JUMPXEQKNIL 77
+            case LOP_JUMPXEQKNIL: // 77
+            {
+                printf("JUMPXEQKNIL %d %d %d\n", a, d, aux);
+                i++;
+            } break;
             //LOP_JUMPXEQKB   78
-            //LOP_JUMPXEQKN   79
+            case LOP_JUMPXEQKN: // 79
+            {
+                printf("JUMPXEQKN %d %d %d\n", a, d, aux);
+                i++;
+            } break;
             case LOP_JUMPXEQKS: // 80
             {
                 printf("if R%d ", a);

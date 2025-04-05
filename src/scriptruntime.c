@@ -150,6 +150,25 @@ static void luau_pushvector3(lua_State *L, Vector3 v)
     lua_setfield(L, -2, "Z");
 }
 
+static Vector2 luau_tovector2(lua_State *L, int idx)
+{
+    Vector2 ret = { 0 };
+
+    if (idx < 0) idx--;
+
+    lua_pushstring(L, "X");
+    lua_gettable(L, idx);
+    ret.x = lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    lua_pushstring(L, "Y");
+    lua_gettable(L, idx);
+    ret.y = lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    return ret;
+}
+
 static void luau_pushvector2(lua_State *L, Vector2 v)
 {
     lua_newtable(L);
@@ -263,6 +282,12 @@ static int luau_Instance__index(lua_State *L)
         lua_pushstring(L, inst->ClassName);
         return 1;
     }
+    else if (!strcmp(name, "Source"))
+    {
+        lua_pushstring(L, ""); // TODO this may be just in the case of the script being bytecode
+                               // DocParser otherwise crashes
+        return 1;
+    }
 
     SerializeInstance sInst = { 0 };
     Instance_Serialize(inst, &sInst);
@@ -278,6 +303,7 @@ static int luau_Instance__index(lua_State *L)
             {
                 case Serialize_string:
                 {
+                    printf("%s %s->%s = %s\n", inst->ClassName, inst->Name, name, *(char**)val);
                     lua_pushstring(L, *(char**)val);
                     return 1;
                 } break;
@@ -432,7 +458,7 @@ static int luau_Instance_GetChildren(lua_State *L)
 
     for (int i = 0; i < inst->childCount; i++)
     {
-        lua_pushstring(L, inst->children[i]->Name);
+        lua_pushinteger(L, i);
         luau_pushinstance(L, inst->children[i]);
         lua_settable(L, -3);
     }
@@ -769,6 +795,25 @@ static void luaL_desandbox(lua_State *L)
     lua_setsafeenv(L, LUA_GLOBALSINDEX, false);
 }
 
+static int luau_require_errfunc(lua_State *L)
+{
+    lua_Debug ar;
+
+    for (int i = 0; lua_getinfo(L, i, "sln", &ar); i++)
+    {
+        printf("%d: %s", i, ar.what);
+
+        if (strcmp(ar.what, "C"))
+        {
+            printf("source %s, line %d, function %s", ar.short_src, ar.currentline, ar.name);
+        }
+        printf("\n");
+    }
+
+    return 1;
+}
+
+
 static int luau_require(lua_State *L)
 {
     Instance *inst = luau_toinstance(L, 1);
@@ -804,17 +849,21 @@ static int luau_require(lua_State *L)
             bytecode = luau_compile(mscript->Source, mscript->sourceLength, &compopts, &bytecodesize);
         }
 
+        lua_pushcfunction(L, luau_require_errfunc, "require errfunc");
+
         int result = luau_load(L, inst->Name, bytecode, bytecodesize, 0); 
         if (result != 0)
         {
             printf("There was a problem: %s\n", lua_tostring(L, -1));
             goto err;
         }
-        if (lua_pcall(L, 0, 1, 0))
+        if (lua_pcall(L, 0, 1, -2))
         {
             printf("Error: %s\n", lua_tostring(L, -1));
             goto err;
-        } 
+        }
+
+        lua_replace(L, -2);
 
         luaL_desandbox(L);
 
@@ -828,33 +877,20 @@ static int luau_require(lua_State *L)
     goto end;
 
 err:
+    
     if (((ModuleScript*)inst)->isBytecode)
     {
-        lua_Debug ar;
-
-        for (int i = 0; lua_getinfo(L, i, "sln", &ar); i++)
-        {
-            printf("%d: %s", i, ar.what);
-
-            if (strcmp(ar.what, "C"))
-            {
-                printf("source %s, line %d, function %s", ar.short_src, ar.currentline, ar.name);
-            }
-            printf("\n");
-        }
-
-        printf("%s ", inst->Name);
+        printf("%s ", Instance_GetFullName(inst));
         disassemble(((ModuleScript*)inst)->Source, ((ModuleScript*)inst)->sourceLength);
     }
     else
     {
         printf("Source: %s\n", ((ModuleScript*)inst)->Source);
-    }
+    } 
 
     luaL_error(L, "Requested module experienced an error while loading\n");
 
-end:
-    
+end:    
 
     //lua_pushnil(L);
     return 1;
@@ -1026,7 +1062,7 @@ static int luau_xpcall(lua_State* L)
 {
     int nargs = lua_gettop(L);
 
-    printf("pcall with %d args\n", nargs);
+    printf("xpcall with %d args\n", nargs);
 
     lua_getglobal(L, "__xpcall");
     lua_insert(L, 1);
@@ -1111,6 +1147,132 @@ static int luau_Instance_new(lua_State *L)
     return 1;
 }
 
+static void luau_pushcolor3(lua_State *L, Color3 c)
+{
+    lua_newtable(L);
+
+    lua_pushnumber(L, c.R);
+    lua_setfield(L, -2, "R");
+
+    lua_pushnumber(L, c.G);
+    lua_setfield(L, -2, "G");
+
+    lua_pushnumber(L, c.B);
+    lua_setfield(L, -2, "B");
+}
+
+static int luau_Color3_fromRGB(lua_State *L)
+{
+    float r = lua_tonumber(L, 1);
+    float g = lua_tonumber(L, 2);
+    float b = lua_tonumber(L, 3);
+
+    Color3 col = {r/255, g/255, b/255};
+
+    luau_pushcolor3(L, col);
+    return 1;
+}
+
+static int luau_typeof(lua_State *L)
+{
+    if (lua_istable(L, 1))
+    {
+        lua_getfield(L, 1, "__inst_ptr");
+        if (!lua_isnil(L, -1))
+        {
+            FIXME("is %s\n", "instance");
+            lua_pushstring(L, "Instance");
+            return 1;
+        }
+        lua_pop(L, 1);
+    }
+
+    FIXME("falling back to %s\n", "builtin typeof");
+    lua_getglobal(L, "__typeof");
+    lua_insert(L, 1);
+    lua_call(L, 1, 1);
+
+    return 1;
+}
+
+static int luau_assert(lua_State *L)
+{
+    lua_pushboolean(L, false);
+    if (lua_equal(L, -1, 1))
+    {
+        FIXME("assertion failed: %s\n", lua_tostring(L, 2));
+    }
+
+    return 0;
+}
+
+static int luau_Rect__index(lua_State *L)
+{
+    const char *key = lua_tostring(L, 2);
+
+    lua_getfield(L, 1, "Min");
+    Vector2 min = luau_tovector2(L, -1);
+
+    lua_getfield(L, 1, "Max");
+    Vector2 max = luau_tovector2(L, -1);
+
+    if (!strcmp(key, "Width"))
+    {
+        lua_pushnumber(L, max.x - min.x);
+        return 1;
+    }
+    else if (!strcmp(key, "Height"))
+    {
+        lua_pushnumber(L, max.y - min.y);
+        return 1;
+    }
+}
+
+static int luau_Rect_new(lua_State *L)
+{
+    Vector2 min;
+    Vector2 max;
+
+    if (lua_gettop(L) == 0)
+    {
+        min = (Vector2){0, 0};
+        max = (Vector2){0, 0};
+    }
+    else if (lua_gettop(L) == 2)
+    {
+        min = luau_tovector2(L, 1);
+        max = luau_tovector2(L, 2);
+    }
+    else if (lua_gettop(L) == 4)
+    {
+        min.x = lua_tonumber(L, 1);
+        min.y = lua_tonumber(L, 2);
+        max.x = lua_tonumber(L, 3);
+        max.y = lua_tonumber(L, 4);
+    }
+    else
+    {
+        luaL_error(L, "Invalid argument count to Rect.new\n");
+    }
+
+    lua_newtable(L);
+
+    lua_newtable(L);
+
+    lua_pushcfunction(L, luau_Rect__index, "Rect:__index");
+    lua_setfield(L, -2, "__index");
+
+    lua_setmetatable(L, -2);
+
+    luau_pushvector2(L, min);
+    lua_setfield(L, -2, "Min");
+
+    luau_pushvector2(L, max);
+    lua_setfield(L, -2, "Max");
+
+    return 1;
+}
+
 static void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plugin *pluginObj)
 {
     //luaL_openlibs(L);
@@ -1125,11 +1287,20 @@ static void init_lua_state(lua_State *L, Script *script, bool client, bool plugi
     lua_getglobal(L, "xpcall");
     lua_setglobal(L, "__xpcall");
 
+    lua_getglobal(L, "typeof");
+    lua_setglobal(L, "__typeof");
+
     lua_pushcfunction(L, luau_pcall, "pcall");
     lua_setglobal(L, "pcall");
 
     lua_pushcfunction(L, luau_xpcall, "xpcall");
     lua_setglobal(L, "xpcall");
+
+    lua_pushcfunction(L, luau_typeof, "typeof");
+    lua_setglobal(L, "typeof");
+
+    lua_pushcfunction(L, luau_assert, "assert");
+    lua_setglobal(L, "assert");
 
     // Roblox global functions
     lua_pushcfunction(L, luau_wait, "wait");
@@ -1198,6 +1369,14 @@ static void init_lua_state(lua_State *L, Script *script, bool client, bool plugi
 
     lua_setglobal(L, "CFrame");
 
+    // Color3
+    lua_newtable(L);
+
+    lua_pushcfunction(L, luau_Color3_fromRGB, "Color3.fromRGB");
+    lua_setfield(L, -2, "fromRGB");
+
+    lua_setglobal(L, "Color3");
+
     // Instance
     lua_newtable(L);
 
@@ -1205,6 +1384,22 @@ static void init_lua_state(lua_State *L, Script *script, bool client, bool plugi
     lua_setfield(L, -2, "new");
 
     lua_setglobal(L, "Instance");
+
+    // Rect
+    lua_newtable(L);
+
+    lua_pushcfunction(L, luau_Rect_new, "Rect.new");
+    lua_setfield(L, -2, "new");
+
+    lua_setglobal(L, "Rect");
+
+    // UDim
+    lua_newtable(L);
+
+    lua_pushcfunction(L, luau_UDim_new, "UDim.new");
+    lua_setfield(L, -2, "new");
+
+    lua_setglobal(L, "UDim");
 
     // DockWidgetPluginGuiInfo
     lua_newtable(L);
