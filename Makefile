@@ -149,6 +149,21 @@ luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Ast/src/StringUtils.o
 luau_CXX_SOURCES+=$(DISTDIR)/src/../lib/luau/Ast/src/TimeTrace.o
 luau_SOURCES+=$(DISTDIR)/src/scriptruntime.o
 luau_SOURCES+=$(DISTDIR)/src/luau/disassembler.o
+luau_SOURCES+=$(DISTDIR)/src/luau/cframe.o
+luau_SOURCES+=$(DISTDIR)/src/luau/color3.o
+luau_SOURCES+=$(DISTDIR)/src/luau/dockwidgetpluginguiinfo.o
+luau_SOURCES+=$(DISTDIR)/src/luau/enum.o
+luau_SOURCES+=$(DISTDIR)/src/luau/event.o
+luau_SOURCES+=$(DISTDIR)/src/luau/globals.o
+luau_SOURCES+=$(DISTDIR)/src/luau/instance.o
+luau_SOURCES+=$(DISTDIR)/src/luau/rect.o
+luau_SOURCES+=$(DISTDIR)/src/luau/serialize.o
+luau_SOURCES+=$(DISTDIR)/src/luau/state.o
+luau_SOURCES+=$(DISTDIR)/src/luau/tweeninfo.o
+luau_SOURCES+=$(DISTDIR)/src/luau/udim2.o
+luau_SOURCES+=$(DISTDIR)/src/luau/udim.o
+luau_SOURCES+=$(DISTDIR)/src/luau/vector2.o
+luau_SOURCES+=$(DISTDIR)/src/luau/vector3.o
 
 instance_SOURCES+=$(DISTDIR)/src/datamodel.o
 instance_SOURCES+=$(DISTDIR)/src/instance.o
@@ -321,6 +336,21 @@ clean:
 	rm -f $(DISTDIR)/src/../lib/luau/Ast/src/TimeTrace.o
 	rm -f $(DISTDIR)/src/scriptruntime.o
 	rm -f $(DISTDIR)/src/luau/disassembler.o
+	rm -f $(DISTDIR)/src/luau/cframe.o
+	rm -f $(DISTDIR)/src/luau/color3.o
+	rm -f $(DISTDIR)/src/luau/dockwidgetpluginguiinfo.o
+	rm -f $(DISTDIR)/src/luau/enum.o
+	rm -f $(DISTDIR)/src/luau/event.o
+	rm -f $(DISTDIR)/src/luau/globals.o
+	rm -f $(DISTDIR)/src/luau/instance.o
+	rm -f $(DISTDIR)/src/luau/rect.o
+	rm -f $(DISTDIR)/src/luau/serialize.o
+	rm -f $(DISTDIR)/src/luau/state.o
+	rm -f $(DISTDIR)/src/luau/tweeninfo.o
+	rm -f $(DISTDIR)/src/luau/udim2.o
+	rm -f $(DISTDIR)/src/luau/udim.o
+	rm -f $(DISTDIR)/src/luau/vector2.o
+	rm -f $(DISTDIR)/src/luau/vector3.o
 	rm -f $(DISTDIR)/src/datamodel.o
 	rm -f $(DISTDIR)/src/instance.o
 	rm -f $(DISTDIR)/src/rbxscriptsignal.o

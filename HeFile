@@ -79,6 +79,21 @@ CxxSource ../lib/luau/Ast/src/StringUtils.cpp
 CxxSource ../lib/luau/Ast/src/TimeTrace.cpp
 Source scriptruntime.c
 Source luau/disassembler.c
+Source luau/cframe.c
+Source luau/color3.c
+Source luau/dockwidgetpluginguiinfo.c
+Source luau/enum.c
+Source luau/event.c
+Source luau/globals.c
+Source luau/instance.c
+Source luau/rect.c
+Source luau/serialize.c
+Source luau/state.c
+Source luau/tweeninfo.c
+Source luau/udim2.c
+Source luau/udim.c
+Source luau/vector2.c
+Source luau/vector3.c
 
 SourceGroup instance
 UseSourceGroup luau

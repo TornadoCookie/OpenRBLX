@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "cframe.h"
-#include "instance.h"
 
 typedef enum {
     Serialize_bool,
