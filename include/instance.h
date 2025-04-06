@@ -28,6 +28,8 @@ typedef struct Instance {
     Instance **children;
     int childCount;
     char *xmlref;
+    Serialization *attributes;
+    int attributeCount;
 } Instance;
 
 Instance *Instance_new(const char *className, Instance *parent);
@@ -48,6 +50,8 @@ Instance *Instance_FindFirstChildOfClass(Instance *this, const char *className);
 Instance *Instance_FindFirstAncestorWhichIsA(Instance *this, const char *className);
 Instance *Instance_WaitForChild(Instance *this, const char *childName, double timeOut);
 Instance *Instance_FindFirstAncestor(Instance *this, const char *ancestorName);
+void Instance_SetAttribute(Instance *this, Serialization sz);
+Serialization Instance_GetAttribute(Instance *this, const char *name);
 
 bool ClassName_IsA(const char *className1, const char *className2);
 int GetInstanceCount(void);

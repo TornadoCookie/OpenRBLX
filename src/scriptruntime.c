@@ -303,6 +303,44 @@ static int luau_pushevent(lua_State *L, RBXScriptSignal *event)
     return 1;
 }
 
+static int luau_pushserialization(lua_State *L, Serialization sz)
+{
+    int type = sz.type;
+    void *val = sz.val;
+
+    if (!val || !sz.name) return 0;
+
+    switch (type)
+    {
+        case Serialize_float:
+        {
+            lua_pushnumber(L, *(float*)val);
+            return 1;
+        } break;
+        case Serialize_string:
+        {
+            lua_pushstring(L, *(char**)val);
+            return 1;
+        } break;
+        case Serialize_Ref:
+        {
+            luau_pushinstance(L, *(Instance**)val);
+            return 1;
+        } break;
+        case Serialize_event:
+        {
+            luau_pushevent(L, *(RBXScriptSignal**)val);
+            return 1;
+        } break;
+        default:
+        {
+            FIXME("No lua type serializer for %d\n", type);
+            luaL_error(L, "No lua type serializer for %d\n", type);
+        } break;
+    }
+    return 0;
+}
+
 static int luau_Instance__index(lua_State *L)
 {
     Instance *inst = luau_toinstance(L, 1);
@@ -345,27 +383,7 @@ static int luau_Instance__index(lua_State *L)
     {
         if (!strcmp(name, sInst.serializations[i].name))
         {
-            int type = sInst.serializations[i].type;
-            void *val = sInst.serializations[i].val;
-
-            switch (type)
-            {
-                case Serialize_string:
-                {
-                    lua_pushstring(L, *(char**)val);
-                    return 1;
-                } break;
-                case Serialize_event:
-                {
-                    luau_pushevent(L, *(RBXScriptSignal**)val);
-                    return 1;
-                } break;
-                default:
-                {
-                    FIXME("No lua type serializer for %d\n", type);
-                    luaL_error(L, "No lua type serializer for %d\n", type);
-                } break;
-            }
+             return luau_pushserialization(L, sInst.serializations[i]);
         }
     }
 
@@ -379,6 +397,104 @@ static int luau_Instance__index(lua_State *L)
     return 1;
 }
 
+static int sztypesiz(int t)
+{
+    switch (t)
+    {
+        case Serialize_bool: return sizeof(bool);
+        case Serialize_float: return sizeof(float);
+        case Serialize_token: return sizeof(int);
+        case Serialize_int: return sizeof(int);
+        case Serialize_CoordinateFrame: return sizeof(CFrame);
+        case Serialize_string: return sizeof(char*);
+        case Serialize_Vector3: return sizeof(Vector3);
+        case Serialize_Color3: return sizeof(Color3);
+        case Serialize_Ref: return sizeof(Instance*);
+        case Serialize_double: return sizeof(double);
+        case Serialize_event: return sizeof(RBXScriptSignal*);
+    }
+}
+
+static Serialization luau_toserialization(lua_State *L, int idx)
+{
+    Serialization ret = { 0 };
+
+    if (lua_isboolean(L, idx))
+    {
+        ret.type = Serialize_bool;
+        ret.val = malloc(sizeof(bool));
+        *(bool*)ret.val = lua_toboolean(L, idx);
+    }
+    else if (lua_isnumber(L, idx))
+    {
+        ret.type = Serialize_float;
+        ret.val = malloc(sizeof(float));
+        *(float*)ret.val = lua_tonumber(L, idx);
+    }
+    else if (lua_isstring(L, idx))
+    {
+        ret.type = Serialize_string;
+        ret.val = malloc(sizeof(char**));
+        *(char**)ret.val = lua_tostring(L, idx);
+    }
+    else if (lua_istable(L, idx))
+    {
+        lua_getfield(L, idx, "__inst_ptr");
+        if (!lua_isnil(L, idx))
+        {
+            lua_pop(L, 1);
+            ret.type = Serialize_Ref;
+            ret.val = malloc(sizeof(Instance**));
+            *(Instance**)ret.val = luau_toinstance(L, idx);
+            return ret;
+        }
+        lua_pop(L, 1);
+
+        lua_getfield(L, idx, "X");
+        if (!lua_isnil(L, idx))
+        {
+            if (lua_istable(L, -1))
+            {
+                FIXME("type is %s\n", "UDim2");
+                luaL_error(L, "unable to set UDim2 attr\n");
+            }
+
+            lua_pop(L, 1);
+            lua_getfield(L, idx, "Z");
+
+            if (!lua_isnil(L, -1))
+            {
+                lua_pop(L, 1);
+
+                ret.type = Serialize_Vector3;
+                ret.val = malloc(sizeof(Vector3*));
+                *(Vector3*)ret.val = luau_tovector3(L, idx);
+                return ret;
+            }
+            else
+            {
+                FIXME("type is %s\n", "Vector2");
+                luaL_error(L, "unable to set Vector2 attr\n");
+            }
+        }
+
+        lua_pop(L, 1);
+        
+        lua_getfield(L, idx, "Scale");
+        if (!lua_isnil(L, idx))
+        {
+            FIXME("type is %s\n", "UDim");
+            luaL_error(L, "unable to set UDim attr\n");
+        }
+    }
+    else
+    {
+        ret.val = NULL;
+    }
+
+    return ret;
+}
+
 static int luau_Instance__newindex(lua_State *L)
 {
     Instance *inst = luau_toinstance(L, 1);
@@ -389,6 +505,22 @@ static int luau_Instance__newindex(lua_State *L)
         printf("attempt to newindex nil with %s\n", key);
         return 0;
     }
+
+    SerializeInstance sInst = { 0 };
+    Instance_Serialize(inst, &sInst);
+
+    for (int i = 0; i < sInst.serializationCount; i++)
+    {
+        if (!strcmp(key, sInst.serializations[i].name))
+        {
+            Serialization sz = luau_toserialization(L, 3);
+            int ds = sztypesiz(sz.type);
+
+            memcpy(sInst.serializations[i].val, sz.val, ds);
+        }
+    }
+
+    free(sInst.serializations);
 
     printf("__newindex %s %s %s\n", inst->ClassName, inst->Name, key);
 
@@ -586,22 +718,26 @@ static int luau_Instance_IsA(lua_State *L)
     return 1;
 }
 
+
 static int luau_Instance_SetAttribute(lua_State *L)
 {
+    Instance *inst = luau_toinstance(L, 1);
     const char *attributeName = lua_tostring(L, 2);
 
-    FIXME("attribute %s\n", attributeName);
+    Serialization sz = luau_toserialization(L, 3);
+    sz.name = attributeName;
+
+    Instance_SetAttribute(inst, sz);
 
     return 0;
 }
 
 static int luau_Instance_GetAttribute(lua_State *L)
 {
-    const char *attributeName = lua_tostring(L, 2);
+    Instance *inst = luau_toinstance(L, 1);
+    const char *attributeName = lua_tostring(L, 2); 
 
-    FIXME("attribute %s\n", attributeName);
-
-    return 0;
+    return luau_pushserialization(L, Instance_GetAttribute(inst, attributeName));
 }
 
 static int luau_ServiceProvider_GetService(lua_State *L)
@@ -715,6 +851,12 @@ static int luau_GlobalSettings_GetFVariable(lua_State *L)
     return 1;
 }
 
+static int luau_StyleRule_SetProperties(lua_State *L)
+{
+    FIXME("state %p\n", L);
+    return 0;
+}
+
 static void luau_pushinstance(lua_State *L, Instance *inst)
 {
     if (!inst)
@@ -806,6 +948,12 @@ static void luau_pushinstance(lua_State *L, Instance *inst)
         lua_pushstring(L, "IsPlaceDocumentOpen");
         lua_pushcfunction(L, luau_Plugin_IsPlaceDocumentOpen, "Plugin:IsPlaceDocumentOpen");
         lua_settable(L, -3);
+    }
+
+    if (!strcmp(inst->ClassName, "StyleRule"))
+    {
+        lua_pushcfunction(L, luau_StyleRule_SetProperties, "StyleRule:SetProperties");
+        lua_setfield(L, -2, "SetProperties");
     }
 
     lua_newtable(L);
@@ -1651,6 +1799,31 @@ static int luau_settings(lua_State *L)
     return 1;
 }
 
+static int luau_TweenInfo_new(lua_State *L)
+{
+    lua_newtable(L);
+    
+    lua_pushnumber(L, lua_tonumber(L, 1));
+    lua_setfield(L, -2, "Time");
+
+    lua_pushinteger(L, lua_tointeger(L, 2));
+    lua_setfield(L, -2, "EasingStyle");
+
+    lua_pushinteger(L, lua_tointeger(L, 3));
+    lua_setfield(L, -2, "EasingDirection");
+
+    lua_pushnumber(L, lua_tonumber(L, 4));
+    lua_setfield(L, -2, "RepeatCount");
+
+    lua_pushboolean(L, lua_toboolean(L, 5));
+    lua_setfield(L, -2, "Reverses");
+
+    lua_pushnumber(L, lua_tonumber(L, 6));
+    lua_setfield(L, -2, "DelayTime");
+
+    return 1;
+}
+
 static void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plugin *pluginObj)
 {
     //luaL_openlibs(L);
@@ -1809,6 +1982,14 @@ static void init_lua_state(lua_State *L, Script *script, bool client, bool plugi
     lua_setfield(L, -2, "new");
 
     lua_setglobal(L, "DockWidgetPluginGuiInfo");
+
+    // TweenInfo
+    lua_newtable(L);
+
+    lua_pushcfunction(L, luau_TweenInfo_new, "TweenInfo.new");
+    lua_setfield(L, -2, "new");
+
+    lua_setglobal(L, "TweenInfo");
 
     //global index hook
     lua_newtable(L);

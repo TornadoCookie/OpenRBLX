@@ -64,6 +64,9 @@ Instance *Instance_new(const char *className, Instance *parent)
 
     newInst->Parent = NULL;
 
+    newInst->attributes = NULL;
+    newInst->attributeCount = 0;
+
     instanceCount++;
 
     return newInst;
@@ -321,6 +324,36 @@ Instance *Instance_FindFirstAncestor(Instance *this, const char *name)
     if (!this->Parent) return NULL;
     if (!strcmp(this->Parent->Name, name)) return this->Parent;
     return Instance_FindFirstAncestor(this->Parent, name);
+}
+
+void Instance_SetAttribute(Instance *this, Serialization sz)
+{
+    for (int i = 0; i < this->attributeCount; i++)
+    {
+        if (!strcmp(this->attributes[i].name, sz.name))
+        {
+            free(this->attributes[i].val);
+            this->attributes[i] = sz;
+            return;
+        }
+    }
+
+    this->attributeCount++;
+    this->attributes = realloc(this->attributes, sizeof(Serialization) * this->attributeCount);
+    this->attributes[this->attributeCount - 1] = sz;
+}
+
+Serialization Instance_GetAttribute(Instance *this, const char *name)
+{
+    for (int i = 0; i < this->attributeCount; i++)
+    {
+        if (!strcmp(this->attributes[i].name, name))
+        {
+            return this->attributes[i];
+        }
+    }
+
+    return (Serialization){.name = NULL, .val = NULL};
 }
 
 void Instance_SetArchivable(Instance *this, bool archivable) 
