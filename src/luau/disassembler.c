@@ -361,7 +361,10 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
             } break;
             //LOP_JUMPIFNOTLE 31
             //LOP_JUMPIFNOTLT 32
-            //LOP_ADD        33
+            case LOP_ADD: // 33
+            {
+                printf("R%d = R%d + R%d\n", a, b, c);
+            } break;
             case LOP_SUB: // 34
             {
                 printf("R%d = R%d - R%d\n", a, b, c);

@@ -4,6 +4,7 @@
 #include "luau/vector3.h"
 #include "luau/vector2.h"
 #include "luau/udim2.h"
+#include "luau/udim.h"
 
 #include "color3.h"
 
@@ -49,6 +50,11 @@ int luau_pushserialization(lua_State *L, Serialization sz)
         case Serialize_UDim2:
         {
             luau_pushudim2(L, *(UDim2*)val);
+            return 1;
+        } break;
+        case Serialize_UDim:
+        {
+            luau_pushudim(L, *(UDim*)val);
             return 1;
         } break;
         default:
@@ -116,7 +122,7 @@ Serialization luau_toserialization(lua_State *L, int idx)
         lua_pop(L, 1);
 
         lua_getfield(L, idx, "X");
-        if (!lua_isnil(L, idx))
+        if (!lua_isnil(L, -1))
         {
             if (lua_istable(L, -1))
             {
@@ -150,10 +156,11 @@ Serialization luau_toserialization(lua_State *L, int idx)
         lua_pop(L, 1);
         
         lua_getfield(L, idx, "Scale");
-        if (!lua_isnil(L, idx))
+        if (!lua_isnil(L, -1))
         {
-            FIXME("type is %s\n", "UDim");
-            luaL_error(L, "unable to set UDim attr\n");
+            ret.type = Serialize_UDim;
+            ret.val = malloc(sizeof(UDim));
+            *(UDim*)ret.val = luau_toudim(L, idx);
         }
     }
     else

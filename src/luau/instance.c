@@ -310,6 +310,8 @@ static int luau_Instance_SetAttribute(lua_State *L)
     Serialization sz = luau_toserialization(L, 3);
     sz.name = attributeName;
 
+    FIXME("attr %s, type %d\n", sz.name, sz.type);
+
     Instance_SetAttribute(inst, sz);
 
     return 0;

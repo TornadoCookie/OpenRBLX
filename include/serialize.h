@@ -19,6 +19,7 @@ typedef enum {
     Serialize_event,
     Serialize_Vector2,
     Serialize_UDim2,
+    Serialize_UDim,
 } SerializationType;
 
 typedef struct Serialization {
