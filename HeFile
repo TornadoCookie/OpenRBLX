@@ -165,6 +165,7 @@ Source stylingservice.c
 Source tweenservice.c
 Source genericsettings.c
 Source globalsettings.c
+Source studiowidgetsservice.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c

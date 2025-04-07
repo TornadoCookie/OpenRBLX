@@ -440,6 +440,12 @@ static int luau_StyleRule_SetProperties(lua_State *L)
     return 0;
 }
 
+static int luau_StudioService_GetClassIcon(lua_State *L)
+{
+    FIXME("className %s\n", lua_tostring(L, 2));
+    return 0;
+}
+
 void luau_pushinstance(lua_State *L, Instance *inst)
 {
     if (!inst)
@@ -537,6 +543,12 @@ void luau_pushinstance(lua_State *L, Instance *inst)
     {
         lua_pushcfunction(L, luau_StyleRule_SetProperties, "StyleRule:SetProperties");
         lua_setfield(L, -2, "SetProperties");
+    }
+
+    if (!strcmp(inst->ClassName, "StudioService"))
+    {
+        lua_pushcfunction(L, luau_StudioService_GetClassIcon, "StudioService:GetClassIcon");
+        lua_setfield(L, -2, "GetClassIcon");
     }
 
     lua_newtable(L);
