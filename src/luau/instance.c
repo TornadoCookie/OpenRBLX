@@ -5,6 +5,7 @@
 #include "plugin.h"
 #include "globalsettings.h"
 #include "datamodel.h"
+#include "messagebusservice.h"
 
 #include "debug.h"
 DEFAULT_DEBUG_CHANNEL(luau);
@@ -448,6 +449,17 @@ static int luau_StudioService_GetClassIcon(lua_State *L)
     return 0;
 }
 
+static int luau_MessageBusService_GetMessageId(lua_State *L)
+{
+    MessageBusService *mbs = luau_toinstance(L, 1);
+    const char *domainName = lua_tostring(L, 2);
+    const char *messageName = lua_tostring(L, 3);
+
+    lua_pushstring(L, MessageBusService_GetMessageId(mbs, domainName, messageName));
+
+    return 1;
+}
+
 void luau_pushinstance(lua_State *L, Instance *inst)
 {
     if (!inst)
@@ -551,6 +563,12 @@ void luau_pushinstance(lua_State *L, Instance *inst)
     {
         lua_pushcfunction(L, luau_StudioService_GetClassIcon, "StudioService:GetClassIcon");
         lua_setfield(L, -2, "GetClassIcon");
+    }
+
+    if (!strcmp(inst->ClassName, "MessageBusService"))
+    {
+        lua_pushcfunction(L, luau_MessageBusService_GetMessageId, "MessageBusService:GetMessageId");
+        lua_setfield(L, -2, "GetMessageId");
     }
 
     lua_newtable(L);
