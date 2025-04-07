@@ -2,6 +2,8 @@
 #include "luau/instance.h"
 #include "luau/event.h"
 #include "luau/vector3.h"
+#include "luau/vector2.h"
+#include "luau/udim2.h"
 
 #include "color3.h"
 
@@ -39,6 +41,16 @@ int luau_pushserialization(lua_State *L, Serialization sz)
             luau_pushevent(L, *(RBXScriptSignal**)val);
             return 1;
         } break;
+        case Serialize_Vector2:
+        {
+            luau_pushvector2(L, *(Vector2*)val);
+            return 1;
+        } break;
+        case Serialize_UDim2:
+        {
+            luau_pushudim2(L, *(UDim2*)val);
+            return 1;
+        } break;
         default:
         {
             FIXME("No lua type serializer for %d\n", type);
@@ -64,6 +76,7 @@ int sztypesiz(int t)
         case Serialize_Ref: return sizeof(Instance*);
         case Serialize_double: return sizeof(double);
         case Serialize_event: return sizeof(RBXScriptSignal*);
+        default: FIXME("no sz for %d\n", t); return 0;
     }
 }
 
@@ -92,11 +105,11 @@ Serialization luau_toserialization(lua_State *L, int idx)
     else if (lua_istable(L, idx))
     {
         lua_getfield(L, idx, "__inst_ptr");
-        if (!lua_isnil(L, idx))
+        if (!lua_isnil(L, -1))
         {
             lua_pop(L, 1);
             ret.type = Serialize_Ref;
-            ret.val = malloc(sizeof(Instance**));
+            ret.val = malloc(sizeof(Instance*));
             *(Instance**)ret.val = luau_toinstance(L, idx);
             return ret;
         }
@@ -107,8 +120,10 @@ Serialization luau_toserialization(lua_State *L, int idx)
         {
             if (lua_istable(L, -1))
             {
-                FIXME("type is %s\n", "UDim2");
-                luaL_error(L, "unable to set UDim2 attr\n");
+                ret.type = Serialize_UDim2;
+                ret.val = malloc(sizeof(UDim2));
+                *(UDim2*)ret.val = luau_toudim2(L, idx);
+                return ret;
             }
 
             lua_pop(L, 1);
@@ -119,14 +134,16 @@ Serialization luau_toserialization(lua_State *L, int idx)
                 lua_pop(L, 1);
 
                 ret.type = Serialize_Vector3;
-                ret.val = malloc(sizeof(Vector3*));
+                ret.val = malloc(sizeof(Vector3));
                 *(Vector3*)ret.val = luau_tovector3(L, idx);
                 return ret;
             }
             else
             {
-                FIXME("type is %s\n", "Vector2");
-                luaL_error(L, "unable to set Vector2 attr\n");
+                ret.type = Serialize_Vector2;
+                ret.val = malloc(sizeof(Vector2));
+                *(Vector2*)ret.val = luau_tovector2(L, idx);
+                return ret;
             }
         }
 
