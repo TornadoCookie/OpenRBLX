@@ -8,6 +8,7 @@ typedef struct RunService {
 
     RBXScriptSignal *Stepped;
     RBXScriptSignal *Heartbeat;
+    RBXScriptSignal *RenderStepped;
 
     bool running;
 } RunService;

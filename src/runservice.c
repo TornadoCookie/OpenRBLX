@@ -18,6 +18,7 @@ RunService *RunService_new(const char *className, Instance *parent)
 
     newInst->Heartbeat = RBXScriptSignal_new();
     newInst->Stepped = RBXScriptSignal_new();
+    newInst->RenderStepped = RBXScriptSignal_new();
     newInst->running = false;
 
     if (parent) Instance_SetParent(newInst, parent);
@@ -31,6 +32,7 @@ void serialize_RunService(RunService *this, SerializeInstance *inst)
 
     serialize_atomic(event, this, Heartbeat);
     serialize_atomic(event, this, Stepped);
+    serialize_atomic(event, this, RenderStepped);
 }
 
 void RunService_Run(RunService *this)

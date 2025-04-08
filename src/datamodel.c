@@ -198,6 +198,11 @@ void DataModel_Draw(DataModel *this)
         }
     }
 
+    if (rs->running)
+    {
+        RBXScriptSignal_Fire(rs->RenderStepped, NULL);
+    }
+
     ClearBackground(SKYBLUE);
 
     clock_t render_start_clock = clock();
@@ -306,6 +311,9 @@ void DataModel_Draw(DataModel *this)
     if (rs->running)
     {
         RBXScriptSignal_Fire(rs->Stepped, NULL);
+        
+        // do simulation here
+
         RBXScriptSignal_Fire(rs->Heartbeat, NULL);
     }
 

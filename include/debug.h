@@ -32,6 +32,8 @@ const char *debugstr_color3(Color3 c)
     return debugstr_vector3((Vector3){c.R, c.G, c.B});
 }
 
+#include <unistd.h>
+
 void dbg_printf(const char *type, const char *channel, const char *func, const char *restrict format, ...)
 {
     static char buf[1024];
@@ -42,7 +44,7 @@ void dbg_printf(const char *type, const char *channel, const char *func, const c
         return;
     }
 
-    snprintf(buf, 1024, "%s:%s:%s %s", type, channel, func, format);
+    snprintf(buf, 1024, "%04x:%s:%s:%s %s", gettid(), type, channel, func, format);
     
     va_list args;
     va_start(args, format);
