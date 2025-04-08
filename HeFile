@@ -169,6 +169,10 @@ Source studiowidgetsservice.c
 Source startpageservice.c
 Source studiouserservice.c
 Source messagebusservice.c
+Source guibase.c
+Source guibase2d.c
+Source guiobject.c
+Source frame.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c
