@@ -81,6 +81,12 @@ void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plug
     
     // task library
     lua_newtable(L);
+
+    lua_pushcfunction(L, luau_task_delay, "task.delay");
+    lua_setfield(L, -2, "delay");
+
+    lua_pushcfunction(L, luau_task_defer, "task.defer");
+    lua_setfield(L, -2, "defer");
     
     lua_setglobal(L, "task");
 

@@ -72,6 +72,19 @@ static int luau_require_errfunc(lua_State *L)
 }
 
 
+#include "Luau/Bytecode.h"
+static void sanitize_bytecode(uint32_t *code, int size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        if (LUAU_INSN_OP(code[i]) == LOP_FASTCALL1 && LUAU_INSN_A(code[i]) == LBF_TYPEOF)
+        {
+            // disable the typeof builtin by patching the bytecode
+            code[i] = LOP_NOP;
+        }
+    }
+}
+
 static int luau_require(lua_State *L)
 {
     Instance *inst = luau_toinstance(L, 1);
@@ -84,7 +97,9 @@ static int luau_require(lua_State *L)
 
         size_t bytecodesize = 0;
         char *bytecode;
-        struct lua_CompileOptions compopts = { 0 };
+        struct lua_CompileOptions compopts = {
+            .disabledBuiltins = {"typeof", NULL}
+        };
 
         // Set the script global
         lua_getglobal(L, "script");
@@ -101,6 +116,8 @@ static int luau_require(lua_State *L)
         {
             bytecode = mscript->Source;
             bytecodesize = mscript->sourceLength;
+
+            sanitize_bytecode(bytecode, bytecodesize);
         }
         else
         {
@@ -187,8 +204,6 @@ int luau_require_cached(lua_State *L)
 int luau_pcall(lua_State* L)
 {
     int nargs = lua_gettop(L);
-
-    printf("pcall with %d args\n", nargs);
 
     lua_getglobal(L, "__pcall");
     lua_insert(L, 1);
@@ -358,5 +373,23 @@ int luau_tick(lua_State *L)
 {
     lua_pushinteger(L, time(NULL));
     return 1;
+}
+
+int luau_task_delay(lua_State *L)
+{
+    //FIXME("duration %f\n", lua_tonumber(L, 1));
+    
+    usleep(lua_tonumber(L, 1)*1000000);
+
+    int nargs = lua_gettop(L) - 2;
+    lua_call(L, nargs, 0);
+
+    return 0;
+}
+
+int luau_task_defer(lua_State *L)
+{
+    FIXME("state %p\n", L);
+    return 0;
 }
 

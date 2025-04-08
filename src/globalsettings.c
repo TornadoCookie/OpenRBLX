@@ -1,4 +1,5 @@
 #include "globalsettings.h"
+#include "studio.h"
 
 #include "debug.h"
 DEFAULT_DEBUG_CHANNEL(globalsettings);
@@ -10,6 +11,8 @@ GlobalSettings *GetGlobalSettings(void)
     if (!settings)
     {
         settings = GenericSettings_new("GlobalSettings", NULL);
+
+        Studio *studio = Studio_new("Studio", settings);
     }
 
     return settings;

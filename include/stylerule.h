@@ -9,4 +9,6 @@ typedef struct StyleRule {
 
 StyleRule *StyleRule_new(const char *className, Instance *parent);
 
+void serialize_StyleRule(StyleRule *stylerule, SerializeInstance *inst);
+
 #endif

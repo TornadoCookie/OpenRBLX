@@ -9,5 +9,7 @@ typedef struct StyleBase {
 
 StyleBase *StyleBase_new(const char *className, Instance *parent);
 
+void serialize_StyleBase(StyleBase *stylebase, SerializeInstance *inst);
+
 #endif
 

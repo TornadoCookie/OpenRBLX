@@ -241,6 +241,7 @@ instance_SOURCES+=$(DISTDIR)/src/guibase.o
 instance_SOURCES+=$(DISTDIR)/src/guibase2d.o
 instance_SOURCES+=$(DISTDIR)/src/guiobject.o
 instance_SOURCES+=$(DISTDIR)/src/frame.o
+instance_SOURCES+=$(DISTDIR)/src/studio.o
 instance_CXX_SOURCES+=$(luau_CXX_SOURCES)
 instance_SOURCES+=$(luau_SOURCES)
 
@@ -435,6 +436,7 @@ clean:
 	rm -f $(DISTDIR)/src/guibase2d.o
 	rm -f $(DISTDIR)/src/guiobject.o
 	rm -f $(DISTDIR)/src/frame.o
+	rm -f $(DISTDIR)/src/studio.o
 	rm -f $(DISTDIR)/src/filetypes/rbxlx.o
 	rm -f $(DISTDIR)/src/filetypes/rbxmx.o
 	rm -f $(DISTDIR)/src/../lib/xml/src/xml.o

@@ -42,6 +42,24 @@ ScriptRuntime *ScriptRuntime_new(const char *className, Instance *parent)
     lua_pop(L, 1); \
 }
 
+static int run_script_errfunc(lua_State *L)
+{
+    lua_Debug ar;
+
+    for (int i = 0; lua_getinfo(L, i, "sln", &ar); i++)
+    {
+        printf("%d: %s", i, ar.what);
+
+        if (strcmp(ar.what, "C"))
+        {
+            printf("source %s, line %d, function %s", ar.short_src, ar.currentline, ar.name);
+        }
+        printf("\n");
+    }
+
+    return 1;
+}
+
 static void run_script(Script *script, const char *source, int sourceLength, bool client, bool plugin, Plugin *pluginObj)
 {
     lua_State *L = luaL_newstate();
@@ -65,9 +83,11 @@ static void run_script(Script *script, const char *source, int sourceLength, boo
         struct lua_CompileOptions compopts = { 0 };
 
         compopts.debugLevel = 2;
+        compopts.disabledBuiltins = "typeof";
 
         bytecode = luau_compile(source, sourceLength, &compopts, &bytecodesize);
     }
+    lua_pushcfunction(L, run_script_errfunc, "errfunc");
     int result = luau_load(L, ((Instance*)script)->Name, bytecode, bytecodesize, 0);
     
     if (!script->isBytecode)
@@ -81,7 +101,7 @@ static void run_script(Script *script, const char *source, int sourceLength, boo
     luaL_sandbox(L);
     //lua_callbacks(L)->debugstep = scrt_debugstep;
     //lua_singlestep(L, 1);
-    if (lua_pcall(L, 0, LUA_MULTRET, 0))
+    if (lua_pcall(L, 0, LUA_MULTRET, -2))
     {
         printf("Error: %s\n", lua_tostring(L, -1));
         goto end;

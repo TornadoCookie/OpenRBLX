@@ -173,6 +173,7 @@ Source guibase.c
 Source guibase2d.c
 Source guiobject.c
 Source frame.c
+Source studio.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c

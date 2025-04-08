@@ -106,8 +106,6 @@ static int luau_Instance__newindex(lua_State *L)
 
     free(sInst.serializations);
 
-    printf("__newindex %s %s %s\n", inst->ClassName, inst->Name, key);
-
     return 0;
 }
 

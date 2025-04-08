@@ -477,7 +477,10 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
                 printf("SUBRK %d %d %d\n", a, b, c);
             } break;
             //LOP_DIVRK       72
-            //LOP_FASTCALL1   73
+            case LOP_FASTCALL1: // 73
+            {
+                printf("FASTCALL1 %d %d %d\n", a, b, c);
+            } break;
             case LOP_FASTCALL2: // 74
             {
                 printf("FASTCALL2 %d %d %d %d\n", a, b, c, aux);
