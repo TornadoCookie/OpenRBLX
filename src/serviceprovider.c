@@ -2,6 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "debug.h"
+DEFAULT_DEBUG_CHANNEL(serviceprovider);
+
 ServiceProvider *ServiceProvider_new(const char *className, Instance *parent)
 {
     ServiceProvider *newInst = Instance_new(className, parent);
@@ -23,6 +26,7 @@ Instance *ServiceProvider_GetService(ServiceProvider *this, const char *classNam
 
     if (!ret)
     {
+        FIXME("creating %s\n", className);
         ret = Instance_dynNew(className, this);
     }
 

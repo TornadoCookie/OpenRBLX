@@ -331,12 +331,14 @@ static int luau_ServiceProvider_GetService(lua_State *L)
     ServiceProvider *serviceProvider = luau_toinstance(L, 1); 
     const char *serviceName = lua_tostring(L, 2);
 
-    Instance *service = ServiceProvider_GetService(serviceProvider, serviceName);
+    Instance *service = ServiceProvider_GetService(serviceProvider, strdup(serviceName));
 
     if (!service)
     {
         luaL_error(L, "No such service %s\n", serviceName);
     }
+
+    FIXME("service %s\n", serviceName);
 
     luau_pushinstance(L, service);
 
@@ -460,6 +462,12 @@ static int luau_MessageBusService_GetMessageId(lua_State *L)
     return 1;
 }
 
+static int luau_HttpService_RequestInternal(lua_State *L)
+{
+    FIXME("state %p\n", L);
+    return 0;
+}
+
 void luau_pushinstance(lua_State *L, Instance *inst)
 {
     if (!inst)
@@ -569,6 +577,12 @@ void luau_pushinstance(lua_State *L, Instance *inst)
     {
         lua_pushcfunction(L, luau_MessageBusService_GetMessageId, "MessageBusService:GetMessageId");
         lua_setfield(L, -2, "GetMessageId");
+    }
+
+    if (!strcmp(inst->ClassName, "HttpService"))
+    {
+        lua_pushcfunction(L, luau_HttpService_RequestInternal, "HttpService:RequestInternal");
+        lua_setfield(L, -2, "RequestInternal");
     }
 
     lua_newtable(L);
