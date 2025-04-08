@@ -338,8 +338,6 @@ static int luau_ServiceProvider_GetService(lua_State *L)
         luaL_error(L, "No such service %s\n", serviceName);
     }
 
-    FIXME("service %s\n", serviceName);
-
     luau_pushinstance(L, service);
 
     return 1;
@@ -369,6 +367,16 @@ static int luau_DataModel_GetFastInt(lua_State *L)
     return 1;
 }
 
+static int luau_DataModel_GetFastString(lua_State *L)
+{
+    DataModel *game = luau_toinstance(L, 1);
+    const char *name = lua_tostring(L, 2);
+
+    lua_pushstring(L, DataModel_GetFastString(game, name));
+
+    return 1;
+}
+
 static int luau_DataModel_DefineFastFlag(lua_State *L)
 {
     DataModel *game = luau_toinstance(L, 1); 
@@ -395,7 +403,26 @@ static int luau_DataModel_DefineFastInt(lua_State *L)
     return 1;
 }
 
+static int luau_DataModel_DefineFastString(lua_State *L)
+{
+    DataModel *game = luau_toinstance(L, 1);
+    const char *name = lua_tostring(L, 2);
+    const char *defaultValue = lua_tostring(L, 3);
 
+    lua_pushstring(L, DataModel_DefineFastString(game, name, defaultValue));
+
+    return 1;
+}
+
+static int luau_DataModel_GetEngineFeature(lua_State *L)
+{
+    DataModel *game = luau_toinstance(L, 1);
+    const char *name = lua_tostring(L, 2);
+
+    lua_pushboolean(L, DataModel_GetEngineFeature(game, name));
+    
+    return 1;
+}
 
 static int luau_Plugin_GetPluginComponent(lua_State *L)
 {
@@ -541,6 +568,15 @@ void luau_pushinstance(lua_State *L, Instance *inst)
 
             lua_pushcfunction(L, luau_DataModel_DefineFastInt, "DataModel:DefineFastInt");
             lua_setfield(L, -2, "DefineFastInt");
+            
+            lua_pushcfunction(L, luau_DataModel_GetFastString, "DataModel:GetFastString");
+            lua_setfield(L, -2, "GetFastString");
+
+            lua_pushcfunction(L, luau_DataModel_DefineFastString, "DataModel:DefineFastString");
+            lua_setfield(L, -2, "DefineFastString");
+
+            lua_pushcfunction(L, luau_DataModel_GetEngineFeature, "DataModel:GetEngineFeature");
+            lua_setfield(L, -2, "GetEngineFeature");
         }
 
         if (!strcmp(inst->ClassName, "GlobalSettings"))
@@ -607,6 +643,11 @@ int luau_Instance_new(lua_State *L)
     }
 
     Instance *newInst = Instance_dynNew(className, parent);
+
+    if (!newInst)
+    {
+        luaL_error(L, "Unable to create instance. (class not implemented?)\n");
+    }
 
     luau_pushinstance(L, newInst);
     return 1;

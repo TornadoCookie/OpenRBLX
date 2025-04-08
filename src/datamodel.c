@@ -117,6 +117,13 @@ int DataModel_GetFastInt(DataModel *this, const char *name)
     return 0;
 }
 
+const char *DataModel_GetFastString(DataModel *this, const char *name)
+{
+    FIXME("unknown fstring %s\n", name);
+
+    return "";
+}
+
 bool DataModel_DefineFastFlag(DataModel *this, const char *name, bool defaultValue)
 {
     FIXME("this %p, name %s, defaultValue %d stub!\n", this, name, defaultValue);
@@ -127,6 +134,18 @@ int DataModel_DefineFastInt(DataModel *this, const char *name, int defaultValue)
 {
     FIXME("this %p, name %s, defaultValue %d stub!\n", this, name, defaultValue);
     return DataModel_GetFastInt(this, name);
+}
+
+const char *DataModel_DefineFastString(DataModel *this, const char *name, const char *defaultValue)
+{
+    FIXME("this %p, name %s, defaultValue %s stub!\n", this, name, defaultValue);
+    return DataModel_GetFastString(this, name);
+}
+
+bool DataModel_GetEngineFeature(DataModel *this, const char *name)
+{
+    FIXME("this %p, name %s stub!\n", this, name);
+    return false;
 }
 
 static void draw_recursive(Instance *inst)
