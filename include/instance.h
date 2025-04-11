@@ -30,6 +30,11 @@ typedef struct Instance {
     char *xmlref;
     Serialization *attributes;
     int attributeCount;
+    int propCount; 
+    struct {
+        RBXScriptSignal *event;
+        const char *propName;
+    } *propChangedSignals;
 } Instance;
 
 Instance *Instance_new(const char *className, Instance *parent);
@@ -52,6 +57,7 @@ Instance *Instance_WaitForChild(Instance *this, const char *childName, double ti
 Instance *Instance_FindFirstAncestor(Instance *this, const char *ancestorName);
 void Instance_SetAttribute(Instance *this, Serialization sz);
 Serialization Instance_GetAttribute(Instance *this, const char *name);
+RBXScriptSignal *Instance_GetPropertyChangedSignal(Instance *this, const char *propName);
 
 bool ClassName_IsA(const char *className1, const char *className2);
 int GetInstanceCount(void);
@@ -65,10 +71,17 @@ Instance *Instance_dynNew(const char *className, Instance *parent);
 void serialize_Instance(Instance *instance, SerializeInstance *inst);
 void Instance_Serialize(Instance *obj, SerializeInstance *inst);
 
+void Instance_FireChanged(Instance *this, const char *propName);
+
 typedef struct EventArg_Instance_AncestryChanged {
     Instance *child;
     Instance *parent;
 } EventArg_Instance_AncestryChanged;
+
+typedef struct EventArg_Instance_Changed {
+    Instance *inst;
+    Serialization sz;
+} EventArg_Instance_Changed;
 
 #define INSTANCE_STUB_CONSTRUCTOR_BASE(T, B) \
     T *newInst = B##_new(className, parent); \

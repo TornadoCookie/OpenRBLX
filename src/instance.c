@@ -67,6 +67,9 @@ Instance *Instance_new(const char *className, Instance *parent)
     newInst->attributes = NULL;
     newInst->attributeCount = 0;
 
+    newInst->propCount = 0;
+    newInst->propChangedSignals = NULL;
+
     instanceCount++;
 
     return newInst;
@@ -356,16 +359,57 @@ Serialization Instance_GetAttribute(Instance *this, const char *name)
     return (Serialization){.name = NULL, .val = NULL};
 }
 
+static void get_property_changed_signal_dispatcher(void *arg)
+{
+    EventArg_Instance_Changed *changed = arg;
+
+    for (int i = 0; i < changed->inst->propCount; i++)
+    {
+        if (!strcmp(changed->sz.name, changed->inst->propChangedSignals[i].propName))
+        {
+            RBXScriptSignal_Fire(changed->inst->propChangedSignals[i].event, NULL);
+        }
+    }
+}
+
+RBXScriptSignal *Instance_GetPropertyChangedSignal(Instance *this, const char *propName)
+{
+    if (!this->propChangedSignals)
+    {
+        SerializeInstance sInst = { 0 };
+        Instance_Serialize(this, &sInst);
+
+        this->propCount = sInst.serializationCount;
+        this->propChangedSignals = malloc(sizeof(*this->propChangedSignals) * sInst.serializationCount);
+
+        for (int i = 0; i < sInst.serializationCount; i++)
+        {
+            this->propChangedSignals[i].event = RBXScriptSignal_new();
+            this->propChangedSignals[i].propName = sInst.serializations[i].name;
+        }
+
+        RBXScriptSignal_Connect(this->Changed, get_property_changed_signal_dispatcher, NULL);
+    }
+
+    for (int i = 0; i < this->propCount; i++)
+    {
+        if (!strcmp(this->propChangedSignals[i].propName, propName))
+        {
+            return this->propChangedSignals[i].event;
+        }
+    }
+}
+
 void Instance_SetArchivable(Instance *this, bool archivable) 
 {
     this->archivable = archivable;
-    RBXScriptSignal_Fire(this->Changed, "Archivable");
+    Instance_FireChanged(this, "Archivable");
 }
 
 void Instance_SetName(Instance *this, const char *name)
 {
     this->Name = name;
-    RBXScriptSignal_Fire(this->Changed, "Name");
+    Instance_FireChanged(this, "Name");
 }
 
 void Instance_SetParent(Instance *this, Instance *parent)
@@ -379,7 +423,7 @@ void Instance_SetParent(Instance *this, Instance *parent)
     parent->children = realloc(parent->children, parent->childCount * sizeof(Instance*));
     parent->children[parent->childCount - 1] = this;
     
-    RBXScriptSignal_Fire(this->Changed, "Parent");
+    //Instance_FireChanged(this, "Parent");
     RBXScriptSignal_Fire(this->AncestryChanged, eventarg);
     RBXScriptSignal_Fire(parent->ChildAdded, this);
 
@@ -430,3 +474,26 @@ void serialize_Instance(Instance *instance, SerializeInstance *inst)
     serialize_atomic(string, instance, Name);
     serialize_atomic(bool, instance, archivable);
 }
+
+void Instance_FireChanged(Instance *this, const char *propName)
+{
+    SerializeInstance sInst = { 0 };
+
+    Instance_Serialize(this, &sInst);
+
+    EventArg_Instance_Changed *evtarg;
+
+    evtarg = malloc(sizeof(*evtarg));
+    evtarg->inst = this;
+
+    for (int i = 0; i < sInst.serializationCount; i++)
+    {
+        if (!strcmp(sInst.serializations[i].name, propName))
+        {
+            evtarg->sz = sInst.serializations[i];
+        }
+    }
+
+    free(sInst.serializations);
+}
+
