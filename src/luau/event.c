@@ -16,11 +16,42 @@ static RBXScriptSignal *luau_toevent(lua_State *L, int i)
     return event;
 }
 
+typedef struct luau_event_ud {
+    lua_State *L;
+    int eventid;
+} luau_event_ud;
+
+static void luau_event_func(void *arg, void *ud)
+{
+    luau_event_ud *info = ud;
+    lua_State *L = info->L;
+
+    lua_getglobal(L, "__OpenRblx_event_ids");
+    lua_pushinteger(L, info->eventid);
+    lua_gettable(L, -2);
+
+    lua_call(L, 0, 0);
+}
+
 static int luau_RBXScriptSignal_Connect(lua_State *L)
 {
     RBXScriptSignal *event = luau_toevent(L, 1);
+    static int eventid = 0;
+    luau_event_ud *ud;
 
-    FIXME("event %p\n", event);
+    ud = malloc(sizeof(*ud));
+
+    ud->L = L;
+    ud->eventid = eventid;
+
+    lua_getglobal(L, "__OpenRblx_event_ids");
+    lua_pushinteger(L, eventid);
+    lua_pushvalue(L, 2);
+    lua_settable(L, -3);
+
+    RBXScriptSignal_Connect(event, luau_event_func, ud);
+
+    eventid++;
 
     return 0;
 }

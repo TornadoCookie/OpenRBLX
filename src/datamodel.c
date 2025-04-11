@@ -43,6 +43,18 @@ DataModel *DataModel_new(void)
 
     newInst->Workspace = ServiceProvider_GetService(newInst, "Workspace");
 
+    newInst->fflags = NULL;
+    newInst->fflagCount = 0;
+    newInst->fflagNames = NULL;
+
+    newInst->fints = NULL;
+    newInst->fintCount = 0;
+    newInst->fintNames = NULL;
+
+    newInst->fstrings = NULL;
+    newInst->fstringCount = 0;
+    newInst->fstringNames = NULL;
+
     CoreGui_new("CoreGui", newInst);
 
     rt = LoadRenderTexture(128, 128);
@@ -103,6 +115,14 @@ bool DataModel_GetFastFlag(DataModel *this, const char *name)
     {
         return true; // make a new explorer
     }
+    else if (!strcmp(name, "DevFrameworkModernStartPageStyle"))
+    {
+        return true;
+    }
+    else if (!strcmp(name, "NewProperties_Dev"))
+    {
+        return true;
+    }
     else
     {
         FIXME("unknown fflag %s\n", name);
@@ -112,6 +132,11 @@ bool DataModel_GetFastFlag(DataModel *this, const char *name)
 
 int DataModel_GetFastInt(DataModel *this, const char *name)
 {
+    if (!strcmp(name, "DebugLuaStartPageLogging"))
+    {
+        return 5;
+    }
+
     FIXME("unknown fint %s\n", name);
 
     return 0;
@@ -155,6 +180,19 @@ static void draw_recursive(Instance *inst)
     {
         //printf("draw %s.\n", inst->ClassName);
         PVInstance_Draw(inst);
+    }
+    for (int i = 0; i < inst->childCount; i++)
+    {
+        draw_recursive(inst->children[i]);
+    }
+}
+
+static void draw_ui_recursive(Instance *inst)
+{
+    if (!inst) return;
+    if (Instance_IsA(inst, "GuiBase"))
+    {
+        GuiBase_Draw(inst);
     }
     for (int i = 0; i < inst->childCount; i++)
     {
@@ -319,6 +357,9 @@ void DataModel_Draw(DataModel *this)
     //DrawCube((Vector3){1, 0, -1}, 1, 2, 2, MAGENTA);
 
     EndMode3D();
+
+    Instance *rpgs = Instance_FindFirstChild(this, "RobloxPluginGuiService", false);
+    draw_ui_recursive(rpgs);
 
     rlDisableWireMode();
 

@@ -39,7 +39,9 @@ ScriptRuntime *ScriptRuntime_new(const char *className, Instance *parent)
     lua_setreadonly(L, LUA_GLOBALSINDEX, false); \
     lua_getglobal(L, "__OpenRblx_require_cache"); \
     lua_setreadonly(L, -1, false); \
-    lua_pop(L, 1); \
+    lua_getglobal(L, "__OpenRblx_event_ids"); \
+    lua_setreadonly(L, -1, false); \
+    lua_pop(L, 2); \
 }
 
 static int run_script_errfunc(lua_State *L)

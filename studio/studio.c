@@ -218,20 +218,30 @@ static void detail_tree(int level, Instance *inst)
 
 static void load_plugins()
 {
+    Folder *rpgs = Folder_new("RobloxPluginGuiService", GetDataModel()); // too lazy to make a whole class for this just yet...
+    rpgs->instance.Name = "RobloxPluginGuiService";
+
     int mdlCount = 0;
-    Instance **explorerPlugin_s = LoadModelRBXM("studioRoot/BuiltInStandalonePlugins/Optimized_Embedded_Signature/StartPage.rbxm", &mdlCount);
+    Instance **explorerPlugin_s = LoadModelRBXM("studioapr2025/BuiltInStandalonePlugins/Optimized_Embedded_Signature/StartPage.rbxm", &mdlCount);
 
-    Instance_SetParent(explorerPlugin_s[0], explorerPlugin_s[1]);
-
-    detail_tree(0, explorerPlugin_s[1]);
+    printf("mdlCount %d\n", mdlCount);
 
     Plugin *plugin = Plugin_new("Plugin", NULL);
-    Instance_SetParent(explorerPlugin_s[1], plugin);
-
     ScriptRuntime *scrt = ScriptRuntime_new("ScriptRuntime", NULL);
-    ScriptRuntime_RunPluginScript(scrt, explorerPlugin_s[0], plugin);
 
-    pthread_exit(NULL);
+    Instance_SetParent(plugin, rpgs);
+
+    for (int i = 0; i < mdlCount; i++)
+    {
+        printf("x[%d] = %s\n", i, explorerPlugin_s[i]->Name);
+        Instance_SetParent(explorerPlugin_s[i], plugin);
+    }
+
+    detail_tree(0, plugin);
+    
+    ScriptRuntime_RunPluginScript(scrt, Instance_FindFirstChildOfClass(Instance_FindFirstChildWhichIsA(plugin, "StandalonePluginScripts", true), "Script"), plugin);
+
+    //pthread_exit(NULL);
 }
 
 static void load_corescripts(DataModel *game)
@@ -263,7 +273,7 @@ int main()
         DataModel_Draw(datamodel);
 
         if (uiState.windowFileDialogState.windowActive) GuiLock();
-        draw_studio_ui();
+        //draw_studio_ui();
         
         GuiUnlock();
 

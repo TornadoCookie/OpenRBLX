@@ -21,7 +21,9 @@ DEFAULT_DEBUG_CHANNEL(luau)
     lua_setreadonly(L, LUA_GLOBALSINDEX, false); \
     lua_getglobal(L, "__OpenRblx_require_cache"); \
     lua_setreadonly(L, -1, false); \
-    lua_pop(L, 1); \
+    lua_getglobal(L, "__OpenRblx_event_ids"); \
+    lua_setreadonly(L, -1, false); \
+    lua_pop(L, 2); \
 }
 
 static void luaL_desandbox(lua_State *L)
@@ -265,7 +267,7 @@ int luau_xpcall(lua_State* L)
 
     if (!lua_toboolean(L, -2))
     {
-        FIXME("pcall failed: %s\n", lua_tostring(L, -1));
+        FIXME("xpcall failed: %s\n", lua_tostring(L, -1));
         
         lua_getglobal(L, "script");
         Instance *i = luau_toinstance(L, -1);
@@ -346,6 +348,18 @@ int luau_settings(lua_State *L)
     return 1;
 }
 
+int luau_spawn(lua_State *L)
+{
+    FIXME("state %p\n", L);
+
+    lua_pushnumber(L, 0);
+    lua_pushnumber(L, 0);
+
+    lua_call(L, 2, 0);
+
+    return 0;
+}
+
 int luau_wait(lua_State *L)
 {
     lua_Number towait = 0.03;
@@ -377,17 +391,29 @@ int luau_tick(lua_State *L)
 
 int luau_task_delay(lua_State *L)
 {
-    //FIXME("duration %f\n", lua_tonumber(L, 1));
+    float duration = lua_tonumber(L, 1);
+    FIXME("duration %f\n", duration);
     
-    usleep(lua_tonumber(L, 1)*1000000);
+    if(duration != 0)
+    {
+        usleep(duration*1000000);
+    }
 
     int nargs = lua_gettop(L) - 2;
+    FIXME("%d args, %d\n", nargs, lua_isfunction(L, 2));
+
     lua_call(L, nargs, 0);
 
     return 0;
 }
 
 int luau_task_defer(lua_State *L)
+{
+    FIXME("state %p\n", L);
+    return 0;
+}
+
+int luau_debug_loadmodule(lua_State *L)
 {
     FIXME("state %p\n", L);
     return 0;

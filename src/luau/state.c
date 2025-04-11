@@ -63,6 +63,9 @@ void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plug
     lua_pushcfunction(L, luau_settings, "settings");
     lua_setglobal(L, "settings");
 
+    lua_pushcfunction(L, luau_spawn, "spawn");
+    lua_setglobal(L, "spawn");
+
     // Global instances
     luau_pushinstance(L, GetDataModel()->Workspace);
     lua_setglobal(L, "Workspace");
@@ -211,17 +214,20 @@ void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plug
     lua_setglobal(L, "__DEV__");
 
     // debug
-    //lua_getglobal(L, "debug");
+    lua_getglobal(L, "debug");
 
-    //lua_pushstring(L, "loadmodule");
-    //lua_pushcfunction(L, luau_require, "debug.loadmodule"); //TODO this right?
-    //lua_settable(L, -3);
+    lua_pushstring(L, "loadmodule");
+    lua_pushcfunction(L, luau_debug_loadmodule, "debug.loadmodule"); //TODO this right?
+    lua_settable(L, -3);
 
-    //lua_setglobal(L, "debug");
+    lua_setglobal(L, "debug");
 
     // OpenRblx internal globals
     lua_newtable(L);
     lua_setglobal(L, "__OpenRblx_require_cache");
+
+    lua_newtable(L);
+    lua_setglobal(L, "__OpenRblx_event_ids");
     
 }
 

@@ -26,14 +26,15 @@ RBXScriptSignal *RBXScriptSignal_new()
     return signal;
 }
 
-RBXScriptConnection *RBXScriptSignal_Connect(RBXScriptSignal *this, void *func)
+RBXScriptConnection *RBXScriptSignal_Connect(RBXScriptSignal *this, void *func, void *ud)
 {
     RBXScriptConnection *connection = malloc(sizeof(RBXScriptConnection));
 
-    connection->connected = false;
+    connection->connected = true;
     connection->did_once = false;
     connection->do_once = false;
     connection->func = func;
+    connection->userdata = ud;
     
     this->connectionCount++;
     this->connections = realloc(this->connections, this->connectionCount * sizeof(RBXScriptConnection *));
@@ -42,9 +43,9 @@ RBXScriptConnection *RBXScriptSignal_Connect(RBXScriptSignal *this, void *func)
     return connection;
 }
 
-RBXScriptConnection *RBXScriptSignal_Once(RBXScriptSignal *this, void *func)
+RBXScriptConnection *RBXScriptSignal_Once(RBXScriptSignal *this, void *func, void *ud)
 {
-    RBXScriptConnection *connection = RBXScriptSignal_Connect(this, func);
+    RBXScriptConnection *connection = RBXScriptSignal_Connect(this, func, ud);
 
     connection->do_once = true;
 
@@ -66,7 +67,7 @@ void RBXScriptSignal_Fire(RBXScriptSignal *this, void *arg)
         if (this->connections[i]->connected)
         {
             if (this->connections[i]->do_once && this->connections[i]->did_once) continue;
-            this->connections[i]->func(arg);
+            this->connections[i]->func(arg, this->connections[i]->userdata);
             this->connections[i]->did_once = true;
         }
     }

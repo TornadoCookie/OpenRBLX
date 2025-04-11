@@ -24,6 +24,10 @@ typedef struct DataModel {
     RBXScriptSignal *AllowedGearTypeChanged;
     RBXScriptSignal *GraphicsQualityChangeRequest;
     RBXScriptSignal *ItemChanged;
+
+    int *fints; int fintCount; const char **fintNames;
+    bool *fflags; int fflagCount; const char **fflagNames;
+    const char **fstrings; int fstringCount; const char **fstringNames;
 } DataModel;
 
 DataModel *DataModel_new(void);
