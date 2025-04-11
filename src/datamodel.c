@@ -111,59 +111,83 @@ void DataModel_Shutdown(DataModel *this)
 
 bool DataModel_GetFastFlag(DataModel *this, const char *name)
 {
-    if (!strcmp(name, "NewExplorer"))
+    for (int i = 0; i < this->fflagCount; i++)
     {
-        return true; // make a new explorer
+        if (!strcmp(this->fflagNames[i], name))
+        {
+            FIXME("using default value for %s: %d\n", name, this->fflags[i]);
+            return this->fflags[i];
+        }
     }
-    else if (!strcmp(name, "DevFrameworkModernStartPageStyle"))
-    {
-        return true;
-    }
-    else if (!strcmp(name, "NewProperties_Dev"))
-    {
-        return true;
-    }
-    else
-    {
-        FIXME("unknown fflag %s\n", name);
-        return false;
-    }
+
+    FIXME("no value for %s\n", name);
+    return false;
 }
 
 int DataModel_GetFastInt(DataModel *this, const char *name)
 {
-    if (!strcmp(name, "DebugLuaStartPageLogging"))
+    for (int i = 0; i < this->fintCount; i++)
     {
-        return 5;
+        if (!strcmp(this->fintNames[i], name))
+        {
+            FIXME("using default value for %s: %d\n", name, this->fints[i]);
+            return this->fints[i];
+        }
     }
 
-    FIXME("unknown fint %s\n", name);
+    FIXME("no value for %s\n", name);
 
     return 0;
 }
 
 const char *DataModel_GetFastString(DataModel *this, const char *name)
 {
-    FIXME("unknown fstring %s\n", name);
+    for (int i = 0; i < this->fstringCount; i++)
+    {
+        if (!strcmp(this->fstringNames[i], name))
+        {
+            FIXME("using default value for %s: %s\n", name, this->fstrings[i]);
+            return this->fstrings[i];
+        }
+    }
 
+    FIXME("no value for %s\n", name);
     return "";
 }
 
 bool DataModel_DefineFastFlag(DataModel *this, const char *name, bool defaultValue)
 {
-    FIXME("this %p, name %s, defaultValue %d stub!\n", this, name, defaultValue);
+    FIXME("name %s, defaultval %d semi-stub\n", name, defaultValue);
+    this->fflagCount++;
+    this->fflags = realloc(this->fflags, this->fflagCount * sizeof(bool));
+    this->fflagNames = realloc(this->fflagNames, this->fflagCount * sizeof(char *));
+    this->fflags[this->fflagCount - 1] = defaultValue;
+    this->fflagNames[this->fflagCount - 1] = name;
+
     return DataModel_GetFastFlag(this, name);
 }
 
 int DataModel_DefineFastInt(DataModel *this, const char *name, int defaultValue)
 {
-    FIXME("this %p, name %s, defaultValue %d stub!\n", this, name, defaultValue);
+    FIXME("name %s, defaultval %d semi-stub\n", name, defaultValue);
+    this->fintCount++;
+    this->fints = realloc(this->fints, this->fintCount * sizeof(int));
+    this->fintNames = realloc(this->fintNames, this->fintCount * sizeof(char *));
+    this->fints[this->fintCount - 1] = defaultValue;
+    this->fintNames[this->fintCount - 1] = name;
+
     return DataModel_GetFastInt(this, name);
 }
 
 const char *DataModel_DefineFastString(DataModel *this, const char *name, const char *defaultValue)
 {
-    FIXME("this %p, name %s, defaultValue %s stub!\n", this, name, defaultValue);
+    FIXME("name %s, defaultval %s semi-stub\n", name, defaultValue);
+    this->fstringCount++;
+    this->fstrings = realloc(this->fstrings, this->fstringCount * sizeof(char *));
+    this->fstringNames = realloc(this->fstringNames, this->fstringCount * sizeof(char *));
+    this->fstrings[this->fstringCount - 1] = defaultValue;
+    this->fstringNames[this->fstringCount - 1] = name;
+
     return DataModel_GetFastString(this, name);
 }
 
