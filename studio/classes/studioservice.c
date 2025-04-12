@@ -16,5 +16,7 @@ StudioService *StudioService_new(const char *className, Instance *parent)
 void serialize_StudioService(StudioService *studioservice, SerializeInstance *inst)
 {
     serialize_Instance(studioservice, inst);
+
+    serialize_atomic(string, studioservice, StudioLocaleId);
 }
 

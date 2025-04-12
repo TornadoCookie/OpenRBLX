@@ -60,6 +60,8 @@ void RBXScriptSignal_Wait(RBXScriptSignal *this)
 
 void RBXScriptSignal_Fire(RBXScriptSignal *this, void *arg)
 {
+    if (!this) return;
+
     //pthread_cond_broadcast(&this->private->cond);
 
     for (int i = 0; i < this->connectionCount; i++)

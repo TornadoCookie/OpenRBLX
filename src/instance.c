@@ -398,6 +398,10 @@ RBXScriptSignal *Instance_GetPropertyChangedSignal(Instance *this, const char *p
             return this->propChangedSignals[i].event;
         }
     }
+
+    ERR("no prop %s for %s\n", propName, this->ClassName);
+    
+    return NULL;
 }
 
 void Instance_SetArchivable(Instance *this, bool archivable) 

@@ -17,6 +17,7 @@ int luau_task_delay(lua_State *L);
 int luau_task_defer(lua_State *L);
 
 int luau_debug_loadmodule(lua_State *L);
+int luau_debug_profilebegin(lua_State *L);
 
 #endif
 

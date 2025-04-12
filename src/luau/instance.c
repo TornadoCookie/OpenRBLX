@@ -324,6 +324,16 @@ static int luau_Instance_GetAttribute(lua_State *L)
     return luau_pushserialization(L, Instance_GetAttribute(inst, attributeName));
 }
 
+static int luau_Instance_GetPropertyChangedSignal(lua_State *L)
+{
+    Instance *inst = luau_toinstance(L, 1);
+    const char *prop = lua_tostring(L, 2);
+
+    luau_pushevent(L, Instance_GetPropertyChangedSignal(inst, prop));
+
+    return 1;
+}
+
 static int luau_ServiceProvider_GetService(lua_State *L)
 {
     ServiceProvider *serviceProvider = luau_toinstance(L, 1); 
@@ -493,6 +503,12 @@ static int luau_HttpService_RequestInternal(lua_State *L)
     return 0;
 }
 
+static int luau_LocalizationTable_GetTranslator(lua_State *L)
+{
+    FIXME("state %p\n", L);
+    return 0;
+}
+
 void luau_pushinstance(lua_State *L, Instance *inst)
 {
     if (!inst)
@@ -541,6 +557,9 @@ void luau_pushinstance(lua_State *L, Instance *inst)
 
     lua_pushcfunction(L, luau_Instance_GetAttribute, "Instance:GetAttribute");
     lua_setfield(L, -2, "GetAttribute");
+
+    lua_pushcfunction(L, luau_Instance_GetPropertyChangedSignal, "Instance:GetPropertyChangedSignal");
+    lua_setfield(L, -2, "GetPropertyChangedSignal");
 
     lua_pushlightuserdata(L, inst);
     lua_setfield(L, -2, "__inst_ptr");
@@ -617,6 +636,12 @@ void luau_pushinstance(lua_State *L, Instance *inst)
     {
         lua_pushcfunction(L, luau_HttpService_RequestInternal, "HttpService:RequestInternal");
         lua_setfield(L, -2, "RequestInternal");
+    }
+
+    if (!strcmp(inst->ClassName, "LocalizationTable"))
+    {
+        lua_pushcfunction(L, luau_LocalizationTable_GetTranslator, "LocalizationTable:GetTranslator");
+        lua_setfield(L, -2, "GetTranslator");
     }
 
     lua_newtable(L);

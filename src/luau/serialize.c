@@ -22,6 +22,11 @@ int luau_pushserialization(lua_State *L, Serialization sz)
 
     switch (type)
     {
+        case Serialize_bool:
+        {
+            lua_pushboolean(L, *(bool*)val);
+            return 1;
+        } break;
         case Serialize_float:
         {
             lua_pushnumber(L, *(float*)val);

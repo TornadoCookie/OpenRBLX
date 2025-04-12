@@ -7,6 +7,7 @@ typedef struct Studio {
     Instance instance;
 
     RBXScriptSignal *ThemeChanged;
+    Instance *Theme;
 } Studio;
 
 Studio *Studio_new(const char *className, Instance *parent);

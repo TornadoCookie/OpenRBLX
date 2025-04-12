@@ -213,12 +213,18 @@ void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plug
     lua_pushboolean(L, true);
     lua_setglobal(L, "__DEV__");
 
+    //lua_pushboolean(L, true);
+    //lua_setglobal(L, "__COMPAT_WARNINGS__");
+
     // debug
     lua_getglobal(L, "debug");
 
     lua_pushstring(L, "loadmodule");
-    lua_pushcfunction(L, luau_debug_loadmodule, "debug.loadmodule"); //TODO this right?
+    lua_pushcfunction(L, luau_debug_loadmodule, "debug.loadmodule");
     lua_settable(L, -3);
+
+    lua_pushcfunction(L, luau_debug_profilebegin, "debug.profilebegin");
+    lua_setfield(L, -2, "profilebegin");
 
     lua_setglobal(L, "debug");
 

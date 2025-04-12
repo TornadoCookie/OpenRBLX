@@ -263,12 +263,15 @@ int luau_xpcall(lua_State* L)
     lua_getglobal(L, "__xpcall");
     lua_insert(L, 1);
     
+    int ts = lua_gettop(L);
+
     lua_call(L, nargs, LUA_MULTRET);
 
-    if (!lua_toboolean(L, -2))
+    int nrets = lua_gettop(L) - ts;
+
+    if (!lua_toboolean(L, -nrets))
     {
-        FIXME("xpcall failed: %s\n", lua_tostring(L, -1));
-        
+
         lua_getglobal(L, "script");
         Instance *i = luau_toinstance(L, -1);
         lua_pop(L, 1);
@@ -276,7 +279,7 @@ int luau_xpcall(lua_State* L)
         if (!strcmp(i->ClassName, "Script"))
         {
             Script *sc = i;
-            printf("%s ", i->Name);
+            printf("xpcall %s ", i->Name);
             
             if (sc->isBytecode)
             {
@@ -290,7 +293,7 @@ int luau_xpcall(lua_State* L)
         else if (!strcmp(i->ClassName, "ModuleScript"))
         {
             ModuleScript *sc = i;
-            printf("%s ", i->Name);
+            printf("xpcall %s ", i->Name);
             
             if (sc->isBytecode)
             {
@@ -311,9 +314,9 @@ int luau_warn(lua_State *L)
 {
     int nargs = lua_gettop(L);
 
-    printf("lua warning: ");
+    printf("lua warning: %d ", nargs);
 
-    for (int i = 1; i < nargs; i++)
+    for (int i = 1; i <= nargs; i++)
     {
         printf("%s ", lua_tostring(L, i));
     }
@@ -414,6 +417,12 @@ int luau_task_defer(lua_State *L)
 }
 
 int luau_debug_loadmodule(lua_State *L)
+{
+    FIXME("state %p\n", L);
+    return 0;
+}
+
+int luau_debug_profilebegin(lua_State *L)
 {
     FIXME("state %p\n", L);
     return 0;

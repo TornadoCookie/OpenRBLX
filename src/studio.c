@@ -8,6 +8,7 @@ Studio *Studio_new(const char *className, Instance *parent)
 
     newInst->instance.Name = "Studio";
 
+    newInst->Theme = NULL;
     newInst->ThemeChanged = RBXScriptSignal_new();
 
     if (parent)
@@ -21,5 +22,6 @@ void serialize_Studio(Studio *studio, SerializeInstance *inst)
     serialize_Instance(studio, inst);
 
     serialize_atomic(event, studio, ThemeChanged);
+    serialize_atomic(Ref, studio, Theme);
 }
 
