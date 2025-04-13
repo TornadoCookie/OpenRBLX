@@ -244,6 +244,8 @@ instance_SOURCES+=$(DISTDIR)/src/frame.o
 instance_SOURCES+=$(DISTDIR)/src/studio.o
 instance_SOURCES+=$(DISTDIR)/src/standalonepluginscripts.o
 instance_SOURCES+=$(DISTDIR)/src/boolvalue.o
+instance_SOURCES+=$(DISTDIR)/src/studiotheme.o
+instance_SOURCES+=$(DISTDIR)/src/stylesheet.o
 instance_CXX_SOURCES+=$(luau_CXX_SOURCES)
 instance_SOURCES+=$(luau_SOURCES)
 
@@ -441,6 +443,8 @@ clean:
 	rm -f $(DISTDIR)/src/studio.o
 	rm -f $(DISTDIR)/src/standalonepluginscripts.o
 	rm -f $(DISTDIR)/src/boolvalue.o
+	rm -f $(DISTDIR)/src/studiotheme.o
+	rm -f $(DISTDIR)/src/stylesheet.o
 	rm -f $(DISTDIR)/src/filetypes/rbxlx.o
 	rm -f $(DISTDIR)/src/filetypes/rbxmx.o
 	rm -f $(DISTDIR)/src/../lib/xml/src/xml.o

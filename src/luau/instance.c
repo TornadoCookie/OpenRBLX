@@ -480,6 +480,12 @@ static int luau_StyleRule_SetProperties(lua_State *L)
     return 0;
 }
 
+static int luau_StyleSheet_SetDerives(lua_State *L)
+{
+    FIXME("state %p\n", L);
+    return 0;
+}
+
 static int luau_StudioService_GetClassIcon(lua_State *L)
 {
     FIXME("className %s\n", lua_tostring(L, 2));
@@ -618,6 +624,12 @@ void luau_pushinstance(lua_State *L, Instance *inst)
     {
         lua_pushcfunction(L, luau_StyleRule_SetProperties, "StyleRule:SetProperties");
         lua_setfield(L, -2, "SetProperties");
+    }
+
+    if (!strcmp(inst->ClassName, "StyleSheet"))
+    {
+        lua_pushcfunction(L, luau_StyleSheet_SetDerives, "StyleSheet:SetDerives");
+        lua_setfield(L, -2, "SetDerives");
     }
 
     if (!strcmp(inst->ClassName, "StudioService"))

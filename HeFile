@@ -176,6 +176,8 @@ Source frame.c
 Source studio.c
 Source standalonepluginscripts.c
 Source boolvalue.c
+Source studiotheme.c
+Source stylesheet.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c
