@@ -770,13 +770,23 @@ void disassemble(uint8_t *data, int dataSize)
 
             const int sizelineinfo = absoffset + intervals * sizeof(int);
 
+            int startoffset = 0;
+            uint8_t prevlastoffset = 0;
             uint8_t lastoffset = 0;
             for (int j = 0; j < sizecode; j++)
             {
                 lastoffset += *(uint8_t*)data;
                 data++;
-                printf("lastoffset %05x: %d\n", j, lastoffset+1);
+                if (prevlastoffset != lastoffset)
+                {
+                    printf("line %d: %05x-%05x\n", prevlastoffset, startoffset, j-1);
+                    
+                    prevlastoffset = lastoffset;
+                    startoffset = j;
+                    //printf("lastoffset %05x: %d\n", j, lastoffset+1);
+                }
             }
+            printf("line %d: %05x-%05x\n", prevlastoffset, startoffset, sizecode-1);
 
             int lastline = 0;
             for (int j = 0; j < intervals; j++)

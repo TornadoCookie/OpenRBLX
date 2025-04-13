@@ -226,6 +226,9 @@ void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plug
     lua_pushcfunction(L, luau_debug_profilebegin, "debug.profilebegin");
     lua_setfield(L, -2, "profilebegin");
 
+    lua_pushcfunction(L, luau_debug_profileend, "debug.profileend");
+    lua_setfield(L, -2, "profileend");
+
     lua_setglobal(L, "debug");
 
     // OpenRblx internal globals

@@ -15,6 +15,8 @@ DEFAULT_DEBUG_CHANNEL(luau)
 #include "luacode.h"
 #include "lualib.h"
 
+#include "luau/utils.h"
+
 // _G should not be readonly (eek)
 #define luaL_sandbox(L) { \
     luaL_sandbox(L); \
@@ -335,12 +337,16 @@ int luau_typeof(lua_State *L)
             return 1;
         }
         lua_pop(L, 1);
+
+        //luauD_traverse(L, 1);
     }
 
-    FIXME("falling back to %s\n", "builtin typeof");
     lua_getglobal(L, "__typeof");
     lua_insert(L, 1);
     lua_call(L, 1, 1);
+
+    FIXME("builtin typeof returned %s\n", lua_tostring(L, -1));
+    
 
     return 1;
 }
@@ -423,6 +429,12 @@ int luau_debug_loadmodule(lua_State *L)
 }
 
 int luau_debug_profilebegin(lua_State *L)
+{
+    FIXME("state %p\n", L);
+    return 0;
+}
+
+int luau_debug_profileend(lua_State *L)
 {
     FIXME("state %p\n", L);
     return 0;

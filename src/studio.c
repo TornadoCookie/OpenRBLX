@@ -1,4 +1,5 @@
 #include "studio.h"
+#include "studiotheme.h"
 
 Studio *Studio_new(const char *className, Instance *parent)
 {
@@ -8,7 +9,9 @@ Studio *Studio_new(const char *className, Instance *parent)
 
     newInst->instance.Name = "Studio";
 
-    newInst->Theme = NULL;
+    newInst->Theme = StudioTheme_new("StudioTheme", newInst);
+    newInst->Theme->Name = "Dark";
+
     newInst->ThemeChanged = RBXScriptSignal_new();
 
     if (parent)
