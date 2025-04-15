@@ -271,7 +271,7 @@ int luau_xpcall(lua_State* L)
 
     int nrets = lua_gettop(L) - ts;
 
-    if (!lua_toboolean(L, -nrets))
+    if (0)//(!lua_toboolean(L, -nrets))
     {
 
         lua_getglobal(L, "script");

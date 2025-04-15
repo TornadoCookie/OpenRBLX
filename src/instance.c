@@ -210,6 +210,7 @@ bool ClassName_IsA(const char *className1, const char *className)
     else if (!strcmp(className, "ServiceProvider")) return ClassName_IsA(className1, "DataModel") || ClassName_IsA(className1, "GenericSettings");
     else if (!strcmp(className, "Part")) return ClassName_IsA(className1, "SpawnLocation");
     else if (!strcmp(className, "GenericSettings")) return ClassName_IsA(className1, "GlobalSettings");
+    else if (!strcmp(className, "StyleBase")) return ClassName_IsA(className1, "StyleRule") || ClassName_IsA(className1, "StyleSheet");
     //else FIXME("className1 %s, className %s\n", className1, className);
 
     return false;
@@ -423,13 +424,18 @@ void Instance_SetParent(Instance *this, Instance *parent)
     eventarg->parent = parent;
 
     this->Parent = parent;
-    parent->childCount++;
-    parent->children = realloc(parent->children, parent->childCount * sizeof(Instance*));
-    parent->children[parent->childCount - 1] = this;
-    
+
+    if (parent)
+    {
+        parent->childCount++;
+        parent->children = realloc(parent->children, parent->childCount * sizeof(Instance*));
+        parent->children[parent->childCount - 1] = this;
+    }
+
     //Instance_FireChanged(this, "Parent");
     RBXScriptSignal_Fire(this->AncestryChanged, eventarg);
-    RBXScriptSignal_Fire(parent->ChildAdded, this);
+    if (parent)
+        RBXScriptSignal_Fire(parent->ChildAdded, this);
 
     free(eventarg);
     

@@ -11,6 +11,7 @@
 #include "luau/dockwidgetpluginguiinfo.h"
 #include "luau/tweeninfo.h"
 #include "luau/instance.h"
+#include "luau/numbersequence.h"
 
 #include "datamodel.h"
 
@@ -199,6 +200,22 @@ void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plug
     lua_setfield(L, -2, "new");
 
     lua_setglobal(L, "TweenInfo");
+
+    // NumberSequence
+    lua_newtable(L);
+
+    lua_pushcfunction(L, luau_NumberSequence_new, "NumberSequence.new");
+    lua_setfield(L, -2, "new");
+
+    lua_setglobal(L, "NumberSequence");
+
+    // NumberSequenceKeypoint
+    lua_newtable(L);
+    
+    lua_pushcfunction(L, luau_NumberSequenceKeypoint_new, "NumberSequenceKeypoint.new");
+    lua_setfield(L, -2, "new");
+
+    lua_setglobal(L, "NumberSequenceKeypoint");
 
     //global index hook
     lua_newtable(L);

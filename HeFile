@@ -94,6 +94,7 @@ Source luau/udim2.c
 Source luau/udim.c
 Source luau/vector2.c
 Source luau/vector3.c
+Source luau/numbersequence.c
 
 SourceGroup instance
 UseSourceGroup luau
@@ -178,6 +179,8 @@ Source standalonepluginscripts.c
 Source boolvalue.c
 Source studiotheme.c
 Source stylesheet.c
+Source mouse.c
+Source pluginmouse.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c

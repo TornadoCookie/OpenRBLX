@@ -164,6 +164,7 @@ luau_SOURCES+=$(DISTDIR)/src/luau/udim2.o
 luau_SOURCES+=$(DISTDIR)/src/luau/udim.o
 luau_SOURCES+=$(DISTDIR)/src/luau/vector2.o
 luau_SOURCES+=$(DISTDIR)/src/luau/vector3.o
+luau_SOURCES+=$(DISTDIR)/src/luau/numbersequence.o
 
 instance_SOURCES+=$(DISTDIR)/src/datamodel.o
 instance_SOURCES+=$(DISTDIR)/src/instance.o
@@ -246,6 +247,8 @@ instance_SOURCES+=$(DISTDIR)/src/standalonepluginscripts.o
 instance_SOURCES+=$(DISTDIR)/src/boolvalue.o
 instance_SOURCES+=$(DISTDIR)/src/studiotheme.o
 instance_SOURCES+=$(DISTDIR)/src/stylesheet.o
+instance_SOURCES+=$(DISTDIR)/src/mouse.o
+instance_SOURCES+=$(DISTDIR)/src/pluginmouse.o
 instance_CXX_SOURCES+=$(luau_CXX_SOURCES)
 instance_SOURCES+=$(luau_SOURCES)
 
@@ -364,6 +367,7 @@ clean:
 	rm -f $(DISTDIR)/src/luau/udim.o
 	rm -f $(DISTDIR)/src/luau/vector2.o
 	rm -f $(DISTDIR)/src/luau/vector3.o
+	rm -f $(DISTDIR)/src/luau/numbersequence.o
 	rm -f $(DISTDIR)/src/datamodel.o
 	rm -f $(DISTDIR)/src/instance.o
 	rm -f $(DISTDIR)/src/rbxscriptsignal.o
@@ -445,6 +449,8 @@ clean:
 	rm -f $(DISTDIR)/src/boolvalue.o
 	rm -f $(DISTDIR)/src/studiotheme.o
 	rm -f $(DISTDIR)/src/stylesheet.o
+	rm -f $(DISTDIR)/src/mouse.o
+	rm -f $(DISTDIR)/src/pluginmouse.o
 	rm -f $(DISTDIR)/src/filetypes/rbxlx.o
 	rm -f $(DISTDIR)/src/filetypes/rbxmx.o
 	rm -f $(DISTDIR)/src/../lib/xml/src/xml.o

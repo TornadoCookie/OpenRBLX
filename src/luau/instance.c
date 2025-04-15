@@ -15,6 +15,12 @@ DEFAULT_DEBUG_CHANNEL(luau);
 Instance *luau_toinstance(lua_State *L, int i)
 {
     if (i < 0) i--;
+
+    if (lua_isnil(L, i))
+    {
+        return NULL;
+    }
+
     lua_pushstring(L, "__inst_ptr");
     lua_rawget(L, i);
     Instance *inst = lua_touserdata(L, -1);
@@ -87,6 +93,12 @@ static int luau_Instance__newindex(lua_State *L)
     if (!inst)
     {
         printf("attempt to newindex nil with %s\n", key);
+        return 0;
+    }
+
+    if (!strcmp(key, "Parent"))
+    {
+        Instance_SetParent(inst, luau_toinstance(L, 3));
         return 0;
     }
 
@@ -334,6 +346,24 @@ static int luau_Instance_GetPropertyChangedSignal(lua_State *L)
     return 1;
 }
 
+static int luau_Instance_GetDescendants(lua_State *L)
+{
+    Instance *inst = luau_toinstance(L, 1);
+    int descCount = 0;
+    Instance **descendants = Instance_GetDescendants(inst, &descCount);
+
+    lua_newtable(L);
+
+    for (int i = 0; i < descCount; i++)
+    {
+        lua_pushinteger(L, i);
+        luau_pushinstance(L, descendants[i]);
+        lua_settable(L, -3);
+    }
+
+    return 1;
+}
+
 static int luau_ServiceProvider_GetService(lua_State *L)
 {
     ServiceProvider *serviceProvider = luau_toinstance(L, 1); 
@@ -464,6 +494,17 @@ static int luau_Plugin_IsPlaceDocumentOpen(lua_State *L)
     return 1;
 }
 
+static int luau_Plugin_GetMouse(lua_State *L)
+{
+    Plugin *plugin = luau_toinstance(L, 1);
+
+    FIXME("plugin %p stub!\n", plugin);
+
+    luau_pushinstance(L, Plugin_GetMouse(plugin));
+
+    return 1;
+}
+
 static int luau_GlobalSettings_GetFVariable(lua_State *L)
 {
     GlobalSettings *settings = luau_toinstance(L, 1);
@@ -472,6 +513,12 @@ static int luau_GlobalSettings_GetFVariable(lua_State *L)
     lua_pushstring(L, GlobalSettings_GetFVariable(settings, name));
 
     return 1;
+}
+
+static int luau_StyleBase_InsertStyleRule(lua_State *L)
+{
+    FIXME("state %p\n", L);
+    return 0;
 }
 
 static int luau_StyleRule_SetProperties(lua_State *L)
@@ -567,6 +614,9 @@ void luau_pushinstance(lua_State *L, Instance *inst)
     lua_pushcfunction(L, luau_Instance_GetPropertyChangedSignal, "Instance:GetPropertyChangedSignal");
     lua_setfield(L, -2, "GetPropertyChangedSignal");
 
+    lua_pushcfunction(L, luau_Instance_GetDescendants, "Instance:GetDescendants");
+    lua_setfield(L, -2, "GetDescendants");
+
     lua_pushlightuserdata(L, inst);
     lua_setfield(L, -2, "__inst_ptr");
 
@@ -618,18 +668,27 @@ void luau_pushinstance(lua_State *L, Instance *inst)
         lua_pushstring(L, "IsPlaceDocumentOpen");
         lua_pushcfunction(L, luau_Plugin_IsPlaceDocumentOpen, "Plugin:IsPlaceDocumentOpen");
         lua_settable(L, -3);
+
+        lua_pushcfunction(L, luau_Plugin_GetMouse, "Plugin:GetMouse");
+        lua_setfield(L, -2, "GetMouse");
     }
 
-    if (!strcmp(inst->ClassName, "StyleRule"))
+    if (Instance_IsA(inst, "StyleBase"))
     {
-        lua_pushcfunction(L, luau_StyleRule_SetProperties, "StyleRule:SetProperties");
-        lua_setfield(L, -2, "SetProperties");
-    }
+        lua_pushcfunction(L, luau_StyleBase_InsertStyleRule, "StyleBase:InsertStyleRule");
+        lua_setfield(L, -2, "InsertStyleRule");
 
-    if (!strcmp(inst->ClassName, "StyleSheet"))
-    {
-        lua_pushcfunction(L, luau_StyleSheet_SetDerives, "StyleSheet:SetDerives");
-        lua_setfield(L, -2, "SetDerives");
+        if (!strcmp(inst->ClassName, "StyleRule"))
+        {
+            lua_pushcfunction(L, luau_StyleRule_SetProperties, "StyleRule:SetProperties");
+            lua_setfield(L, -2, "SetProperties");
+        }
+
+        if (!strcmp(inst->ClassName, "StyleSheet"))
+        {
+            lua_pushcfunction(L, luau_StyleSheet_SetDerives, "StyleSheet:SetDerives");
+            lua_setfield(L, -2, "SetDerives");
+        }
     }
 
     if (!strcmp(inst->ClassName, "StudioService"))
