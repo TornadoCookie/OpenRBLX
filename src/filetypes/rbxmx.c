@@ -237,6 +237,71 @@ static void xmlserialize_token(int *val, char *prop, char *propName)
     }
 }
 
+static char *parse_html_escapes(char *str)
+{
+    char *ret = malloc(strlen(str)+1);
+    char *retcur = ret;
+
+    while (*str)
+    {
+        if (*str == '&')
+        {
+            char *ampstart = str;
+            
+            while (*str && *str != ';') str++;
+            char *ampend = str;
+            
+            if (ampstart[1] == '#')
+            {
+                int base = 10;
+                char *numstart = ampstart + 2;
+
+                if (ampstart[2] == 'x')
+                {
+                    base = 16;
+                    numstart++;
+                }
+
+                *retcur = strtol(numstart, NULL, base);
+                //FIXME("%d, %.*s\n", *retcur, ampend-numstart, numstart);
+                retcur++;
+            }
+            else
+            {
+                int len = ampend - ampstart;
+
+                if (!strncmp(ampstart, "&quot;", len))
+                {
+                    *retcur = '"';
+                    retcur++;
+                }
+                else if (!strncmp(ampstart, "&apos;", len))
+                {
+                    *retcur = '\'';
+                    retcur++;
+                }
+                else
+                {
+                    FIXME("unknown html code \"%.*s\".\n", len, ampstart);
+                }
+            }
+            str++;
+        }
+        else
+        {
+
+            *retcur = *str;
+            str++;
+            retcur++;
+        }
+    }
+    *retcur = 0;
+
+    ret = realloc(ret, strlen(ret)+1);
+
+    return ret;
+}
+
 static void serialize(SerializeInstance *inst, char *prop, char *propName, struct xml_node *child, Instance *ret, XMLRefsInstance *refsInst)
 {
     bool done = false;
@@ -301,9 +366,7 @@ static void serialize(SerializeInstance *inst, char *prop, char *propName, struc
                 } break;
                 case Serialize_string:
                 {
-                    char *str = malloc(strlen(prop) + 1);
-                    memcpy(str, prop, strlen(prop));
-                    str[strlen(prop)] = 0;
+                    char *str = parse_html_escapes(prop);
                     *(char**)val = str;
                 } break;
                 case Serialize_CoordinateFrame:
