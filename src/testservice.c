@@ -1,5 +1,7 @@
 #include "testservice.h"
 #include "scriptruntime.h"
+#include <stdio.h>
+#include <string.h>
 
 TestService *TestService_new(const char *className, Instance *parent)
 {

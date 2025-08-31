@@ -32,7 +32,7 @@ Shader *LoadShadersRBXS(char *filename, int *shaderCount)
     if (strncmp(data, "RBXS", 4))
     {
         ERR("invalid signature %4s\n", data);
-        return;
+        return NULL;
     }
 
     data += 4;

@@ -12,6 +12,7 @@
 #include <stdio.h>
 
 #include "luau/state.h"
+#include "luau/utils.h"
 
 #include "debug.h"
 DEFAULT_DEBUG_CHANNEL(scriptruntime);

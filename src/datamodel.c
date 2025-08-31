@@ -13,6 +13,7 @@
 #include <time.h>
 #include "players.h"
 #include "coregui.h"
+#include "guibase.h"
 
 DEFAULT_DEBUG_CHANNEL(datamodel)
 

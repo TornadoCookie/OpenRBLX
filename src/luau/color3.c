@@ -1,5 +1,7 @@
 #include "luau/color3.h"
 
+#include <string.h>
+#include <stdlib.h>
 
 #include "lualib.h"
 

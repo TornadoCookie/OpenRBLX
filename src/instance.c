@@ -169,7 +169,7 @@ Instance *Instance_WaitForChild(Instance *this, const char *childName, double ti
         clock_t st = clock();
         if (elapsed > 1 && !saidInfiniteYield)
         {
-            const char *fullname = Instance_GetFullName(this);
+            char *fullname = Instance_GetFullName(this);
             printf("Infinite yield possible on '%s:WaitForChild(\"%s\")'\n", fullname, childName);
             free(fullname);
             saidInfiniteYield = true;

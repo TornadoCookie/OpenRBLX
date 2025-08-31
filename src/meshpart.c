@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <rlgl.h>
 #include "accoutrement.h"
+#include <string.h>
 
 DEFAULT_DEBUG_CHANNEL(meshpart)
 

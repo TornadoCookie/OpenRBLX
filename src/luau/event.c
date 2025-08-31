@@ -1,6 +1,7 @@
 #include "luau/event.h"
 #include "lua.h"
 #include "rbxscriptsignal.h"
+#include <stdlib.h>
 
 #include "debug.h"
 DEFAULT_DEBUG_CHANNEL(luau)

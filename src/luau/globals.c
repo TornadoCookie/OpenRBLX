@@ -6,11 +6,12 @@
 #include "globalsettings.h"
 
 #include "debug.h"
-DEFAULT_DEBUG_CHANNEL(luau)
+DEFAULT_DEBUG_CHANNEL(luau);
 
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "luacode.h"
 #include "lualib.h"

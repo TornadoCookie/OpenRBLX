@@ -7,6 +7,9 @@
 #include "datamodel.h"
 #include "messagebusservice.h"
 
+#include <string.h>
+#include <stdio.h>
+
 #include "debug.h"
 DEFAULT_DEBUG_CHANNEL(luau);
 

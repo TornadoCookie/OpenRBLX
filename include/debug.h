@@ -5,6 +5,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <sys/syscall.h>
+#define gettid() syscall(SYS_gettid)
+
 const char *debugstr_vector3(Vector3 v)
 {
     char *buf = malloc(1024);

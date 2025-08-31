@@ -7,6 +7,7 @@
 #include "starterplayerscripts.h"
 #include "startercharacterscripts.h"
 #include "playerscripts.h"
+#include <stdio.h>
 
 static void replicate_scripts(Instance *src, Instance *dest)
 {

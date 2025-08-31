@@ -29,5 +29,7 @@
      } \
 } 
 
+void disassemble(uint8_t *data, int dataSize);
+
 #endif
 
