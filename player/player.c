@@ -8,6 +8,7 @@
 #include "runservice.h"
 #include "cacheablecontentprovider.h"
 #include "localscript.h"
+#include "spawnlocation.h"
 
 #define DEBUG_IMPL
 #include "debug.h"
@@ -148,6 +149,13 @@ int main(int argc, char **argv)
     Players_CreateLocalPlayer(players);
     Player *localPlayer = players->LocalPlayer;
     Player_LoadCharacter(localPlayer); 
+
+    SpawnLocation *spwn = Instance_FindFirstChildOfClass(game->Workspace, "SpawnLocation");
+
+    if (spwn)
+    {
+        Model_MoveTo(localPlayer->Character, spwn->part.formfactorpart.basepart.Position);
+    }
 
     RunService *runService = ServiceProvider_GetService(game, "RunService");
     RunService_Run(runService);

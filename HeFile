@@ -14,6 +14,12 @@ ExtraCFlag -Ilib/luau/Ast/include
 
 ExtraCFlag -Ilib/luau/VM/src
 
+# hacky fix for no spaces
+ExtraCxxFlag -DLUA_API='extern
+ExtraCxxFlag "C"'
+ExtraCxxFlag -DLUACODE_API='extern
+ExtraCxxFlag "C"'
+
 ExtraLDFlag -lcurl
 
 Dependency xml

@@ -14,12 +14,12 @@ void workspace_draw(Workspace *this)
 
 Workspace *Workspace_new(const char *className, Instance *parent)
 {
-    //DataModel *datamodel = GetDataModel();
-    //Workspace *dmworkspace;
-    //if (dmworkspace = Instance_FindFirstChildOfClass(datamodel, "Workspace"))
-    //{
-    //    return dmworkspace;
-    //}
+    DataModel *datamodel = GetDataModel();
+    Workspace *dmworkspace;
+    if (dmworkspace = Instance_FindFirstChildOfClass(datamodel, "Workspace"))
+    {
+        return dmworkspace;
+    }
     Workspace *newInst = RootInstance_new("Workspace", parent);
 
     newInst->rootinstance.model.pvinstance.instance.DataCost = sizeof(Workspace);

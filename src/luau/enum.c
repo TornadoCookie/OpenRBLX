@@ -1,12 +1,19 @@
 #include "luau/enum.h"
 
 #include "debug.h"
-DEFAULT_DEBUG_CHANNEL(enum)
+DEFAULT_DEBUG_CHANNEL(enum);
+
+static int luau_Enum_GetEnumItems(lua_State *L)
+{
+    // the enum obj is at 1. since this is a table, we can just 'return self'
+    // TODO this includes member functions
+    return 1;
+}
 
 int luau_Enums_GetEnums(lua_State *L)
 {
 
-#define enum_start(n) lua_pushstring(L, #n); lua_newtable(L);
+#define enum_start(n) lua_pushstring(L, #n); lua_newtable(L); lua_pushcfunction(L, luau_Enum_GetEnumItems, "Enum:GetEnumItems"); lua_setfield(L, -2, "GetEnumItems");
 #define enum_val(n, v) lua_pushstring(L, #n); lua_pushinteger(L, v); lua_settable(L, -3);
 #define enum_end() lua_settable(L, -3);
     lua_newtable(L);
@@ -117,6 +124,28 @@ int luau_Enums_GetEnums(lua_State *L)
     enum_val(Exponential, 8);
     enum_val(Circular, 9);
     enum_val(Cubic, 10);
+    enum_end();
+
+    enum_start(SurfaceType);
+    enum_val(Smooth, 0);
+    enum_val(Glue, 1);
+    enum_val(Weld, 2);
+    enum_val(Studs, 3);
+    enum_val(Inlet, 4);
+    enum_val(Universal, 5);
+    enum_val(Hinge, 6);
+    enum_val(Motor, 7);
+    enum_val(SteppingMotor, 8);
+    enum_val(SmoothNoOutlines, 10);
+    enum_end();
+
+    enum_start(NormalId);
+    enum_val(Right, 0);
+    enum_val(Top, 1);
+    enum_val(Back, 2);
+    enum_val(Left, 3);
+    enum_val(Bottom, 4);
+    enum_val(Front, 5);
     enum_end();
 
 #undef enum_end
