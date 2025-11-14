@@ -4,6 +4,9 @@
 #include <raylib.h>
 #include <string.h>
 #include "datamodel.h"
+#include "debug.h"
+
+DEFAULT_DEBUG_CHANNEL(cacheablecontentprovider);
 
 CacheableContentProvider *CacheableContentProvider_new(const char *className, Instance *parent)
 {
@@ -21,7 +24,7 @@ long CacheableContentProvider_GetAssetIdFromContent(CacheableContentProvider *th
 
     if (*content == 0) return 0;
 
-    printf("Get Asset Id from %s\n", content);
+    //printf("Get Asset Id from %s\n", content);
     if (!strncmp(content, "http://www.roblox.com/asset", 27))
     {
         sscanf(content, "http://www.roblox.com/asset/?id=%ld", &assetid);   
@@ -36,7 +39,7 @@ long CacheableContentProvider_GetAssetIdFromContent(CacheableContentProvider *th
     }
     else
     {
-        printf("Don't know how to handle this\n");
+        FIXME("Don't know URL format %s\n", content);
         return 0;
     }
 

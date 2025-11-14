@@ -29,7 +29,10 @@ BasePart *BasePart_new(const char *className, Instance *parent)
     newInst->LeftSurface = SurfaceType_Smooth;
     newInst->RightSurface = SurfaceType_Smooth;
 
+    newInst->Transparency = 0.0f;
+
     BasePart_SetCFrame(newInst, (CFrame){0, 0, 0, -1, 0, 0, 0, 1, 0, 0, 0, -1});
+    BasePart_SetBrickColor(newInst, 199); // Medium sone grey
 
     return newInst;
 }
@@ -140,6 +143,13 @@ void serialize_BasePart(BasePart *basepart, SerializeInstance *inst)
     serialize_atomic(Vector3, basepart, Velocity);
     serialize_atomic(Vector3, basepart, size);
     serialize_atomic(Color3, basepart, Color);
+
+    // 'Size' is a hardcoded alias of 'size'
+    _serialize_atomic(inst, (Serialization){
+        Serialize_Vector3,
+        "Size",
+        &basepart->size
+    });
 
     serialize_atomic(token, inst, TopConstraint);
     serialize_atomic(token, inst, BottomConstraint);

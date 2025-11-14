@@ -107,47 +107,11 @@ static void draw_bumps(Part *this)
     }
 }
 
-void BeginSurfaceMode(SurfaceType surface, Shader tilingShader, int tilePositionLoc, Texture2D studs)
+void BeginSurfaceMode(SurfaceType surface, Texture2D studs)
 {
-    return; // TODO
-    int texOffset = 0;
-    bool shouldDraw = surface != SurfaceType_Smooth && surface != SurfaceType_SmoothNoOutlines && surface != SurfaceType_Hinge && surface != SurfaceType_Motor && surface != SurfaceType_SteppingMotor;
-    if (shouldDraw)
+    if (surface != SurfaceType_Smooth)
     {
-        printf("Begin Surface Mode %d ", surface);
-        switch (surface)
-        {
-            case SurfaceType_Bumps:
-                FIXME("treating 2005 SurfaceType as studs (%d)\n", surface);
-            case SurfaceType_Studs:
-            {
-                texOffset = 0;
-            } break;
-            case SurfaceType_Weld:
-            {
-                texOffset = 1;
-            } break;
-            case SurfaceType_Inlet:
-            {
-                texOffset = 2;
-            } break;
-            case SurfaceType_Universal:
-            {
-                texOffset = 3;
-            } break;
-            default:
-            {
-                FIXME("Unknown SurfaceType %d.\n", surface);
-            } break;
-        }
-        printf("texOffset %d\n", texOffset);
         rlSetTexture(studs.id);
-        float tilePosition[2] = {0.0f, 0.25f*texOffset};
-        SetShaderValue(tilingShader, tilePositionLoc, tilePosition, SHADER_UNIFORM_VEC2);
-    }
-    else
-    {
-        //printf("no surface.\n");
     }
 }
 
@@ -185,13 +149,7 @@ void Draw3DSurface(SurfaceType sf, NormalId normal, Vector3 ptSize)
 
 void EndSurfaceMode(SurfaceType surface)
 {
-    return; // TODO
-    //printf("End surface.\n");
-    bool shouldDraw = surface != SurfaceType_Smooth && surface != SurfaceType_SmoothNoOutlines && surface != SurfaceType_Hinge && surface != SurfaceType_Motor && surface != SurfaceType_SteppingMotor; 
-    if (shouldDraw)
-    {
-        rlSetTexture(0);
-    }
+    rlSetTexture(0);    
 }
 
 static void draw_block(Part *this)
@@ -227,7 +185,7 @@ static void draw_block(Part *this)
     int childCount;
     Instance **children = Instance_GetChildren(this, &childCount);
 
-    for (int i = 0; i < childCount; i++)
+    /*for (int i = 0; i < childCount; i++)
     {
         if (!strcmp(children[i]->ClassName, "Decal"))
         {
@@ -238,7 +196,7 @@ static void draw_block(Part *this)
                 dc->texture = TextureContentProvider_LoadTextureAsset(ServiceProvider_GetService(GetDataModel(), "TextureContentProvider"), dc->Texture);
             }
         }
-    }
+    }*/
 
     rlPushMatrix();
         // NOTE: Transformation is applied in inverse order (scale -> rotate -> translate)
@@ -258,7 +216,7 @@ static void draw_block(Part *this)
             //printf("FRONT ");
 
             //rlColor3f(1.0f, 0.0f, 1.0f);
-            BeginSurfaceMode(this->formfactorpart.basepart.FrontSurface, tilingShader, tilePositionLoc, studs);
+            BeginSurfaceMode(this->formfactorpart.basepart.FrontSurface, studs);
             //if (decals[NormalId_Front]) rlEnableTexture(decals[NormalId_Front]->texture.id);
 
             rlTexCoord2f(0.0f, size.y/Y_STUD_SCALE);
@@ -282,7 +240,7 @@ static void draw_block(Part *this)
 
             //rlColor3f(1.0f, 1.0f, 0.0f);
 
-            BeginSurfaceMode(this->formfactorpart.basepart.BackSurface, tilingShader, tilePositionLoc, studs);
+            BeginSurfaceMode(this->formfactorpart.basepart.BackSurface, studs);
             //if (decals[NormalId_Back]) rlEnableTexture(decals[NormalId_Back]->texture.id);
 
             rlTexCoord2f(0.0f, 0.0f);
@@ -306,7 +264,7 @@ static void draw_block(Part *this)
 
             //rlColor3f(0.0f, 1.0f, 1.0f);
 
-            BeginSurfaceMode(this->formfactorpart.basepart.TopSurface, tilingShader, tilePositionLoc, studs);
+            BeginSurfaceMode(this->formfactorpart.basepart.TopSurface, studs);
             //if (decals[NormalId_Top]) rlEnableTexture(decals[NormalId_Top]->texture.id);
 
             rlTexCoord2f(0.0f, size.z/Y_STUD_SCALE);
@@ -330,7 +288,7 @@ static void draw_block(Part *this)
 
             //rlColor3f(1.0f, 1.0f, 1.0f);
 
-            BeginSurfaceMode(this->formfactorpart.basepart.BottomSurface, tilingShader, tilePositionLoc, studs);
+            BeginSurfaceMode(this->formfactorpart.basepart.BottomSurface, studs);
             //if (decals[NormalId_Bottom]) rlEnableTexture(decals[NormalId_Bottom]->texture.id);
 
             rlTexCoord2f(0.0f, 0.0f);
@@ -354,7 +312,7 @@ static void draw_block(Part *this)
 
             //rlColor3f(1.0f, 0.0f, 0.0f);
 
-            BeginSurfaceMode(this->formfactorpart.basepart.RightSurface, tilingShader, tilePositionLoc, studs);
+            BeginSurfaceMode(this->formfactorpart.basepart.RightSurface, studs);
             //if (decals[NormalId_Right]) rlEnableTexture(decals[NormalId_Right]->texture.id);
 
             rlTexCoord2f(0.0f, size.y/Y_STUD_SCALE);
@@ -377,7 +335,7 @@ static void draw_block(Part *this)
             //printf("LEFT ");
             //rlColor3f(0.0f, 0.0f, 1.0f);
 
-            BeginSurfaceMode(this->formfactorpart.basepart.LeftSurface, tilingShader, tilePositionLoc, studs);
+            BeginSurfaceMode(this->formfactorpart.basepart.LeftSurface, studs);
             //if (decals[NormalId_Left]) rlEnableTexture(decals[NormalId_Left]->texture.id);
 
             rlTexCoord2f(0.0f, 0.0f);
@@ -508,7 +466,7 @@ Part *Part_new(const char *className, Instance *parent)
     newInst->formfactorpart.basepart.pvinstance.drawFunc = part_draw;
 
     newInst->material = LoadMaterialDefault();
-    //newInst->material.maps[MATERIAL_MAP_DIFFUSE].texture = ((TextureContentProvider*)ServiceProvider_GetService(GetDataModel(), "TextureContentProvider"))->studsTexture;
+    newInst->material.maps[MATERIAL_MAP_DIFFUSE].texture = ((TextureContentProvider*)ServiceProvider_GetService(GetDataModel(), "TextureContentProvider"))->studsTexture;
     newInst->shape = Shape_Block;
 
     Part_SetShape(newInst, newInst->shape);

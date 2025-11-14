@@ -5,9 +5,28 @@ DEFAULT_DEBUG_CHANNEL(enum);
 
 static int luau_Enum_GetEnumItems(lua_State *L)
 {
-    // the enum obj is at 1. since this is a table, we can just 'return self'
-    // TODO this includes member functions
-    return 1;
+    // this is at 1
+
+    lua_newtable(L); // at 2
+    
+    /* table is in the stack at index 't' */
+     lua_pushnil(L);  /* first key */
+     while (lua_next(L, 1) != 0) {
+       /* uses 'key' (at index -2) and 'value' (at index -1) */
+         if (lua_type(L, -1) == LUA_TFUNCTION)
+         {
+             lua_pop(L, 1);
+         }
+        else
+        {
+         lua_pushvalue(L, -2);
+         lua_settable(L, 2);
+        }
+         /* removes 'value'; keeps 'key' for next iteration */
+       //lua_pop(L, 2);
+     }
+
+     return 1;
 }
 
 int luau_Enums_GetEnums(lua_State *L)

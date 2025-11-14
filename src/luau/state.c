@@ -71,6 +71,9 @@ void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plug
     luau_pushinstance(L, GetDataModel()->Workspace);
     lua_setglobal(L, "Workspace");
 
+    luau_pushinstance(L, GetDataModel()->Workspace);
+    lua_setglobal(L, "workspace");
+
     luau_pushinstance(L, script);
     lua_setglobal(L, "script");
 

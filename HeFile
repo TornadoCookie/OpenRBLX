@@ -187,6 +187,7 @@ Source studiotheme.c
 Source stylesheet.c
 Source mouse.c
 Source pluginmouse.c
+Source humanoid.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c

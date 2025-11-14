@@ -108,10 +108,13 @@ static int luau_Instance__newindex(lua_State *L)
     SerializeInstance sInst = { 0 };
     Instance_Serialize(inst, &sInst);
 
+    bool found = false;
+
     for (int i = 0; i < sInst.serializationCount; i++)
     {
         if (!strcmp(key, sInst.serializations[i].name))
         {
+            found = true;
             Serialization sz = luau_toserialization(L, 3);
             int ds = sztypesiz(sz.type);
 
@@ -120,6 +123,11 @@ static int luau_Instance__newindex(lua_State *L)
     }
 
     free(sInst.serializations);
+
+    if (!found)
+    {
+        FIXME("not found %s\n", key);
+    }
 
     return 0;
 }
@@ -733,6 +741,8 @@ int luau_Instance_new(lua_State *L)
 {
     const char *className = lua_tostring(L, 1);
     Instance *parent = NULL;
+
+    printf("luau Instance new %s\n", className);
 
     if (lua_istable(L, 2))
     {

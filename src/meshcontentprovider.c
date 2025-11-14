@@ -60,7 +60,7 @@ Mesh LoadMeshRBXV1(const char *data, int dataSize)
     mesh.texcoords = malloc(sizeof(float) * mesh.vertexCount * 2);
     mesh.normals = malloc(sizeof(float) * mesh.vertexCount * 3);
 
-    printf("Triangle Count: %d\n", mesh.triangleCount);
+    //printf("Triangle Count: %d\n", mesh.triangleCount);
 
     char *theRest = data;
 
@@ -116,11 +116,11 @@ Mesh LoadMeshRBXV2(const char *data, int dataSize)
 
     MeshHeader2 header = *(MeshHeader2*)data;
 
-    printf("Header Size: %d\n", header.size);
-    printf("Vertex Size: %d\n", header.vertexSize);
-    printf("Face Size: %d\n", header.faceSize);
-    printf("Vertex Count: %d\n", header.vertexCount);
-    printf("Face Count: %d\n", header.faceCount);
+    //printf("Header Size: %d\n", header.size);
+    //printf("Vertex Size: %d\n", header.vertexSize);
+    //printf("Face Size: %d\n", header.faceSize);
+    //printf("Vertex Count: %d\n", header.vertexCount);
+    //printf("Face Count: %d\n", header.faceCount);
 
     mesh.triangleCount = header.faceCount;
     mesh.vertexCount = mesh.triangleCount * 3;
@@ -198,15 +198,15 @@ Mesh LoadMeshRBXV4(const char *data, int dataSize)
 
     MeshHeader4 header = *(MeshHeader4*)data;
 
-    printf("Header Size: %d\n", header.size);
-    printf("LOD Type: %d\n", header.lodType);
-    printf("Vertex Count: %d\n", header.vertexCount);
-    printf("Face Count: %d\n", header.faceCount);
-    printf("LOD Count: %d\n", header.lodCount);
-    printf("Bone Count: %d\n", header.boneCount);
-    printf("Bone name buffer size: %d\n", header.boneNameBufferSize);
-    printf("Subset count: %d\n", header.subsetCount);
-    printf("HQ LOD count: %d\n", header.hqLodCount);
+    //printf("Header Size: %d\n", header.size);
+    //printf("LOD Type: %d\n", header.lodType);
+    //printf("Vertex Count: %d\n", header.vertexCount);
+    //printf("Face Count: %d\n", header.faceCount);
+    //printf("LOD Count: %d\n", header.lodCount);
+    //printf("Bone Count: %d\n", header.boneCount);
+    //printf("Bone name buffer size: %d\n", header.boneNameBufferSize);
+    //printf("Subset count: %d\n", header.subsetCount);
+    //printf("HQ LOD count: %d\n", header.hqLodCount);
 
     data += sizeof(MeshHeader4);
 
@@ -275,7 +275,7 @@ Mesh LoadMeshFromRobloxFormat(const char *data, int dataSize)
     sscanf(data, "version %f", &version);
     data = strchr(data, '\n')+1;
 
-    printf("Version: %f\n", version);
+    //printf("Version: %f\n", version);
 
     if (version == 1.0f)
     {
@@ -302,12 +302,12 @@ Mesh MeshContentProvider_GetFileMesh(MeshContentProvider *this, const char *cont
 {
     long assetid = CacheableContentProvider_GetAssetIdFromContent(this, content);
 
-    printf("GetFileMesh %s\n", content);
-    printf("Get AssetId %ld\n", assetid);
+    //printf("GetFileMesh %s\n", content);
+    //printf("Get AssetId %ld\n", assetid);
 
     if (FileExists(TextFormat("cache/%ld.obj", assetid)))
     {
-        printf("Using cached\n");
+        //printf("Using cached\n");
         return LoadModel(TextFormat("cache/%ld.obj", assetid)).meshes[0];
     }
 

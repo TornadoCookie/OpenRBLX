@@ -14,6 +14,7 @@
 #include "players.h"
 #include "coregui.h"
 #include "guibase.h"
+#include "humanoid.h"
 
 DEFAULT_DEBUG_CHANNEL(datamodel)
 
@@ -205,6 +206,10 @@ static void draw_recursive(Instance *inst)
     {
         //printf("draw %s.\n", inst->ClassName);
         PVInstance_Draw(inst);
+    }
+    else if (!strcmp(inst->ClassName, "Humanoid"))
+    {
+        Humanoid_Draw(inst);
     }
     for (int i = 0; i < inst->childCount; i++)
     {

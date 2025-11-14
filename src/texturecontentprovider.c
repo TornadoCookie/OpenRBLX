@@ -8,7 +8,7 @@ TextureContentProvider *TextureContentProvider_new(const char *className, Instan
     newInst->cacheablecontentprovider.instance.DataCost = sizeof(TextureContentProvider);
     newInst = realloc(newInst, sizeof(TextureContentProvider));
 
-    newInst->studsTexture = LoadTexture("staticdata/studs.dds");
+    newInst->studsTexture = LoadTexture("staticdata/cat.jpg");
     newInst->tilingShader = LoadShader("staticdata/default.vs", "staticdata/repeat.fs");
 
     newInst->texturesEnabled = true;
@@ -24,12 +24,12 @@ Texture2D TextureContentProvider_LoadTextureAsset(TextureContentProvider *this, 
 
     if (assetid == 0) return (Texture2D){0};
 
-    printf("LoadTextureAsset %s\n", content);
-    printf("Get AssetId %ld\n", assetid);
+    //printf("LoadTextureAsset %s\n", content);
+    //printf("Get AssetId %ld\n", assetid);
 
     if (FileExists(TextFormat("cache/%ld.png", assetid)))
     {
-        printf("Using cached\n");
+        //printf("Using cached\n");
         if (!this->texturesEnabled)
         {
             return (Texture2D){0};

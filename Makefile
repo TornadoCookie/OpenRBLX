@@ -289,6 +289,7 @@ instance_SOURCES+=$(DISTDIR)/src/studiotheme.o
 instance_SOURCES+=$(DISTDIR)/src/stylesheet.o
 instance_SOURCES+=$(DISTDIR)/src/mouse.o
 instance_SOURCES+=$(DISTDIR)/src/pluginmouse.o
+instance_SOURCES+=$(DISTDIR)/src/humanoid.o
 instance_CXX_SOURCES+=$(luau_CXX_SOURCES)
 instance_SOURCES+=$(luau_SOURCES)
 
