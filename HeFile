@@ -101,6 +101,7 @@ Source luau/udim.c
 Source luau/vector2.c
 Source luau/vector3.c
 Source luau/numbersequence.c
+Source luau/font.c
 
 SourceGroup instance
 UseSourceGroup luau

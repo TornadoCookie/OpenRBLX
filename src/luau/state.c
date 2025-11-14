@@ -12,6 +12,7 @@
 #include "luau/tweeninfo.h"
 #include "luau/instance.h"
 #include "luau/numbersequence.h"
+#include "luau/font.h"
 
 #include "datamodel.h"
 
@@ -219,6 +220,14 @@ void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plug
     lua_setfield(L, -2, "new");
 
     lua_setglobal(L, "NumberSequenceKeypoint");
+
+    // Font
+    lua_newtable(L);
+
+    lua_pushcfunction(L, luau_Font_new, "Font.new");
+    lua_setfield(L, -2, "new");
+
+    lua_setglobal(L, "Font");
 
     //global index hook
     lua_newtable(L);

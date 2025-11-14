@@ -167,6 +167,25 @@ int luau_Enums_GetEnums(lua_State *L)
     enum_val(Front, 5);
     enum_end();
 
+    enum_start(PreferredTextSize);
+    enum_val(Medium, 1);
+    enum_val(Large, 2);
+    enum_val(Larger, 3);
+    enum_val(Largest, 4);
+    enum_end();
+
+    enum_start(FontWeight);
+    enum_val(Thin, 100);
+    enum_val(ExtraLight, 200);
+    enum_val(Light, 300);
+    enum_val(Regular, 400);
+    enum_val(Medium, 500);
+    enum_val(SemiBold, 600);
+    enum_val(Bold, 700);
+    enum_val(ExtraBold, 800);
+    enum_val(Heavy, 900);
+    enum_end();
+
 #undef enum_end
 #undef enum_val
 #undef enum_start

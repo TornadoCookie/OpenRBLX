@@ -110,6 +110,15 @@ void DrawCubeTextureRec(Texture2D texture, Rectangle source, Vector3 position, f
         rlTexCoord2f(source.x/texWidth, source.y/texHeight);
         rlVertex3f(x - width/2, y + height/2, z + length/2);
 
+        
+
+    rlEnd();
+
+    rlSetTexture(1); // 1x1 default texture -- plain color
+
+    rlBegin(RL_QUADS);
+        rlColor4ub(color.r, color.g, color.b, color.a);
+
         // Back face
         rlNormal3f(0.0f, 0.0f, - 1.0f);
         rlTexCoord2f((source.x + source.width)/texWidth, (source.y + source.height)/texHeight);
@@ -166,8 +175,6 @@ void DrawCubeTextureRec(Texture2D texture, Rectangle source, Vector3 position, f
         rlVertex3f(x - width/2, y + height/2, z - length/2);
 
     rlEnd();
-
-    rlSetTexture(0);
 }
 
 static void draw_block(Part *this)

@@ -205,6 +205,7 @@ luau_SOURCES+=$(DISTDIR)/src/luau/udim.o
 luau_SOURCES+=$(DISTDIR)/src/luau/vector2.o
 luau_SOURCES+=$(DISTDIR)/src/luau/vector3.o
 luau_SOURCES+=$(DISTDIR)/src/luau/numbersequence.o
+luau_SOURCES+=$(DISTDIR)/src/luau/font.o
 
 instance_SOURCES+=$(DISTDIR)/src/datamodel.o
 instance_SOURCES+=$(DISTDIR)/src/instance.o
