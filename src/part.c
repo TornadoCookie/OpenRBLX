@@ -50,71 +50,6 @@ static Matrix cf_to_matrix(CFrame cf)
     return MatrixMultiply(cf_to_rot_matrix(cf), cf_to_trans_matrix(cf));
 }
 
-static void draw_bump_surface(Part *this, Vector3 unit)
-{
-    unit = Vector3Multiply(unit, Vector3Divide(this->formfactorpart.basepart.size, (Vector3){2, 2, 2}));
-    Vector3 start = unit, end;
-    if (unit.y)
-    {
-        start.x = -this->formfactorpart.basepart.size.x / 2;
-        start.z = -this->formfactorpart.basepart.size.z / 2;
-        end = Vector3Add(start, this->formfactorpart.basepart.size);
-
-        for (int x = start.x; x < end.x; x++)
-        {
-            for (int z = start.z; z < end.z; z++)
-            {
-                printf("draw {%d, %f, %d}\n", x, unit.y, z);
-                rlPushMatrix();
-                Vector3 axis;
-                float angle;
-                QuaternionToAxisAngle(QuaternionFromMatrix(cf_to_rot_matrix(this->formfactorpart.basepart.CFrame)), &axis, &angle);\
-                rlRotatef(angle, axis.x, axis.y, axis.z);
-                rlTranslatef(this->formfactorpart.basepart.Position.x, this->formfactorpart.basepart.Position.y, this->formfactorpart.basepart.Position.z);
-                DrawCube((Vector3){x, unit.y, z}, 0.75f, 0.75f, 0.75f, rl_from_color3(this->formfactorpart.basepart.Color, this->formfactorpart.basepart.Transparency));
-                rlPopMatrix();
-            }
-        }   
-    }
-}
-
-static void draw_bumps(Part *this)
-{
-    printf("topsurface %d.\n", this->formfactorpart.basepart.TopSurface);
-    if (this->formfactorpart.basepart.BackSurface == SurfaceType_Bumps)
-    {
-        draw_bump_surface(this, (Vector3){0, 0, -1});    
-    }
-    if (this->formfactorpart.basepart.FrontSurface == SurfaceType_Bumps)
-    {
-        draw_bump_surface(this, (Vector3){0, 0, 1});    
-    }
-    if (this->formfactorpart.basepart.BottomSurface == SurfaceType_Bumps)
-    {
-        draw_bump_surface(this, (Vector3){0, -1, 0});    
-    }
-    if (this->formfactorpart.basepart.TopSurface == SurfaceType_Bumps)
-    {
-        draw_bump_surface(this, (Vector3){0, 1, 0});    
-    }
-    if (this->formfactorpart.basepart.LeftSurface == SurfaceType_Bumps)
-    {
-        draw_bump_surface(this, (Vector3){-1, 0, 0});    
-    }
-    if (this->formfactorpart.basepart.RightSurface == SurfaceType_Bumps)
-    {
-        draw_bump_surface(this, (Vector3){1, 0, 0});    
-    }
-}
-
-void BeginSurfaceMode(SurfaceType surface, Texture2D studs)
-{
-    if (surface != SurfaceType_Smooth)
-    {
-        rlSetTexture(studs.id);
-    }
-}
-
 static Vector3 normal_from_NormalId(NormalId nid)
 {
     switch (nid)
@@ -147,9 +82,92 @@ void Draw3DSurface(SurfaceType sf, NormalId normal, Vector3 ptSize)
     rlPopMatrix();
 }
 
-void EndSurfaceMode(SurfaceType surface)
+// Draw cube with texture piece applied to all faces
+void DrawCubeTextureRec(Texture2D texture, Rectangle source, Vector3 position, float width, float height, float length, Color color)
 {
-    rlSetTexture(0);    
+    float x = position.x;
+    float y = position.y;
+    float z = position.z;
+    float texWidth = (float)texture.width;
+    float texHeight = (float)texture.height;
+
+    // Set desired texture to be enabled while drawing following vertex data
+    rlSetTexture(texture.id);
+
+    // We calculate the normalized texture coordinates for the desired texture-source-rectangle
+    // It means converting from (tex.width, tex.height) coordinates to [0.0f, 1.0f] equivalent
+    rlBegin(RL_QUADS);
+        rlColor4ub(color.r, color.g, color.b, color.a);
+
+        // Front face
+        rlNormal3f(0.0f, 0.0f, 1.0f);
+        rlTexCoord2f(source.x/texWidth, (source.y + source.height)/texHeight);
+        rlVertex3f(x - width/2, y - height/2, z + length/2);
+        rlTexCoord2f((source.x + source.width)/texWidth, (source.y + source.height)/texHeight);
+        rlVertex3f(x + width/2, y - height/2, z + length/2);
+        rlTexCoord2f((source.x + source.width)/texWidth, source.y/texHeight);
+        rlVertex3f(x + width/2, y + height/2, z + length/2);
+        rlTexCoord2f(source.x/texWidth, source.y/texHeight);
+        rlVertex3f(x - width/2, y + height/2, z + length/2);
+
+        // Back face
+        rlNormal3f(0.0f, 0.0f, - 1.0f);
+        rlTexCoord2f((source.x + source.width)/texWidth, (source.y + source.height)/texHeight);
+        rlVertex3f(x - width/2, y - height/2, z - length/2);
+        rlTexCoord2f((source.x + source.width)/texWidth, source.y/texHeight);
+        rlVertex3f(x - width/2, y + height/2, z - length/2);
+        rlTexCoord2f(source.x/texWidth, source.y/texHeight);
+        rlVertex3f(x + width/2, y + height/2, z - length/2);
+        rlTexCoord2f(source.x/texWidth, (source.y + source.height)/texHeight);
+        rlVertex3f(x + width/2, y - height/2, z - length/2);
+
+        // Top face
+        rlNormal3f(0.0f, 1.0f, 0.0f);
+        rlTexCoord2f(source.x/texWidth, source.y/texHeight);
+        rlVertex3f(x - width/2, y + height/2, z - length/2);
+        rlTexCoord2f(source.x/texWidth, (source.y + source.height)/texHeight);
+        rlVertex3f(x - width/2, y + height/2, z + length/2);
+        rlTexCoord2f((source.x + source.width)/texWidth, (source.y + source.height)/texHeight);
+        rlVertex3f(x + width/2, y + height/2, z + length/2);
+        rlTexCoord2f((source.x + source.width)/texWidth, source.y/texHeight);
+        rlVertex3f(x + width/2, y + height/2, z - length/2);
+
+        // Bottom face
+        rlNormal3f(0.0f, - 1.0f, 0.0f);
+        rlTexCoord2f((source.x + source.width)/texWidth, source.y/texHeight);
+        rlVertex3f(x - width/2, y - height/2, z - length/2);
+        rlTexCoord2f(source.x/texWidth, source.y/texHeight);
+        rlVertex3f(x + width/2, y - height/2, z - length/2);
+        rlTexCoord2f(source.x/texWidth, (source.y + source.height)/texHeight);
+        rlVertex3f(x + width/2, y - height/2, z + length/2);
+        rlTexCoord2f((source.x + source.width)/texWidth, (source.y + source.height)/texHeight);
+        rlVertex3f(x - width/2, y - height/2, z + length/2);
+
+        // Right face
+        rlNormal3f(1.0f, 0.0f, 0.0f);
+        rlTexCoord2f((source.x + source.width)/texWidth, (source.y + source.height)/texHeight);
+        rlVertex3f(x + width/2, y - height/2, z - length/2);
+        rlTexCoord2f((source.x + source.width)/texWidth, source.y/texHeight);
+        rlVertex3f(x + width/2, y + height/2, z - length/2);
+        rlTexCoord2f(source.x/texWidth, source.y/texHeight);
+        rlVertex3f(x + width/2, y + height/2, z + length/2);
+        rlTexCoord2f(source.x/texWidth, (source.y + source.height)/texHeight);
+        rlVertex3f(x + width/2, y - height/2, z + length/2);
+
+        // Left face
+        rlNormal3f( - 1.0f, 0.0f, 0.0f);
+        rlTexCoord2f(source.x/texWidth, (source.y + source.height)/texHeight);
+        rlVertex3f(x - width/2, y - height/2, z - length/2);
+        rlTexCoord2f((source.x + source.width)/texWidth, (source.y + source.height)/texHeight);
+        rlVertex3f(x - width/2, y - height/2, z + length/2);
+        rlTexCoord2f((source.x + source.width)/texWidth, source.y/texHeight);
+        rlVertex3f(x - width/2, y + height/2, z + length/2);
+        rlTexCoord2f(source.x/texWidth, source.y/texHeight);
+        rlVertex3f(x - width/2, y + height/2, z - length/2);
+
+    rlEnd();
+
+    rlSetTexture(0);
 }
 
 static void draw_block(Part *this)
@@ -175,10 +193,10 @@ static void draw_block(Part *this)
     int tilePositionLoc = GetShaderLocation(tilingShader, "tilePosition");
     int tileSizeLoc = GetShaderLocation(tilingShader, "tileSize");
 
-    BeginShaderMode(tilingShader);
+    //BeginShaderMode(tilingShader);
 
-    const int Y_STUD_SCALE = 32;
-    const int X_STUD_SCALE = 2;
+    const int Y_STUD_SCALE = 4;
+    const int X_STUD_SCALE = 4;
 
     Decal *decals[6] = {NULL};
     
@@ -199,159 +217,8 @@ static void draw_block(Part *this)
     }*/
 
     rlPushMatrix();
-        // NOTE: Transformation is applied in inverse order (scale -> rotate -> translate)
-        rlMultMatrixf(MatrixToFloat(mat));
-
-        //DrawLine3D((Vector3){0, 0, 0}, (Vector3){0, 0, 1}, BLUE);
-
-        //printf("Matrix: %s\n", debugstr_matrix(rlGetMatrixTransform()));
-        //printf("Origin: %s\n", debugstr_matrix(mat));
-
-        rlBegin(RL_QUADS);
-            rlColor4ub(color.r, color.g, color.b, color.a);
-
-            // Front face
-            rlNormal3f(0.0f, 0.0f, 1.0f);
-
-            //printf("FRONT ");
-
-            //rlColor3f(1.0f, 0.0f, 1.0f);
-            BeginSurfaceMode(this->formfactorpart.basepart.FrontSurface, studs);
-            //if (decals[NormalId_Front]) rlEnableTexture(decals[NormalId_Front]->texture.id);
-
-            rlTexCoord2f(0.0f, size.y/Y_STUD_SCALE);
-            rlVertex3f(x - width/2, y - height/2, z + length/2);  // Bottom Left
-
-            rlTexCoord2f(size.x/X_STUD_SCALE, size.y/Y_STUD_SCALE);
-            rlVertex3f(x + width/2, y - height/2, z + length/2);  // Bottom Right
-
-            rlTexCoord2f(size.x/X_STUD_SCALE, 0.0f);
-            rlVertex3f(x + width/2, y + height/2, z + length/2);  // Top Right
-
-            rlTexCoord2f(0.0f, 0.0f);
-            rlVertex3f(x - width/2, y + height/2, z + length/2);  // Top Left
-
-            EndSurfaceMode(this->formfactorpart.basepart.FrontSurface);
-
-            // Back face
-            rlNormal3f(0.0f, 0.0f, -1.0f);
-
-            //printf("BACK ");
-
-            //rlColor3f(1.0f, 1.0f, 0.0f);
-
-            BeginSurfaceMode(this->formfactorpart.basepart.BackSurface, studs);
-            //if (decals[NormalId_Back]) rlEnableTexture(decals[NormalId_Back]->texture.id);
-
-            rlTexCoord2f(0.0f, 0.0f);
-            rlVertex3f(x - width/2, y + height/2, z - length/2);  // Top Left
-
-            rlTexCoord2f(size.x/X_STUD_SCALE, 0.0f);
-            rlVertex3f(x + width/2, y + height/2, z - length/2);  // Top Right
-
-            rlTexCoord2f(size.x/X_STUD_SCALE, size.y/Y_STUD_SCALE);
-            rlVertex3f(x + width/2, y - height/2, z - length/2);  // Bottom Right
-
-            rlTexCoord2f(0.0f, size.y/Y_STUD_SCALE);
-            rlVertex3f(x - width/2, y - height/2, z - length/2);  // Bottom Left
-
-            EndSurfaceMode(this->formfactorpart.basepart.BackSurface);
-
-            // Top face
-            rlNormal3f(0.0f, 1.0f, 0.0f);
-
-            //printf("TOP ");
-
-            //rlColor3f(0.0f, 1.0f, 1.0f);
-
-            BeginSurfaceMode(this->formfactorpart.basepart.TopSurface, studs);
-            //if (decals[NormalId_Top]) rlEnableTexture(decals[NormalId_Top]->texture.id);
-
-            rlTexCoord2f(0.0f, size.z/Y_STUD_SCALE);
-            rlVertex3f(-0.5f, 0.5f, 0.5f);  // Bottom Left
-
-            rlTexCoord2f(size.x/X_STUD_SCALE, size.z/Y_STUD_SCALE);
-            rlVertex3f(0.5f, 0.5f, 0.5f);  // Bottom Right
-
-            rlTexCoord2f(size.x/X_STUD_SCALE, 0.0f);
-            rlVertex3f(0.5f, 0.5f, -0.5f);  // Top Right
-
-            rlTexCoord2f(0.0f, 0.0f);
-            rlVertex3f(-0.5f, 0.5f, -0.5f);  // Top Left
-
-            EndSurfaceMode(this->formfactorpart.basepart.TopSurface);
-
-            // Bottom face
-            rlNormal3f(0.0f, -1.0f, 0.0f);
-
-            //printf("BOTTOM ");
-
-            //rlColor3f(1.0f, 1.0f, 1.0f);
-
-            BeginSurfaceMode(this->formfactorpart.basepart.BottomSurface, studs);
-            //if (decals[NormalId_Bottom]) rlEnableTexture(decals[NormalId_Bottom]->texture.id);
-
-            rlTexCoord2f(0.0f, 0.0f);
-            rlVertex3f(x - width/2, y - height/2, z - length/2);  // Top Left
-
-            rlTexCoord2f(size.x/X_STUD_SCALE, 0.0f);
-            rlVertex3f(x + width/2, y - height/2, z - length/2);  // Top Right
-
-            rlTexCoord2f(size.x/X_STUD_SCALE, size.z/Y_STUD_SCALE);
-            rlVertex3f(x + width/2, y - height/2, z + length/2);  // Bottom Right
-            
-            rlTexCoord2f(0.0f, size.z/Y_STUD_SCALE);
-            rlVertex3f(x - width/2, y - height/2, z + length/2);  // Bottom Left
-
-            EndSurfaceMode(this->formfactorpart.basepart.BottomSurface);
-
-            // Right face
-            rlNormal3f(1.0f, 0.0f, 0.0f);
-
-            //printf("RIGHT ");
-
-            //rlColor3f(1.0f, 0.0f, 0.0f);
-
-            BeginSurfaceMode(this->formfactorpart.basepart.RightSurface, studs);
-            //if (decals[NormalId_Right]) rlEnableTexture(decals[NormalId_Right]->texture.id);
-
-            rlTexCoord2f(0.0f, size.y/Y_STUD_SCALE);
-            rlVertex3f(0.5f, -0.5f, 0.5f);  // Bottom Left
-
-            rlTexCoord2f(size.z/X_STUD_SCALE, size.y/Y_STUD_SCALE);
-            rlVertex3f(0.5f, -0.5f, -0.5f);  // Bottom Right
-
-            rlTexCoord2f(size.z/X_STUD_SCALE, 0.0f);
-            rlVertex3f(0.5f, 0.5f, -0.5f);  // Top Right
-
-            rlTexCoord2f(0.0f, 0.0f);
-            rlVertex3f(0.5f, 0.5f, 0.5f);  // Top Left
-
-            EndSurfaceMode(this->formfactorpart.basepart.RightSurface);
-
-            // Left face
-            rlNormal3f(-1.0f, 0.0f, 0.0f);
-
-            //printf("LEFT ");
-            //rlColor3f(0.0f, 0.0f, 1.0f);
-
-            BeginSurfaceMode(this->formfactorpart.basepart.LeftSurface, studs);
-            //if (decals[NormalId_Left]) rlEnableTexture(decals[NormalId_Left]->texture.id);
-
-            rlTexCoord2f(0.0f, 0.0f);
-            rlVertex3f(-0.5f, 0.5f, 0.5f);  // Top Left
-
-            rlTexCoord2f(size.z/X_STUD_SCALE, 0.0f);
-            rlVertex3f(-0.5f, 0.5f, -0.5f);  // Top Right
-
-            rlTexCoord2f(size.z/X_STUD_SCALE, size.y/Y_STUD_SCALE);
-            rlVertex3f(-0.5f, -0.5f, -0.5f);  // Bottom Right
-
-            rlTexCoord2f(0.0f, size.y/Y_STUD_SCALE);
-            rlVertex3f(-0.5f, -0.5f, 0.5f);  // Bottom Left
-
-            EndSurfaceMode(this->formfactorpart.basepart.LeftSurface);
-        rlEnd();
+        rlMultMatrixf(MatrixToFloat(mat)); // pos, rot, scale for us
+        DrawCubeTextureRec(studs, (Rectangle){0, 0, studs.width, studs.height}, (Vector3){0, 0, 0}, 1, 1, 1, color);
     rlPopMatrix();
 
     // 3D Surfaces
@@ -372,7 +239,7 @@ static void draw_block(Part *this)
 
     rlPopMatrix();
 
-    EndShaderMode();
+    //EndShaderMode();
 
     //draw_bumps(this);
 }
