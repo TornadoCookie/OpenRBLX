@@ -222,7 +222,7 @@ static void load_plugins()
     rpgs->instance.Name = "RobloxPluginGuiService";
 
     int mdlCount = 0;
-    Instance **explorerPlugin_s = LoadModelRBXM("studioapr2025/BuiltInStandalonePlugins/Optimized_Embedded_Signature/StartPage.rbxm", &mdlCount);
+    Instance **explorerPlugin_s = LoadModelRBXM("studionov2025/BuiltInStandalonePlugins/Optimized_Embedded_Signature/StartPage.rbxm", &mdlCount);
 
     printf("mdlCount %d\n", mdlCount);
 

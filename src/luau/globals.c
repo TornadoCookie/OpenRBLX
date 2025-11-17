@@ -80,7 +80,7 @@ static int luau_require_errfunc(lua_State *L)
 #include "Luau/Bytecode.h"
 static void sanitize_bytecode(uint32_t *code, int size)
 {
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < (size>>2); i++)
     {
         if (LUAU_INSN_OP(code[i]) == LOP_FASTCALL1 && LUAU_INSN_A(code[i]) == LBF_TYPEOF)
         {

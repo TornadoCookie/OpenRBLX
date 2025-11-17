@@ -10,6 +10,10 @@ Script *Script_new(const char *className, Instance *parent)
 
     if (!strcmp(className, "Script") && parent) Instance_SetParent(newInst, parent);
 
+    newInst->Source = NULL;
+    newInst->sourceLength = 0;
+    newInst->isBytecode = false;
+
     return newInst;
 }
 

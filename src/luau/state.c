@@ -13,6 +13,7 @@
 #include "luau/instance.h"
 #include "luau/numbersequence.h"
 #include "luau/font.h"
+#include "luau/path2dcontrolpoint.h"
 
 #include "datamodel.h"
 
@@ -227,7 +228,18 @@ void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plug
     lua_pushcfunction(L, luau_Font_new, "Font.new");
     lua_setfield(L, -2, "new");
 
+    lua_pushcfunction(L, luau_Font_fromEnum, "Font.fromEnum");
+    lua_setfield(L, -2, "fromEnum");
+
     lua_setglobal(L, "Font");
+
+    // Path2DControlPoint
+    lua_newtable(L);
+
+    lua_pushcfunction(L, luau_Path2DControlPoint_new, "Path2DControlPoint.new");
+    lua_setfield(L, -2, "new");
+
+    lua_setglobal(L, "Path2DControlPoint");
 
     //global index hook
     lua_newtable(L);

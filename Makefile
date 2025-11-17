@@ -206,6 +206,7 @@ luau_SOURCES+=$(DISTDIR)/src/luau/vector2.o
 luau_SOURCES+=$(DISTDIR)/src/luau/vector3.o
 luau_SOURCES+=$(DISTDIR)/src/luau/numbersequence.o
 luau_SOURCES+=$(DISTDIR)/src/luau/font.o
+luau_SOURCES+=$(DISTDIR)/src/luau/path2dcontrolpoint.o
 
 instance_SOURCES+=$(DISTDIR)/src/datamodel.o
 instance_SOURCES+=$(DISTDIR)/src/instance.o
@@ -291,6 +292,7 @@ instance_SOURCES+=$(DISTDIR)/src/stylesheet.o
 instance_SOURCES+=$(DISTDIR)/src/mouse.o
 instance_SOURCES+=$(DISTDIR)/src/pluginmouse.o
 instance_SOURCES+=$(DISTDIR)/src/humanoid.o
+instance_SOURCES+=$(DISTDIR)/src/localizationservice.o
 instance_CXX_SOURCES+=$(luau_CXX_SOURCES)
 instance_SOURCES+=$(luau_SOURCES)
 
@@ -306,6 +308,7 @@ rbxs_SOURCES+=$(DISTDIR)/src/filetypes/rbxs.o
 
 studioclasses_SOURCES+=$(DISTDIR)/src/../studio/classes/studioservice.o
 studioclasses_SOURCES+=$(DISTDIR)/src/../studio/classes/corepackages.o
+studioclasses_SOURCES+=$(DISTDIR)/src/../studio/classes/changehistoryservice.o
 
 studio_SOURCES+=$(DISTDIR)/src/../studio/studio.o
 studio_CXX_SOURCES+=$(instance_CXX_SOURCES)

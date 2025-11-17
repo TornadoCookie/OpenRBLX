@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "rbxscriptsignal.h"
 #include "serialize.h"
+#include <string.h>
 
 typedef struct Instance Instance;
 
@@ -83,6 +84,7 @@ typedef struct EventArg_Instance_Changed {
     Serialization sz;
 } EventArg_Instance_Changed;
 
+// deprecated: INSTANCE_STUB_CONSTRUCTOR_BASE
 #define INSTANCE_STUB_CONSTRUCTOR_BASE(T, B) \
     T *newInst = B##_new(className, parent); \
     ((Instance*)newInst)->DataCost = sizeof(*newInst); \

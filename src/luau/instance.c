@@ -573,6 +573,18 @@ static int luau_LocalizationTable_GetTranslator(lua_State *L)
     return 0;
 }
 
+static int luau_GuiService_GetResolutionScale(lua_State *L)
+{
+    FIXME("state %p\n", L);
+    return 0;
+}
+
+static int luau_GuiService_IsTenFootInterface(lua_State *L)
+{
+    FIXME("state %p\n", L);
+    return 0;
+}
+
 void luau_pushinstance(lua_State *L, Instance *inst)
 {
     if (!inst)
@@ -724,6 +736,15 @@ void luau_pushinstance(lua_State *L, Instance *inst)
     {
         lua_pushcfunction(L, luau_LocalizationTable_GetTranslator, "LocalizationTable:GetTranslator");
         lua_setfield(L, -2, "GetTranslator");
+    }
+
+    if (!strcmp(inst->ClassName, "GuiService"))
+    {
+        lua_pushcfunction(L, luau_GuiService_GetResolutionScale, "GuiService:GetResolutionScale");
+        lua_setfield(L, -2, "GetResolutionScale");
+
+        lua_pushcfunction(L, luau_GuiService_IsTenFootInterface, "GuiService:IsTenFootInterface");
+        lua_setfield(L, -2, "IsTenFootInterface");
     }
 
     lua_newtable(L);

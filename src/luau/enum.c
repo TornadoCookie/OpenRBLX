@@ -8,7 +8,8 @@ static int luau_Enum_GetEnumItems(lua_State *L)
     // this is at 1
 
     lua_newtable(L); // at 2
-    
+    int count = 1;
+
     /* table is in the stack at index 't' */
      lua_pushnil(L);  /* first key */
      while (lua_next(L, 1) != 0) {
@@ -19,8 +20,10 @@ static int luau_Enum_GetEnumItems(lua_State *L)
          }
         else
         {
+            lua_pushinteger(L, count);
          lua_pushvalue(L, -2);
          lua_settable(L, 2);
+         count++;
         }
          /* removes 'value'; keeps 'key' for next iteration */
        //lua_pop(L, 2);
@@ -33,7 +36,7 @@ int luau_Enums_GetEnums(lua_State *L)
 {
 
 #define enum_start(n) lua_pushstring(L, #n); lua_newtable(L); lua_pushcfunction(L, luau_Enum_GetEnumItems, "Enum:GetEnumItems"); lua_setfield(L, -2, "GetEnumItems");
-#define enum_val(n, v) lua_pushstring(L, #n); lua_pushinteger(L, v); lua_settable(L, -3);
+#define enum_val(n, v) lua_pushinteger(L, v); lua_setfield(L, -2, #n);
 #define enum_end() lua_settable(L, -3);
     lua_newtable(L);
 
@@ -56,6 +59,7 @@ int luau_Enums_GetEnums(lua_State *L)
     enum_val(ArialBold, 2);
     enum_val(SourceSans, 3);
     enum_val(SourceSansBold, 4);
+    enum_val(BuilderSans, 46);
     enum_end();
 
     enum_start(HorizontalAlignment);
@@ -184,6 +188,37 @@ int luau_Enums_GetEnums(lua_State *L)
     enum_val(Bold, 700);
     enum_val(ExtraBold, 800);
     enum_val(Heavy, 900);
+    enum_end();
+
+    enum_start(GuiState);
+    enum_val(Idle, 0);
+    enum_val(Hover, 1);
+    enum_val(Press, 2);
+    enum_val(NonInteractable, 3);
+    enum_end();
+
+    enum_start(UIFlexAlignment);
+    enum_val(None, 0);
+    enum_val(Fill, 1);
+    enum_val(SpaceAround, 2);
+    enum_val(SpaceBetween, 3);
+    enum_val(SpaceEvenly, 4);
+    enum_end();
+
+    enum_start(ItemLineAlignment);
+    enum_val(Automatic, 0);
+    enum_val(Start, 1);
+    enum_val(Center, 2);
+    enum_val(End, 3);
+    enum_val(Stretch, 4);
+    enum_end();
+
+    enum_start(UIFlexMode);
+    enum_val(None, 0);
+    enum_val(Grow, 1);
+    enum_val(Shrink, 2);
+    enum_val(Fill, 3);
+    enum_val(Custom, 4);
     enum_end();
 
 #undef enum_end

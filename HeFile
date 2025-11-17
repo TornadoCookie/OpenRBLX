@@ -102,6 +102,7 @@ Source luau/vector2.c
 Source luau/vector3.c
 Source luau/numbersequence.c
 Source luau/font.c
+Source luau/path2dcontrolpoint.c
 
 SourceGroup instance
 UseSourceGroup luau
@@ -189,6 +190,7 @@ Source stylesheet.c
 Source mouse.c
 Source pluginmouse.c
 Source humanoid.c
+Source localizationservice.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c
@@ -206,6 +208,7 @@ Source filetypes/rbxs.c
 SourceGroup studioclasses
 Source ../studio/classes/studioservice.c
 Source ../studio/classes/corepackages.c
+Source ../studio/classes/changehistoryservice.c
 
 Program studio
 Source ../studio/studio.c
