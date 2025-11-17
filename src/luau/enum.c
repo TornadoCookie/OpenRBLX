@@ -221,6 +221,30 @@ int luau_Enums_GetEnums(lua_State *L)
     enum_val(Custom, 4);
     enum_end();
 
+    enum_start(UserInputType);
+    enum_val(MouseButton1, 0);
+    enum_val(MouseButton2, 1);
+    enum_val(MouseButton3, 2);
+    enum_val(MouseWheel, 3);
+    enum_val(MouseMovement, 4);
+    enum_val(Touch, 7);
+    enum_val(Keyboard, 8);
+    enum_val(Focus, 9);
+    enum_val(Accelerometer, 10);
+    enum_val(Gyro, 11);
+    enum_val(Gamepad1, 12);
+    enum_val(Gamepad2, 13);
+    enum_val(Gamepad3, 14);
+    enum_val(Gamepad4, 15);
+    enum_val(Gamepad5, 16);
+    enum_val(Gamepad6, 17);
+    enum_val(Gamepad7, 18);
+    enum_val(Gamepad8, 19);
+    enum_val(TextInput, 20);
+    enum_val(InputMethod, 21);
+    enum_val(None, 22);
+    enum_end();
+
 #undef enum_end
 #undef enum_val
 #undef enum_start

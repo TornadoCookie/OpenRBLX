@@ -207,6 +207,8 @@ luau_SOURCES+=$(DISTDIR)/src/luau/vector3.o
 luau_SOURCES+=$(DISTDIR)/src/luau/numbersequence.o
 luau_SOURCES+=$(DISTDIR)/src/luau/font.o
 luau_SOURCES+=$(DISTDIR)/src/luau/path2dcontrolpoint.o
+luau_SOURCES+=$(DISTDIR)/src/luau/numberrange.o
+luau_SOURCES+=$(DISTDIR)/src/luau/colorsequence.o
 
 instance_SOURCES+=$(DISTDIR)/src/datamodel.o
 instance_SOURCES+=$(DISTDIR)/src/instance.o
@@ -293,6 +295,7 @@ instance_SOURCES+=$(DISTDIR)/src/mouse.o
 instance_SOURCES+=$(DISTDIR)/src/pluginmouse.o
 instance_SOURCES+=$(DISTDIR)/src/humanoid.o
 instance_SOURCES+=$(DISTDIR)/src/localizationservice.o
+instance_SOURCES+=$(DISTDIR)/src/userinputservice.o
 instance_CXX_SOURCES+=$(luau_CXX_SOURCES)
 instance_SOURCES+=$(luau_SOURCES)
 

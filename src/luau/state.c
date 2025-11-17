@@ -14,6 +14,8 @@
 #include "luau/numbersequence.h"
 #include "luau/font.h"
 #include "luau/path2dcontrolpoint.h"
+#include "luau/numberrange.h"
+#include "luau/colorsequence.h"
 
 #include "datamodel.h"
 
@@ -240,6 +242,22 @@ void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plug
     lua_setfield(L, -2, "new");
 
     lua_setglobal(L, "Path2DControlPoint");
+
+    // NumberRange
+    lua_newtable(L);
+
+    lua_pushcfunction(L, luau_NumberRange_new, "NumberRange.new");
+    lua_setfield(L, -2, "new");
+
+    lua_setglobal(L, "NumberRange");
+
+    // ColorSequence
+    lua_newtable(L);
+
+    lua_pushcfunction(L, luau_ColorSequence_new, "ColorSequence.new");
+    lua_setfield(L, -2, "new");
+
+    lua_setglobal(L, "ColorSequence");
 
     //global index hook
     lua_newtable(L);

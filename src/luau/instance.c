@@ -126,7 +126,7 @@ static int luau_Instance__newindex(lua_State *L)
 
     if (!found)
     {
-        FIXME("not found %s\n", key);
+        FIXME("not found %s, trying to store into %s\n", key, inst->ClassName);
     }
 
     return 0;
@@ -380,6 +380,12 @@ static int luau_ServiceProvider_GetService(lua_State *L)
     ServiceProvider *serviceProvider = luau_toinstance(L, 1); 
     const char *serviceName = lua_tostring(L, 2);
 
+    if (!strcmp(serviceName, "ProcessService"))
+    {
+        // This is a roblox service used internally for testing the engine using a CLI.
+        // The official roblox plugins disable themselves if GetService doesn't error for this service.
+    }
+
     Instance *service = ServiceProvider_GetService(serviceProvider, strdup(serviceName));
 
     if (!service)
@@ -573,6 +579,12 @@ static int luau_LocalizationTable_GetTranslator(lua_State *L)
     return 0;
 }
 
+static int luau_LocalizationTable_SetEntries(lua_State *L)
+{
+    FIXME("state %p\n", L);
+    return 0;
+}
+
 static int luau_GuiService_GetResolutionScale(lua_State *L)
 {
     FIXME("state %p\n", L);
@@ -736,6 +748,9 @@ void luau_pushinstance(lua_State *L, Instance *inst)
     {
         lua_pushcfunction(L, luau_LocalizationTable_GetTranslator, "LocalizationTable:GetTranslator");
         lua_setfield(L, -2, "GetTranslator");
+
+        lua_pushcfunction(L, luau_LocalizationTable_SetEntries, "LocalizationTable:SetEntries");
+        lua_setfield(L, -2, "SetEntries");
     }
 
     if (!strcmp(inst->ClassName, "GuiService"))

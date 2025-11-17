@@ -103,6 +103,8 @@ Source luau/vector3.c
 Source luau/numbersequence.c
 Source luau/font.c
 Source luau/path2dcontrolpoint.c
+Source luau/numberrange.c
+Source luau/colorsequence.c
 
 SourceGroup instance
 UseSourceGroup luau
@@ -191,6 +193,7 @@ Source mouse.c
 Source pluginmouse.c
 Source humanoid.c
 Source localizationservice.c
+Source userinputservice.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c
