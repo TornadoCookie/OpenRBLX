@@ -6,6 +6,7 @@
 #include "globalsettings.h"
 #include "datamodel.h"
 #include "messagebusservice.h"
+#include "localizationtable.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -17,19 +18,14 @@ DEFAULT_DEBUG_CHANNEL(luau);
 
 Instance *luau_toinstance(lua_State *L, int i)
 {
-    if (i < 0) i--;
-
     if (lua_isnil(L, i))
     {
         return NULL;
     }
 
-    lua_pushstring(L, "__inst_ptr");
-    lua_rawget(L, i);
-    Instance *inst = lua_touserdata(L, -1);
-    lua_pop(L, 1);
+    Instance **pInst = lua_touserdata(L, i);
 
-    return inst;
+    return *pInst;
 }
 
 static int luau_Instance__index(lua_State *L)
@@ -46,9 +42,12 @@ static int luau_Instance__index(lua_State *L)
         return 1;
     }
 
-    lua_rawget(L, 1);
+    luau_pushvtbl(L, inst);
+    lua_pushvalue(L, 2);
+    lua_rawget(L, -2);
     if (!lua_isnil(L, -1))
         return 1;
+    lua_pop(L, 1); // pop vtbl
 
     if (!strcmp(name, "Parent"))
     {
@@ -575,8 +574,10 @@ static int luau_HttpService_RequestInternal(lua_State *L)
 
 static int luau_LocalizationTable_GetTranslator(lua_State *L)
 {
-    FIXME("state %p\n", L);
-    return 0;
+    LocalizationTable *this = luau_toinstance(L, 1);
+    const char *localeId = lua_tostring(L, 2);
+    luau_pushinstance(L, LocalizationTable_GetTranslator(this, localeId));
+    return 1;
 }
 
 static int luau_LocalizationTable_SetEntries(lua_State *L)
@@ -597,14 +598,17 @@ static int luau_GuiService_IsTenFootInterface(lua_State *L)
     return 0;
 }
 
-void luau_pushinstance(lua_State *L, Instance *inst)
+static int luau_Translator_FormatByKey(lua_State *L)
 {
-    if (!inst)
-    {
-        lua_pushnil(L);
-        return;
-    }
+    FIXME("%d args\n", lua_gettop(L));
+    Translator *this = luau_toinstance(L, 1);
+    const char *key = lua_tostring(L, 2);
+    lua_pushstring(L, Translator_FormatByKey(this, key));
+    return 1;
+}
 
+void luau_pushvtbl(lua_State *L, Instance *inst)
+{
     lua_newtable(L);
 
     lua_pushcfunction(L, luau_Instance_FindFirstChild, "Instance:FindFirstChild");
@@ -762,6 +766,25 @@ void luau_pushinstance(lua_State *L, Instance *inst)
         lua_setfield(L, -2, "IsTenFootInterface");
     }
 
+    if (!strcmp(inst->ClassName, "Translator"))
+    {
+        lua_pushcfunction(L, luau_Translator_FormatByKey, "Translator:FormatByKey");
+        lua_setfield(L, -2, "FormatByKey");
+    }
+
+}
+
+void luau_pushinstance(lua_State *L, Instance *inst)
+{
+    if (!inst)
+    {
+        lua_pushnil(L);
+        return;
+    }
+
+    Instance **pInst = lua_newuserdata(L, sizeof(Instance*));
+    *pInst = inst;
+    
     lua_newtable(L);
 
     lua_pushcfunction(L, luau_Instance__index, "Instance:__index");
