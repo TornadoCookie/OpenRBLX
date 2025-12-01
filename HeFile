@@ -196,6 +196,7 @@ Source humanoid.c
 Source localizationservice.c
 Source userinputservice.c
 Source translator.c
+Source renderer.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c

@@ -298,6 +298,7 @@ instance_SOURCES+=$(DISTDIR)/src/humanoid.o
 instance_SOURCES+=$(DISTDIR)/src/localizationservice.o
 instance_SOURCES+=$(DISTDIR)/src/userinputservice.o
 instance_SOURCES+=$(DISTDIR)/src/translator.o
+instance_SOURCES+=$(DISTDIR)/src/renderer.o
 instance_CXX_SOURCES+=$(luau_CXX_SOURCES)
 instance_SOURCES+=$(luau_SOURCES)
 

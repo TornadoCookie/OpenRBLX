@@ -15,6 +15,7 @@
 #include "coregui.h"
 #include "guibase.h"
 #include "humanoid.h"
+#include "renderer.h"
 
 DEFAULT_DEBUG_CHANNEL(datamodel)
 
@@ -308,7 +309,8 @@ void DataModel_Draw(DataModel *this)
     Lighting *lighting = Instance_FindFirstChildOfClass(this, "Lighting");
     Lighting_draw(lighting);
     DrawCube((Vector3){0, 0, 0}, 1.0f, 1.0f, 1.0f, WHITE);
-    draw_recursive(this->Workspace);
+    draw_recursive(this->Workspace); // load the render objects
+    RenderGame3D(); // draw them.
     DrawLine3D((Vector3){0, 0, 0}, (Vector3){100, 0, 0}, RED);
     DrawLine3D((Vector3){0, 0, 0}, (Vector3){0, 100, 0}, GREEN);
     DrawLine3D((Vector3){0, 0, 0}, (Vector3){0, 0, 100}, BLUE);

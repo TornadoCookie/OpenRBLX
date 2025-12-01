@@ -12,6 +12,7 @@
 #include "datamodelmesh.h"
 #include "decal.h"
 #include "texturecontentprovider.h"
+#include "renderer.h"
 
 DEFAULT_DEBUG_CHANNEL(part)
 
@@ -253,21 +254,13 @@ static void draw_block(Part *this)
 
 static void draw_cylinder(Part *this)
 {
-    CFrame cf = this->formfactorpart.basepart.CFrame;
-    float r00 = cf.R00, r10 = cf.R10, r20 = cf.R20;
-    cf.R00 = cf.R01;
-    cf.R10 = cf.R11;
-    cf.R20 = cf.R21;
-    cf.R01 = r00;
-    cf.R11 = r10;
-    cf.R21 = r20;
-    cf.R02 = -cf.R02;
-    cf.R12 = -cf.R12;
-    cf.R22 = -cf.R22;
-    cf.X -= this->formfactorpart.basepart.size.x / 2;
-    cf.Y += this->formfactorpart.basepart.size.y / 4;
-    cf.Z -= this->formfactorpart.basepart.size.z;
-    DrawMesh(this->mesh, this->material, cf_size_to_matrix(cf, this->formfactorpart.basepart.size));
+    Add3DRenderObject((RenderObject3D){
+            .shape = RS_Cylinder,
+            .color = this->formfactorpart.basepart.Color,
+            .transparency = this->formfactorpart.basepart.Transparency,
+            .cframe = this->formfactorpart.basepart.CFrame,
+            .size = this->formfactorpart.basepart.size
+    });
 }
 
 static void draw_ball(Part *this)
