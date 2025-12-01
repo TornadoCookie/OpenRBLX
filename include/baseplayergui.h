@@ -8,6 +8,7 @@ typedef struct BasePlayerGui {
 } BasePlayerGui;
 
 BasePlayerGui *BasePlayerGui_new(const char *className, Instance *parent);
+void serialize_BasePlayerGui(BasePlayerGui *baseplayergui, SerializeInstance *inst);
 
 #endif
 

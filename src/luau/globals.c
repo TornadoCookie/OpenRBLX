@@ -326,20 +326,46 @@ int luau_warn(lua_State *L)
     printf("\n");
 }
 
+int luau_error(lua_State *L)
+{
+    int nargs = lua_gettop(L);
+
+    printf("lua error: %d ", nargs);
+
+    for (int i = 1; i <= nargs; i++)
+    {
+        printf("%s ", lua_tostring(L, i));
+    }
+    printf("\n");
+
+    luaL_error(L, "**Hooked Lua Error**");
+}
+
 int luau_typeof(lua_State *L)
 {
+    if (lua_isuserdata(L, 1))
+    {
+        void *ptr = lua_touserdata(L, 1);
+        FIXME("this is userdata, but how tf can I tell wtf more it is: %p assuming it's an Instance...\n", ptr);
+        lua_pushstring(L, "Instance");
+        return 1;
+    }
+
     if (lua_istable(L, 1))
     {
-        lua_getfield(L, 1, "__inst_ptr");
+        lua_pushstring(L, "__ctor");
+        lua_gettable(L, 1);
+
         if (!lua_isnil(L, -1))
         {
-            FIXME("is %s\n", "instance");
+            FIXME("DevFramework object is expected to be Instance for some reason, %d args\n", lua_gettop(L));
             lua_pushstring(L, "Instance");
             return 1;
         }
+
         lua_pop(L, 1);
 
-        //luauD_traverse(L, 1);
+        luauD_traverse(L, 1);
     }
 
     lua_getglobal(L, "__typeof");
@@ -347,7 +373,6 @@ int luau_typeof(lua_State *L)
     lua_call(L, 1, 1);
 
     FIXME("builtin typeof returned %s\n", lua_tostring(L, -1));
-    
 
     return 1;
 }

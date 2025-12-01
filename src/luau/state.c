@@ -16,6 +16,7 @@
 #include "luau/path2dcontrolpoint.h"
 #include "luau/numberrange.h"
 #include "luau/colorsequence.h"
+#include "luau/brickcolor.h"
 
 #include "datamodel.h"
 
@@ -54,6 +55,9 @@ void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plug
 
     lua_pushcfunction(L, luau_typeof, "typeof");
     lua_setglobal(L, "typeof");
+
+    //lua_pushcfunction(L, luau_error, "error");
+    //lua_setglobal(L, "error");
 
     // Roblox global functions
     lua_pushcfunction(L, luau_wait, "wait");
@@ -259,6 +263,22 @@ void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plug
 
     lua_setglobal(L, "ColorSequence");
 
+    // ColorSequenceKeypoint
+    lua_newtable(L);
+    
+    lua_pushcfunction(L, luau_ColorSequenceKeypoint_new, "ColorSequenceKeypoint.new");
+    lua_setfield(L, -2, "new");
+
+    lua_setglobal(L, "ColorSequenceKeypoint");
+
+    // BrickColor
+    lua_newtable(L);
+
+    lua_pushcfunction(L, luau_BrickColor_new, "BrickColor.new");
+    lua_setfield(L, -2, "new");
+
+    lua_setglobal(L, "BrickColor");
+
     //global index hook
     lua_newtable(L);
 
@@ -274,6 +294,9 @@ void init_lua_state(lua_State *L, Script *script, bool client, bool plugin, Plug
 
     //lua_pushboolean(L, true);
     //lua_setglobal(L, "__COMPAT_WARNINGS__");
+
+    lua_pushboolean(L, true);
+    lua_setglobal(L, "__FOUNDATION_TRACE_LOG__");
 
     // debug
     lua_getglobal(L, "debug");

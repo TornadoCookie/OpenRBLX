@@ -128,6 +128,11 @@ bool DataModel_GetFastFlag(DataModel *this, const char *name)
 
 int DataModel_GetFastInt(DataModel *this, const char *name)
 {
+    if (!strcmp(name, "DebugLuaStartPageLogging"))
+    {
+        return 2;
+    }
+
     for (int i = 0; i < this->fintCount; i++)
     {
         if (!strcmp(this->fintNames[i], name))

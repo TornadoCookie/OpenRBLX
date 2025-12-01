@@ -31,7 +31,9 @@ Instance *luau_toinstance(lua_State *L, int i)
 static int luau_Instance__index(lua_State *L)
 {
     Instance *inst = luau_toinstance(L, 1);
-    const char *name = lua_tostring(L, 2); 
+    const char *name = lua_tostring(L, 2);
+
+    //FIXME("%s->%s\n", inst->ClassName, name);
 
     Instance *child = Instance_FindFirstChild(inst, name, false);
 

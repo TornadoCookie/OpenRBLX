@@ -105,6 +105,7 @@ Source luau/font.c
 Source luau/path2dcontrolpoint.c
 Source luau/numberrange.c
 Source luau/colorsequence.c
+Source luau/brickcolor.c
 
 SourceGroup instance
 UseSourceGroup luau
@@ -194,6 +195,7 @@ Source pluginmouse.c
 Source humanoid.c
 Source localizationservice.c
 Source userinputservice.c
+Source translator.c
 
 SourceGroup rbxmx
 Source filetypes/rbxlx.c

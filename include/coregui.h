@@ -8,6 +8,7 @@ typedef struct CoreGui {
 } CoreGui;
 
 CoreGui *CoreGui_new(const char *className, Instance *parent);
+void serialize_CoreGui(CoreGui *coregui, SerializeInstance *inst);
 
 #endif
 

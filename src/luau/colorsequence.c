@@ -9,3 +9,9 @@ int luau_ColorSequence_new(lua_State *L)
     return 0;
 }
 
+int luau_ColorSequenceKeypoint_new(lua_State *L)
+{
+    FIXME("state %p\n", L);
+    return 0;
+}
+

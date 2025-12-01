@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "lualib.h"
 
@@ -38,6 +39,16 @@ static int luau_Color3_Lerp(lua_State *L)
     return 1;
 }
 
+static int luau_Color3_ToHex(lua_State *L)
+{
+    Color3 c = luau_tocolor3(L, 1);
+    char buffer[8];
+    snprintf(buffer, 8, "#%02x%02x%02x", (int)(c.R*0xff), (int)(c.G*0xff), (int)(c.B*0xff));
+    buffer[7] = 0;
+    lua_pushstring(L, buffer);
+    return 1;
+}
+
 static int luau_Color3__index(lua_State *L)
 {
     Color3 *c = lua_touserdata(L, 1);
@@ -55,9 +66,13 @@ static int luau_Color3__index(lua_State *L)
     {
         lua_pushnumber(L, c->B);
     }
-    else if (!strcmp(key, "lerp"))
+    else if (!strcmp(key, "lerp") || !strcmp(key, "Lerp"))
     {
         lua_pushcfunction(L, luau_Color3_Lerp, "Color3:lerp");
+    }
+    else if (!strcmp(key, "ToHex"))
+    {
+        lua_pushcfunction(L, luau_Color3_ToHex, "Color3:ToHex");
     }
     else
     {

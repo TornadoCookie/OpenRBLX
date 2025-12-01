@@ -245,6 +245,13 @@ int luau_Enums_GetEnums(lua_State *L)
     enum_val(None, 22);
     enum_end();
 
+    enum_start(UIDragDetectorDragStyle);
+    enum_val(TranslatePlane, 0);
+    enum_val(TranslateLine, 1);
+    enum_val(Rotate, 2);
+    enum_val(Scriptable, 3);
+    enum_end();
+
 #undef enum_end
 #undef enum_val
 #undef enum_start

@@ -15,3 +15,8 @@ CoreGui *CoreGui_new(const char *className, Instance *parent)
     return newInst;
 }
 
+void serialize_CoreGui(CoreGui *coregui, SerializeInstance *inst)
+{
+    serialize_BasePlayerGui(coregui, inst);
+}
+

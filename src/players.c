@@ -30,4 +30,5 @@ void serialize_Players(Players *players, SerializeInstance *inst)
     serialize_Instance(players, inst);
 
     serialize_atomic(bool, players, CharacterAutoLoads);
+    serialize_atomic(Ref, players, LocalPlayer);
 }

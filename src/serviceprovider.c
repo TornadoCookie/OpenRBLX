@@ -22,6 +22,13 @@ ServiceProvider *ServiceProvider_new(const char *className, Instance *parent)
 
 Instance *ServiceProvider_GetService(ServiceProvider *this, const char *className)
 {
+    // HttpRbxApiService is HttpService, but it can access roblox.com
+    // We do not care
+    if (!strcmp(className, "HttpRbxApiService"))
+    {
+        className = "HttpService";
+    }
+
     Instance *ret = Instance_FindFirstChildOfClass(this, className);
 
     if (!ret)

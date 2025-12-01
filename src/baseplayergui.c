@@ -10,3 +10,8 @@ BasePlayerGui *BasePlayerGui_new(const char *className, Instance *parent)
     return newInst;
 }
 
+void serialize_BasePlayerGui(BasePlayerGui *baseplayergui, SerializeInstance *inst)
+{
+    serialize_Instance(baseplayergui, inst);
+}
+

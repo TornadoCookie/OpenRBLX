@@ -506,17 +506,17 @@ static void disassemblecode(uint32_t *code, int codeSize, LuauConstant *constant
             case LOP_JUMPXEQKS: // 80
             {
                 printf("if R%d ", a);
-                if (aux & 0xffff0000)
-                {
-                    printf("~= ");
-                }
-                else
+                if (aux & 0x80000000)
                 {
                     printf("== ");
                 }
-                print_constant(constants, aux & 0x0000ffff, true);
-                printf(": go to %#x\n", i+d);
+                else
+                {
+                    printf("~= ");
+                }
+                print_constant(constants, aux & 0x00ffffff, true);
                 i++;
+                printf(": go to %#x\n", i+d);
             } break;
             default:
             {
