@@ -119,7 +119,15 @@ static int luau_Instance__newindex(lua_State *L)
             Serialization sz = luau_toserialization(L, 3);
             int ds = sztypesiz(sz.type);
 
-            memcpy(sInst.serializations[i].val, sz.val, ds);
+            if (sInst.serializations[i].val && sz.val)
+            {
+                memcpy(sInst.serializations[i].val, sz.val, ds);
+            }
+            else
+            {
+                luaL_error(L, "(serialization type not supported?)\n");
+                return 0;
+            }
         }
     }
 
