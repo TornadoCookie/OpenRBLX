@@ -249,24 +249,8 @@ static void draw_block(Part *this)
 
     //EndShaderMode();
 
-    //draw_bumps(this);
-}
+    //draw_bumps(this);*/
 
-static void draw_cylinder(Part *this)
-{
-    Add3DRenderObject((RenderObject3D){
-            .shape = RS_Cylinder,
-            .color = this->formfactorpart.basepart.Color,
-            .transparency = this->formfactorpart.basepart.Transparency,
-            .cframe = this->formfactorpart.basepart.CFrame,
-            .size = this->formfactorpart.basepart.size
-    });
-}
-
-static void draw_ball(Part *this)
-{
-    CFrame cf = this->formfactorpart.basepart.CFrame;
-    DrawMesh(this->mesh, this->material, cf_size_to_matrix(cf, this->formfactorpart.basepart.size));
 }
 
 void part_draw(Part *this)
@@ -313,13 +297,13 @@ void part_draw(Part *this)
 
     //printf("color %s.\n", debugstr_color3(this->formfactorpart.basepart.Color));
 
-    switch (this->shape)
-    {
-        case Shape_Block: draw_block(this); break;
-        case Shape_Cylinder: draw_cylinder(this); break;
-        case Shape_Ball: draw_ball(this); break;
-        default: FIXME("not implemented: %d.\n", this->shape); break;
-    }
+    Add3DRenderObject((RenderObject3D){
+        .shape = this->shape,
+        .color = this->formfactorpart.basepart.Color,
+        .transparency = this->formfactorpart.basepart.Transparency,
+        .cframe = this->formfactorpart.basepart.CFrame,
+        .size = this->formfactorpart.basepart.size
+    });
 
 }
 

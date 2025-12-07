@@ -3,6 +3,7 @@
 
 #include "basepart.h"
 
+// MUST BE ALIGNED WITH enum Shape in include/part.h
 typedef enum {
     RS_Ball,
     RS_Block,

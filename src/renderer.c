@@ -18,6 +18,10 @@ void InitRenderer()
     renderer.objs = NULL;
     renderer.mcp = ServiceProvider_GetService(GetDataModel(), "MeshContentProvider");
     renderer.blankMaterial = LoadMaterialDefault();
+
+    rlEnableDepthTest();
+    rlEnableBackfaceCulling();
+    //rlDisableDepthMask();
 }
 
 static Color rl_from_color3(Color3 col, float transparency)
@@ -63,11 +67,84 @@ static void setColor(Color3 col, float transparency)
 
 static void renderBall(RenderObject3D obj)
 {
+    DrawMesh(renderer.mcp->ballMesh, renderer.blankMaterial, cf_size_to_matrix(obj.cframe, obj.size));
+}
+
+static void renderBlockFace(Vector3 vertices[4], Vector3 normal)
+{
+    // rlSetTexture(texture.id)
+
+    rlBegin(RL_QUADS);
+        rlNormal3f(normal.x, normal.y, normal.z);
+        //rlTexCoord2f(source.x/texWidth, (source.y + source.height)/texHeight);
+        rlVertex3f(vertices[0].x, vertices[0].y, vertices[0].z);
+        //rlTexCoord2f((source.x + source.width)/texWidth, (source.y + source.height)/texHeight);
+        rlVertex3f(vertices[1].x, vertices[1].y, vertices[1].z);
+        //rlTexCoord2f((source.x + source.width)/texWidth, source.y/texHeight);
+        rlVertex3f(vertices[2].x, vertices[2].y, vertices[2].z);
+        //rlTexCoord2f(source.x/texWidth, source.y/texHeight);
+        rlVertex3f(vertices[3].x, vertices[3].y, vertices[3].z);
+    rlEnd();
+
+    rlSetTexture(1);
 }
 
 static void renderBlock(RenderObject3D obj)
 {
-    // TODO
+    const float h = 0.5f;
+
+    rlPushMatrix();
+        rlMultMatrixf(MatrixToFloat(cf_size_to_matrix(obj.cframe, obj.size)));
+      
+        // Front
+        renderBlockFace((Vector3[4]){
+            (Vector3){-h, -h, h},
+            (Vector3){h, -h, h},
+            (Vector3){h, h, h},
+            (Vector3){-h, h, h}
+        },  (Vector3){0, 0, 1});
+
+        // Back
+        renderBlockFace((Vector3[4]){
+            (Vector3){-h, -h, -h},
+            (Vector3){-h, h, -h},
+            (Vector3){h, h, -h},
+            (Vector3){h, -h, -h}
+        },  (Vector3){0, 0, -1});
+
+        // Top
+        renderBlockFace((Vector3[4]){
+            (Vector3){-h, h, -h},
+            (Vector3){-h, h, h},
+            (Vector3){h, h, h},
+            (Vector3){h, h, -h}
+        },  (Vector3){0, 1, 0});
+
+        // Bottom
+        renderBlockFace((Vector3[4]){
+            (Vector3){-h, -h, -h},
+            (Vector3){h, -h, -h},
+            (Vector3){h, -h, h},
+            (Vector3){-h, -h, h}
+        },  (Vector3){0, -1, 0});
+
+        // Right
+        renderBlockFace((Vector3[4]){
+            (Vector3){h, -h, -h},
+            (Vector3){h, h, -h},
+            (Vector3){h, h, h},
+            (Vector3){h, -h, h}
+        },  (Vector3){1, 0, 0});
+
+        // Left
+        renderBlockFace((Vector3[4]){
+            (Vector3){-h, -h, -h},
+            (Vector3){-h, -h, h},
+            (Vector3){-h, h, h},
+            (Vector3){-h, h, -h}
+        },  (Vector3){-1, 0, 0});
+
+    rlPopMatrix();
 }
 
 static void renderCylinder(RenderObject3D obj)
@@ -91,7 +168,7 @@ static void renderCylinder(RenderObject3D obj)
 
 static void renderMesh(RenderObject3D obj)
 {
-    // TODO
+    
 }
 
 static void renderObject(RenderObject3D obj)
@@ -124,6 +201,10 @@ void RenderGame3D()
     {
         renderObject(renderer.objs[i]);
     }
+
+    renderer.objCount = 0;
+    free(renderer.objs);
+    renderer.objs = NULL;
 }
 
 void Add3DRenderObject(RenderObject3D obj)
