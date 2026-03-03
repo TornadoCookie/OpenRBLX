@@ -13,6 +13,12 @@ typedef struct MeshContentProvider {
     Mesh blockMesh;
     Mesh wedgeMesh;
     Texture2D studs;
+
+    struct {
+        long assetid;
+        Mesh mesh;
+    } *loadedMeshes;
+    int loadedMeshCount;
 } MeshContentProvider;
 
 MeshContentProvider *MeshContentProvider_new(const char *className, Instance *parent);

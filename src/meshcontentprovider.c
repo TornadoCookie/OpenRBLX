@@ -27,6 +27,9 @@ MeshContentProvider *MeshContentProvider_new(const char *className, Instance *pa
     newInst->cylinderMesh = GenMeshCylinder(0.5f, 1.0f, 24);
     newInst->wedgeMesh = GenMeshWedge();
 
+    newInst->loadedMeshes = NULL;
+    newInst->loadedMeshCount = 0;
+
     newInst->studs = LoadTexture("staticdata/studs.png");
 
     newInst->cacheablecontentprovider.instance.Name = "MeshContentProvider";
@@ -305,6 +308,14 @@ Mesh MeshContentProvider_GetFileMesh(MeshContentProvider *this, const char *cont
     //printf("GetFileMesh %s\n", content);
     //printf("Get AssetId %ld\n", assetid);
 
+    for (int i = 0; i < this->loadedMeshCount; i++)
+    {
+        if (this->loadedMeshes[i].assetid = assetid)
+        {
+            return this->loadedMeshes[i].mesh;
+        }
+    }
+
     if (FileExists(TextFormat("cache/%ld.obj", assetid)))
     {
         //printf("Using cached\n");
@@ -337,6 +348,11 @@ Mesh MeshContentProvider_GetFileMesh(MeshContentProvider *this, const char *cont
     //printf("Unable to retrieve mesh data.\n");
 
     free(data);
+
+    this->loadedMeshCount++;
+    this->loadedMeshes = realloc(this->loadedMeshes, this->loadedMeshCount * sizeof(*(this->loadedMeshes)));
+    this->loadedMeshes[this->loadedMeshCount - 1].assetid = assetid;
+    this->loadedMeshes[this->loadedMeshCount - 1].mesh = ret;
 
     return ret;
 }

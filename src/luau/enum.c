@@ -24,6 +24,7 @@ static int luau_Enum_GetEnumItems(lua_State *L)
          lua_pushvalue(L, -2);
          lua_settable(L, 2);
          count++;
+            lua_pop(L, 1);
         }
          /* removes 'value'; keeps 'key' for next iteration */
        //lua_pop(L, 2);

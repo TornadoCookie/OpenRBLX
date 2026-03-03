@@ -205,11 +205,14 @@ bool DataModel_GetEngineFeature(DataModel *this, const char *name)
     return false;
 }
 
+static int primCount = 0;
+
 static void draw_recursive(Instance *inst)
 {
     if (!inst) return;
     if (Instance_IsA(inst, "PVInstance"))
     {
+        primCount++;
         //printf("draw %s.\n", inst->ClassName);
         PVInstance_Draw(inst);
     }
@@ -309,6 +312,7 @@ void DataModel_Draw(DataModel *this)
     Lighting *lighting = Instance_FindFirstChildOfClass(this, "Lighting");
     Lighting_draw(lighting);
     DrawCube((Vector3){0, 0, 0}, 1.0f, 1.0f, 1.0f, WHITE);
+    primCount = 0;
     draw_recursive(this->Workspace); // load the render objects
     RenderGame3D(); // draw them.
     DrawLine3D((Vector3){0, 0, 0}, (Vector3){100, 0, 0}, RED);
@@ -420,10 +424,16 @@ void DataModel_Draw(DataModel *this)
         printf("render took %d (%f)\n", render_end_clock-render_start_clock, renderTime);
 
         DrawRectangle(0, 300, 100, 180, (Color){128, 128, 128, 128});
-        DrawText("----- World -----", 0, 300, 10, WHITE);
-        DrawText(TextFormat("Instances: %d", GetInstanceCount()), 0, 310, 10, WHITE);
-        DrawText("----- Timing ------", 0, 320, 10, WHITE);
-        DrawText(TextFormat("Render: %.1f %.1f msec %.0f%%", 1.0f/GetFrameTime(), renderTime*1000, (renderTime / GetFrameTime())*100), 0, 330, 10, WHITE);
+        DrawText("----- World -----", 0, 300, 10, SKYBLUE);
+        DrawText(TextFormat("Instances...: %d", GetInstanceCount()), 0, 310, 10, WHITE);
+        DrawText(TextFormat("Primitives..: %d", primCount), 0, 320, 10, WHITE);
+        DrawText(           "Moving Prims:", 0, 330, 10, WHITE);
+        DrawText(           "Joints......:", 0, 340, 10, WHITE);
+        DrawText(           "Contacts....:", 0, 350, 10, WHITE);
+        DrawText("----- Timing ------", 0, 360, 10, SKYBLUE);
+        DrawText(           "Physics...:", 0, 370, 10, WHITE);
+        DrawText(TextFormat("Mouse Move: %.1f/s", Vector2Length(GetMouseDelta())), 0, 380, 10, WHITE);
+        DrawText(TextFormat("Render....: %.1f %.1f msec %.0f%%", 1.0f/GetFrameTime(), renderTime*1000, (renderTime / GetFrameTime())*100), 0, 390, 10, WHITE);
     }
 }
 
