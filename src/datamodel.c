@@ -61,6 +61,7 @@ DataModel *DataModel_new(void)
     CoreGui_new("CoreGui", newInst);
 
     rt = LoadRenderTexture(128, 128);
+    InitRenderer();
 
     return newInst;
 }
